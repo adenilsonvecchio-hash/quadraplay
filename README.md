@@ -141,6 +141,11 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Partidas futuras pendentes ou confirmadas entram em **Próximos**; concluídas ou já transcorridas entram em **Realizados**.
 - Os contadores são atualizados em tempo real quando uma partida muda de status.
 
+### Perfil final sem recursos de demonstração — versão 30
+
+- Removidos **Alternar jogador**, **Estrutura Supabase** e **Restaurar dados de demonstração**.
+- O perfil mantém somente os dados reais, os contadores esportivos, a Administração para usuários autorizados e **Sair da conta**.
+
 ## Aceite, recusa e cancelamento — versão 24
 
 - **Meus jogos** carrega as partidas do usuário diretamente do Supabase.

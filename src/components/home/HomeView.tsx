@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, CalendarDays, CalendarPlus, ChevronRight, MapPin, Swords, Users } from 'lucide-react';
+import { Bell, CalendarDays, CalendarPlus, ChevronRight, MapPin, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../common/BrandLogo';
 
@@ -14,10 +14,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
   const { currentUser } = useAuth();
   const firstName = currentUser?.name.split(' ')[0] || 'Jogador';
   const actions = [
-    { label: 'Agendar', helper: 'Escolha a quadra e o horário', icon: CalendarPlus, onClick: onStartBooking, tone: 'featured' },
-    { label: 'Agenda', helper: 'Horários livres', icon: CalendarDays, onClick: onViewSchedule, tone: 'blue' },
-    { label: 'Meus jogos', helper: 'Convites e reservas', icon: Swords, onClick: onViewAllMatches, tone: 'amber' },
-    { label: 'Jogadores', helper: 'Sua classe', icon: Users, onClick: onViewPlayers, tone: 'green' },
+    { label: 'Agendar', helper: 'Escolha a quadra e o horário', icon: CalendarPlus, image: undefined, onClick: onStartBooking, tone: 'featured' },
+    { label: 'Agenda', helper: 'Horários livres', icon: CalendarDays, image: undefined, onClick: onViewSchedule, tone: 'blue' },
+    { label: 'Meus jogos', helper: 'Convites e reservas', icon: undefined, image: './tennis-ball-realistic.png', onClick: onViewAllMatches, tone: 'amber' },
+    { label: 'Jogadores', helper: 'Sua classe', icon: Users, image: undefined, onClick: onViewPlayers, tone: 'green' },
   ] as const;
 
   return (
@@ -40,9 +40,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
           </div>
         </div>
         <div className="qp-action-grid">
-          {actions.map(({ label, helper, icon: Icon, onClick, tone }) => (
+          {actions.map(({ label, helper, icon: Icon, image, onClick, tone }) => (
             <button type="button" key={label} onClick={onClick} className={`qp-action-card qp-action-card--${tone}`}>
-              <span className={`qp-action-card__icon qp-action-card__icon--${tone}`}><Icon size={25} strokeWidth={1.8} /></span>
+              <span className={`qp-action-card__icon qp-action-card__icon--${tone}`}>
+                {image ? <img className="qp-action-card__photo-icon" src={image} alt="" aria-hidden="true" /> : Icon ? <Icon size={25} strokeWidth={1.8} /> : null}
+              </span>
               <strong>{label}</strong><small>{helper}</small><ChevronRight className="qp-action-card__arrow" size={16} />
             </button>
           ))}

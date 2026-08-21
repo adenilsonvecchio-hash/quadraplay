@@ -167,6 +167,7 @@ body {
 .qp-action-card__icon--blue { color:#23a9ce; background:#e5f8fc; }
 .qp-action-card__icon--amber { color:#ff784f; background:#fff0e9; }
 .qp-action-card__icon--green { color:#2cbf78; background:#e8f8ef; margin:0; flex:0 0 auto; }
+.qp-action-card__photo-icon { width:88%; height:88%; object-fit:contain; filter:drop-shadow(0 4px 5px rgba(71,88,0,.16)); }
 .qp-action-card strong { color:#20223b; font-size:13px; }
 .qp-action-card small { color:#9a9fb0; font-size:9px; max-width:95px; line-height:1.3; }
 .qp-action-card--featured strong { color:#fff; font-size:17px; margin-top:15px; }

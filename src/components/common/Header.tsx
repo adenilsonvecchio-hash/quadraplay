@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
   };
 
   return (
-    <header className="sticky top-0 z-40 px-4 pt-4 pb-3 bg-[#f8f9ff]/88 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 shrink-0 px-4 pt-4 pb-3 bg-[#f8f9ff]/95 backdrop-blur-xl">
       <div className="grid grid-cols-[48px_1fr_48px] items-center gap-3">
         <button
           type="button"

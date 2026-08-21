@@ -145,7 +145,7 @@ body {
 /* Capa clean v2 — baseada no painel de atividades aprovado */
 .qp-clean-home { background:#f3f4f9; color:#15172b; }
 .qp-clean-home::before { display:none; }
-.qp-clean-home__header { height:74px; padding:max(14px,env(safe-area-inset-top)) 20px 12px; color:#16172a; background:#fff; border-bottom:1px solid #eceef4; }
+.qp-clean-home__header { height:74px; padding:max(14px,env(safe-area-inset-top)) 20px 12px; color:#16172a; background:#fff; border-bottom:1px solid #eceef4; position:sticky; top:0; z-index:40; flex-shrink:0; }
 .qp-clean-home__title { position:absolute; left:50%; transform:translateX(-50%); font-size:13px; font-weight:900; }
 .qp-club-mark { width:104px; height:38px; border:0; box-shadow:none; background:#fff; }
 .qp-clean-home__bell { width:34px; height:34px; color:#1d2041; background:#f7f7fb; border-color:#eceef4; border-radius:12px; }
@@ -178,6 +178,7 @@ body {
 .qp-action-card--featured .qp-action-card__arrow { color:rgba(255,255,255,.8); }
 .qp-action-card--green .qp-action-card__arrow { top:50%; bottom:auto; transform:translateY(-50%); }
 .qp-nav { border-radius:0; background:rgba(255,255,255,.98); border:0; border-top:1px solid #eceef4; box-shadow:0 -5px 20px rgba(42,48,85,.05); }
+.qp-bottom-nav { position:fixed; inset:auto 0 0; z-index:50; }
 
 @media (max-height:690px) {
   .qp-clean-home__header { height:66px; padding-top:10px; }

@@ -8,6 +8,7 @@ interface AuthContextType {
   isAdmin: boolean;
   authLoading: boolean;
   usingSupabase: boolean;
+  groupId: string | null;
   loginWithEmail: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   switchUser: (playerId: string) => void;
   logout: () => Promise<void>;
@@ -21,6 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentUser, setCurrentUser] = useState<Player | null>(null);
   const [allPlayers, setAllPlayers] = useState<Player[]>([]);
   const [authLoading, setAuthLoading] = useState(true);
+  const [groupId, setGroupId] = useState<string | null>(null);
 
   const loadSupabaseUser = async (userId: string) => {
     if (!supabase) {
@@ -29,12 +31,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     const [{ data: profile }, { data: membership }] = await Promise.all([
       supabase.from('perfis').select('id, nome, email, telefone, avatar_url, criado_em').eq('id', userId).maybeSingle(),
-      supabase.from('membros_grupo').select('classe, perfil, aprovado').eq('usuario_id', userId).eq('aprovado', true).maybeSingle(),
+      supabase.from('membros_grupo').select('grupo_id, classe, perfil, aprovado').eq('usuario_id', userId).eq('aprovado', true).maybeSingle(),
     ]);
     if (!profile || !membership) {
       setCurrentUser(null);
+      setGroupId(null);
       return false;
     }
+    setGroupId(membership.grupo_id);
     setCurrentUser({
       id: profile.id,
       name: profile.nome,
@@ -50,6 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshAuth = () => {
     const players = storageService.getPlayers();
+    setGroupId('local-group');
     setAllPlayers(players);
 
     const savedId = localStorage.getItem('quadraplay_current_user_id_v1');
@@ -77,7 +82,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
         if (session?.user) void loadSupabaseUser(session.user.id);
-        else setCurrentUser(null);
+        else {
+          setCurrentUser(null);
+          setGroupId(null);
+        }
       });
       return () => authListener.subscription.unsubscribe();
     }
@@ -119,6 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     if (supabase) await supabase.auth.signOut();
     setCurrentUser(null);
+    setGroupId(null);
     localStorage.removeItem('quadraplay_current_user_id_v1');
   };
 
@@ -129,6 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAdmin: !!currentUser?.isAdmin,
         authLoading,
         usingSupabase: isSupabaseConfigured,
+        groupId,
         loginWithEmail,
         switchUser,
         logout,

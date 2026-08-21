@@ -96,3 +96,13 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Cadastro e exclusão das faixas de horários disponíveis.
 - Bloqueio por data e horário para uma quadra específica ou para todas as quadras.
 - Configuração inicial: Quadra 1 liberada; Quadras 2 e 3 bloqueadas.
+
+## Agenda conectada ao Supabase — versão 20
+
+- O grupo do usuário autenticado é identificado em `membros_grupo`.
+- Quadras e situação ativa/bloqueada são carregadas de `quadras`.
+- Regras gerais são carregadas de `configuracoes_agenda`.
+- Bloqueios por data, horário e quadra são carregados de `bloqueios_agenda`.
+- Agenda e Jogos agendados são carregados de `partidas`, incluindo nomes dos dois jogadores.
+- Alterações nas partidas são atualizadas em tempo real.
+- O modo local continua disponível somente quando o Supabase não está configurado.

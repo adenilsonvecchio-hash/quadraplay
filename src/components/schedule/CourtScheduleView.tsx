@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { CourtSlot } from '../../types';
 import { storageService } from '../../services/storageService';
+import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { addDays, formatFriendlyDate, getBrasiliaToday } from '../../utils/dateUtils';
 import {
   CalendarDays,
@@ -20,23 +21,49 @@ interface CourtScheduleViewProps {
 
 
 export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onScheduleSlot }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, usingSupabase, groupId } = useAuth();
   const today = getBrasiliaToday();
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedCourtId, setSelectedCourtId] = useState('court-1');
   const [slots, setSlots] = useState<CourtSlot[]>([]);
   const [courts, setCourts] = useState(() => storageService.getCourts(false));
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
 
-  const loadSlots = () => {
-    const nextCourts = storageService.getCourts(false);
-    setCourts(nextCourts);
-    setSlots(storageService.getCourtScheduleForDate(selectedDate, selectedCourtId));
+  const loadSlots = async () => {
+    setLoading(true);
+    setLoadError('');
+    try {
+      if (usingSupabase && groupId) {
+        const nextCourts = await supabaseAgendaService.getCourts(groupId);
+        setCourts(nextCourts);
+        const availableCourt = nextCourts.find((court) => court.id === selectedCourtId && court.active) || nextCourts.find((court) => court.active);
+        if (!availableCourt) {
+          setSlots([]);
+          return;
+        }
+        if (availableCourt.id !== selectedCourtId) {
+          setSelectedCourtId(availableCourt.id);
+          return;
+        }
+        setSlots(await supabaseAgendaService.getSchedule(groupId, selectedDate, availableCourt.id));
+      } else {
+        const nextCourts = storageService.getCourts(false);
+        setCourts(nextCourts);
+        setSlots(storageService.getCourtScheduleForDate(selectedDate, selectedCourtId));
+      }
+    } catch {
+      setLoadError('Não foi possível carregar a agenda do banco.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    loadSlots();
-    return storageService.subscribe(loadSlots);
-  }, [selectedDate, selectedCourtId]);
+    void loadSlots();
+    if (usingSupabase && groupId) return supabaseAgendaService.subscribeToMatches(groupId, () => void loadSlots());
+    return storageService.subscribe(() => void loadSlots());
+  }, [selectedDate, selectedCourtId, usingSupabase, groupId]);
 
   const dateTitle = useMemo(() => formatFriendlyDate(selectedDate, false), [selectedDate]);
   const weekday = useMemo(() => {
@@ -125,6 +152,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
       </section>
 
       <>
+          {loadError && <div className="rounded-2xl bg-rose-50 border border-rose-100 p-3 text-xs font-bold text-rose-700">{loadError}</div>}
           <div className="qp-glass rounded-[20px] px-3 py-2.5 grid grid-cols-4 gap-2 text-[10px] font-semibold text-slate-700">
             <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />Disponível</div>
             <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-blue-600" />Reservado</div>
@@ -133,6 +161,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
           </div>
 
           <section className="qp-glass rounded-[26px] p-2 space-y-1.5">
+            {loading && <div className="p-6 text-center text-xs font-bold text-slate-500">Carregando agenda...</div>}
             {slots.map((slot) => {
               const isMyMatch = !!currentUser && !!slot.match && (slot.match.player1Id === currentUser.id || slot.match.player2Id === currentUser.id);
               const isPending = slot.match?.status === 'pending';

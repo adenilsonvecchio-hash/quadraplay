@@ -39,10 +39,10 @@ function MainApp() {
 
   return (
     <div className="min-h-screen bg-[#eef1f8] text-[#0b1742] flex justify-center items-start sm:py-5 selection:bg-violet-200">
-      <div className="qp-shell w-full max-w-md min-h-screen sm:min-h-[94vh] sm:rounded-[38px] flex flex-col relative overflow-hidden border border-white">
+      <div className="qp-shell qp-app-shell w-full max-w-md lg:max-w-6xl min-h-screen sm:min-h-[94vh] sm:rounded-[38px] flex flex-col relative overflow-hidden border border-white">
         {activeTab !== 'home' && <Header activeTab={activeTab} onOpenAdmin={() => setActiveTab('admin')} />}
 
-        <main className={activeTab === 'home' ? 'flex-1 min-h-0' : 'flex-1 px-4 pt-1 pb-24 overflow-y-auto custom-scrollbar'}>
+        <main className={`qp-main ${activeTab === 'home' ? 'flex-1 min-h-0' : 'flex-1 px-4 lg:px-8 pt-1 pb-24 lg:pb-24 overflow-y-auto custom-scrollbar'}`}>
           {activeTab === 'home' && (
             <HomeView
               onStartBooking={startGeneralBooking}

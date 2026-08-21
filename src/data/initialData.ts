@@ -7,7 +7,7 @@ export const DEFAULT_COURT_CONFIG: CourtConfig = {
   groupName: "Nosso Tênis",
   slotDurationMinutes: 90,
   openTime: "07:00",
-  closeTime: "19:00",
+  closeTime: "17:30",
   activeDays: [0, 1, 2, 3, 4, 5, 6], // Sunday to Saturday
   maxAdvanceBookingDays: 14,
 };

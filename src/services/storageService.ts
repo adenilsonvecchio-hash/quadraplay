@@ -6,7 +6,8 @@ const STORAGE_KEYS = {
   PLAYERS: 'quadraplay_players_v1',
   MATCHES: 'quadraplay_matches_v1',
   BLOCKED: 'quadraplay_blocked_v1',
-  CONFIG: 'quadraplay_config_v1',
+  // v2 aplica a grade oficial: 07:00–17:30 em blocos fixos de 90 minutos.
+  CONFIG: 'quadraplay_config_v2',
   CURRENT_USER_ID: 'quadraplay_current_user_id_v1',
 };
 

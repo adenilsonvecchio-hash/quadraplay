@@ -25,7 +25,7 @@ Projeto mobile de agendamento de jogos do Tangará Country Clube.
 ## Atualização da Agenda — modelo aprovado
 
 - Agenda com 4 quadras reais no modelo local (`court-1` a `court-4`).
-- Horários de 1h30 entre 07:00 e 19:00.
+- Horários oficiais de 1h30: 07:00–08:30, 08:30–10:00, 10:00–11:30, 11:30–13:00, 13:00–14:30, 14:30–16:00 e 16:00–17:30.
 - Fluxo de reserva reorganizado: Data → Quadra e horário → Adversário → Confirmar.
 - Clique em horário disponível na Agenda abre o fluxo já com data, quadra e horário selecionados.
 - Nova reserva nasce como `pending` e ocupa o horário até o adversário responder.
@@ -57,6 +57,13 @@ O projeto foi padronizado para o novo design aprovado: fundo branco, cartões su
 - quatro acessos: Agendar horário, Ver agenda, Meus jogos e Jogadores;
 - navegação inferior restrita a Início, Agenda e Perfil;
 - layout mobile em uma tela, sem rolagem na capa.
+
+## Layout responsivo para desktop
+
+- celular preservado em uma coluna, sem mudanças no fluxo aprovado;
+- desktop com área de até 1152 px e quatro acessos principais lado a lado;
+- telas internas centralizadas em uma largura confortável de leitura;
+- navegação inferior ampliada e alinhada ao aplicativo em monitores maiores.
 
 ## Migração Supabase — etapa 1
 

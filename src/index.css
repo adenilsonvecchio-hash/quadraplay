@@ -191,3 +191,93 @@ body {
   color: white;
   box-shadow: 0 10px 22px rgba(92, 53, 255, .25), inset 0 1px 0 rgba(255,255,255,.35);
 }
+
+/* Desktop responsivo: preserva o mobile e aproveita telas largas. */
+@media (min-width: 1024px) {
+  .qp-app-shell {
+    min-height: calc(100vh - 40px);
+    max-height: calc(100vh - 40px);
+  }
+
+  .qp-main:not(:has(.qp-clean-home)) > * {
+    width: 100%;
+    max-width: 980px;
+    margin-inline: auto;
+  }
+
+  .qp-clean-home {
+    height: calc(100vh - 116px);
+    min-height: 650px;
+  }
+
+  .qp-clean-home__header {
+    height: 82px;
+    padding: 20px 34px 14px;
+  }
+
+  .qp-clean-home__title { font-size: 15px; }
+  .qp-clean-home__panel {
+    height: calc(100% - 82px);
+    padding: 42px 48px 34px;
+  }
+
+  .qp-clean-home__intro {
+    margin: 0 0 34px;
+  }
+
+  .qp-clean-home__brand { margin-bottom: 18px; }
+  .qp-clean-home__brand .qp-brand-logo__quadra { font-size: 20px; }
+  .qp-clean-home__brand .qp-brand-logo__play { font-size: 34px; }
+  .qp-clean-home__brand .qp-brand-logo__plus { font-size: 31px; }
+  .qp-clean-home__intro h1 { font-size: 34px; }
+  .qp-clean-home__intro p { font-size: 14px; }
+  .qp-clean-home__club { font-size: 11px; }
+
+  .qp-action-grid {
+    height: auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: 210px;
+    gap: 18px;
+  }
+
+  .qp-action-card,
+  .qp-action-card--featured,
+  .qp-action-card--green {
+    grid-column: auto;
+    grid-row: auto;
+    min-height: 210px;
+    padding: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .qp-action-card__icon,
+  .qp-action-card__icon--featured,
+  .qp-action-card__icon--green {
+    width: 56px;
+    height: 56px;
+    margin: 0 0 30px;
+  }
+
+  .qp-action-card strong,
+  .qp-action-card--featured strong { font-size: 18px; margin-top: 0; }
+  .qp-action-card small,
+  .qp-action-card--featured small,
+  .qp-action-card--green small {
+    max-width: 170px;
+    margin: 7px 0 0;
+    font-size: 11px;
+  }
+
+  .qp-action-card__arrow,
+  .qp-action-card--green .qp-action-card__arrow {
+    top: auto;
+    right: 20px;
+    bottom: 20px;
+    transform: none;
+  }
+
+  .qp-bottom-nav__inner {
+    border-radius: 24px 24px 0 0;
+  }
+}

@@ -57,17 +57,9 @@ body {
 .qp-brand-logo {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   line-height: 1;
   white-space: nowrap;
   user-select: none;
-}
-
-.qp-brand-logo__symbol {
-  width: 54px;
-  height: 54px;
-  object-fit: contain;
-  mix-blend-mode: multiply;
 }
 
 .qp-brand-logo__wordmark { display:inline-flex; align-items:baseline; letter-spacing:-1.6px; }
@@ -75,8 +67,6 @@ body {
 .qp-brand-logo__play { color:#6c4cf5; font-size:34px; font-weight:900; letter-spacing:-2.2px; }
 .qp-brand-logo__plus { color:#f59e0b; font-size:31px; font-weight:900; margin-left:2px; }
 
-.qp-brand-logo--compact { gap:4px; }
-.qp-brand-logo--compact .qp-brand-logo__symbol { width:36px; height:36px; }
 .qp-brand-logo--compact .qp-brand-logo__quadra { font-size:12px; letter-spacing:-.5px; }
 .qp-brand-logo--compact .qp-brand-logo__play { font-size:21px; letter-spacing:-1.2px; }
 .qp-brand-logo--compact .qp-brand-logo__plus { font-size:19px; margin-left:1px; }
@@ -162,7 +152,6 @@ body {
 .qp-clean-home__panel { height:calc(100% - 74px); padding:22px 18px 18px; border-radius:0; background:#f3f4f9; box-shadow:none; }
 .qp-clean-home__intro { margin:0 2px 20px; }
 .qp-clean-home__brand { margin:0 0 14px; }
-.qp-clean-home__brand .qp-brand-logo__symbol { width:42px; height:42px; }
 .qp-clean-home__brand .qp-brand-logo__quadra { font-size:14px; }
 .qp-clean-home__brand .qp-brand-logo__play { font-size:24px; }
 .qp-clean-home__brand .qp-brand-logo__plus { font-size:22px; }

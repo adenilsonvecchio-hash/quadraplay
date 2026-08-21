@@ -41,19 +41,39 @@ const matchSelect = `
 export const supabaseAgendaService = {
   async getPlayersByClass(groupId: string, tennisClass: TennisClass, currentUserId: string): Promise<Player[]> {
     if (!supabase) return [];
-    const { data, error } = await supabase
+    // Carrega primeiro os membros e depois os perfis. Esta forma não depende
+    // do nome da relação que o PostgREST atribui à FK e funciona também em
+    // bancos que já tinham a tabela antes da migração atual.
+    const { data: members, error: membersError } = await supabase
       .from('membros_grupo')
-      .select('usuario_id, classe, perfil, perfil_usuario:perfis!membros_grupo_usuario_id_fkey(nome, email, telefone, avatar_url, criado_em)')
+      .select('usuario_id, classe, perfil')
       .eq('grupo_id', groupId)
       .eq('classe', tennisClass)
       .eq('aprovado', true)
       .neq('usuario_id', currentUserId);
-    if (error) throw error;
-    return (data || []).map((row: any) => {
-      const profile = Array.isArray(row.perfil_usuario) ? row.perfil_usuario[0] : row.perfil_usuario;
+    if (membersError) throw membersError;
+    if (!members?.length) return [];
+
+    const playerIds = members.map((member) => member.usuario_id);
+    const { data: profiles, error: profilesError } = await supabase
+      .from('perfis')
+      .select('id, nome, email, telefone, avatar_url, criado_em')
+      .in('id', playerIds);
+    if (profilesError) throw profilesError;
+
+    const profilesById = new Map<string, {
+      id: string;
+      nome: string;
+      email: string;
+      telefone: string | null;
+      avatar_url: string | null;
+      criado_em: string;
+    }>((profiles || []).map((profile: any) => [profile.id, profile]));
+    return members.map((row: any) => {
+      const profile = profilesById.get(row.usuario_id);
       return {
         id: row.usuario_id,
-        name: profile?.nome || 'Jogador',
+        name: profile?.nome?.trim() || 'Jogador sem nome',
         email: profile?.email || '',
         phone: profile?.telefone || undefined,
         avatarUrl: profile?.avatar_url || undefined,

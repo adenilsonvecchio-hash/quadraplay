@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { ArrowLeft, CalendarDays, Check, CheckCircle2, ChevronRight, Clock3, MapPin, ShieldAlert, UserRound } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Check, CheckCircle2, ChevronRight, Clock3, LoaderCircle, MapPin, RefreshCw, ShieldAlert, UserRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Court, CourtSlot, Player } from '../../types';
 import { storageService } from '../../services/storageService';
@@ -36,6 +36,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
   const [selectedOpponent, setSelectedOpponent] = useState<Player | null>(null);
   const [slots, setSlots] = useState<CourtSlot[]>([]);
   const [opponents, setOpponents] = useState<Player[]>([]);
+  const [loadingOpponents, setLoadingOpponents] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -43,6 +44,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
   useEffect(() => {
     if (!currentUser) return;
     const loadPlayersAndCourts = async () => {
+      setLoadingOpponents(true);
       try {
         const [list, nextCourts] = usingSupabase && groupId
           ? await Promise.all([
@@ -60,6 +62,8 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
         }
       } catch {
         setErrorMsg('Não foi possível carregar jogadores e quadras do banco.');
+      } finally {
+        setLoadingOpponents(false);
       }
     };
     void loadPlayersAndCourts();
@@ -166,7 +170,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
 
     {step === 3 && <motion.section initial={{opacity:0,x:12}} animate={{opacity:1,x:0}} className="qp-glass rounded-[26px] p-4">
       <div className="flex items-center gap-3 mb-4"><div className="w-11 h-11 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center"><UserRound className="w-5 h-5" /></div><div><h3 className="font-black text-[#101b3d]">Escolha o adversário</h3><p className="text-xs text-slate-500">Jogadores da Classe {currentUser.tennisClass}</p></div></div>
-      <div className="space-y-2">{opponents.map(player => <button key={player.id} onClick={() => chooseOpponent(player)} className={`w-full rounded-[18px] p-3 flex items-center gap-3 text-left border ${selectedOpponent?.id===player.id?'bg-violet-50 border-violet-200':'bg-white/60 border-white'}`}><div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center font-black text-violet-600">{player.name.charAt(0)}</div><div className="min-w-0 flex-1"><p className="text-sm font-black text-[#101b3d] truncate">{player.name}</p><p className="text-[10px] text-slate-500">Classe {player.tennisClass}</p></div><ChevronRight className="w-4 h-4 text-violet-500" /></button>)}</div>
+      {loadingOpponents ? <div className="rounded-[18px] bg-white/60 border border-white p-5 text-center text-xs font-bold text-slate-500"><LoaderCircle className="w-5 h-5 mx-auto mb-2 animate-spin text-violet-600" />Carregando adversários...</div> : opponents.length === 0 ? <div className="rounded-[18px] bg-amber-50 border border-amber-100 p-4 text-center"><p className="text-sm font-black text-amber-900">Nenhum adversário disponível</p><p className="text-xs text-amber-700 mt-1">É necessário outro jogador aprovado na Classe {currentUser.tennisClass}.</p><button type="button" onClick={() => window.location.reload()} className="mt-3 mx-auto px-4 py-2 rounded-xl bg-white text-amber-800 text-xs font-black flex items-center gap-1.5"><RefreshCw className="w-3.5 h-3.5" />Atualizar jogadores</button></div> : <div className="space-y-2">{opponents.map(player => <button key={player.id} onClick={() => chooseOpponent(player)} className={`w-full rounded-[18px] p-3 flex items-center gap-3 text-left border ${selectedOpponent?.id===player.id?'bg-violet-50 border-violet-200':'bg-white/60 border-white'}`}><div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center font-black text-violet-600">{player.name.charAt(0)}</div><div className="min-w-0 flex-1"><p className="text-sm font-black text-[#101b3d] truncate">{player.name}</p><p className="text-[10px] text-slate-500">Classe {player.tennisClass}</p></div><ChevronRight className="w-4 h-4 text-violet-500" /></button>)}</div>}
     </motion.section>}
 
     {step === 4 && <motion.section initial={{opacity:0,x:12}} animate={{opacity:1,x:0}} className="space-y-3">

@@ -116,6 +116,12 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - As validações do banco impedem horário duplicado, jogador ocupado, quadra bloqueada, data passada e classes diferentes.
 - Após a confirmação, o aplicativo abre **Jogos agendados**, onde a nova partida aparece em tempo real.
 
+### Correção da lista de adversários — versão 26
+
+- A busca dos membros aprovados e de seus perfis foi separada para não depender do nome interno da relação do Supabase.
+- A etapa **Adversário** agora informa quando está carregando e quando ainda não existe outro jogador aprovado na mesma classe.
+- O adversário selecionado permanece visível no resumo e seu ID é gravado em `jogador_2_id` ao confirmar a reserva.
+
 ## Aceite, recusa e cancelamento — versão 24
 
 - **Meus jogos** carrega as partidas do usuário diretamente do Supabase.

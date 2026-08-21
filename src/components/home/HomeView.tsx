@@ -24,8 +24,13 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
     <section className="qp-clean-home" aria-label="Início do QuadraPlay">
       <header className="qp-clean-home__header">
         <div className="qp-clean-home__topline">
-          <div className="qp-club-mark" aria-label="Tangará Country Clube">
-            <img src="./tangara-logo-oficial.png" alt="Tangará" />
+          <div className="qp-header-brands">
+            <div className="qp-club-mark" aria-label="Tangará Country Clube">
+              <img src="./tangara-logo-oficial.png" alt="Tangará" />
+            </div>
+            <div className="qp-group-mark" aria-label="Grupo Nosso Tênis">
+              <img src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis ATT Tour" />
+            </div>
           </div>
           <div className="qp-clean-home__title">Início</div>
           <button type="button" className="qp-clean-home__bell" aria-label="Notificações"><Bell size={18} /><span /></button>

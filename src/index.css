@@ -145,12 +145,15 @@ body {
 /* Capa clean v2 — baseada no painel de atividades aprovado */
 .qp-clean-home { background:#f3f4f9; color:#15172b; }
 .qp-clean-home::before { display:none; }
-.qp-clean-home__header { height:74px; padding:max(14px,env(safe-area-inset-top)) 20px 12px; color:#16172a; background:#fff; border-bottom:1px solid #eceef4; position:sticky; top:0; z-index:40; flex-shrink:0; }
+.qp-clean-home__header { height:104px; padding:max(10px,env(safe-area-inset-top)) 20px 8px; color:#16172a; background:#fff; border-bottom:1px solid #eceef4; position:sticky; top:0; z-index:40; flex-shrink:0; }
+.qp-header-brands { display:block; width:104px; position:relative; }
+.qp-group-mark { position:absolute; left:35px; top:37px; z-index:5; width:38px; height:38px; display:grid; place-items:center; overflow:hidden; border-radius:50%; background:#fff; border:2px solid #fff; box-shadow:0 3px 10px rgba(19,45,74,.13); }
+.qp-group-mark img { width:100%; height:100%; object-fit:contain; display:block; }
 .qp-clean-home__title { position:absolute; left:50%; transform:translateX(-50%); font-size:13px; font-weight:900; }
 .qp-club-mark { width:104px; height:38px; border:0; box-shadow:none; background:#fff; }
 .qp-clean-home__bell { width:34px; height:34px; color:#1d2041; background:#f7f7fb; border-color:#eceef4; border-radius:12px; }
 .qp-clean-home__bell span { background:#6955e3; border-color:#fff; }
-.qp-clean-home__panel { height:calc(100% - 74px); padding:22px 18px 18px; border-radius:0; background:#f3f4f9; box-shadow:none; }
+.qp-clean-home__panel { height:calc(100% - 104px); padding:18px 18px 18px; border-radius:0; background:#f3f4f9; box-shadow:none; }
 .qp-clean-home__intro { margin:0 2px 20px; }
 .qp-clean-home__brand { margin:0 0 14px; }
 .qp-clean-home__brand .qp-brand-logo__quadra { font-size:14px; }
@@ -181,8 +184,10 @@ body {
 .qp-bottom-nav { position:fixed; inset:auto 0 0; z-index:50; }
 
 @media (max-height:690px) {
-  .qp-clean-home__header { height:66px; padding-top:10px; }
-  .qp-clean-home__panel { height:calc(100% - 66px); padding-top:15px; }
+  .qp-clean-home__header { height:94px; padding-top:8px; }
+  .qp-clean-home__panel { height:calc(100% - 94px); padding-top:12px; }
+  .qp-club-mark { height:30px; }
+  .qp-group-mark { left:38px; top:30px; width:32px; height:32px; }
   .qp-clean-home__intro { margin-bottom:12px; }
   .qp-clean-home__brand { margin-bottom:8px; }
   .qp-clean-home__intro h1 { font-size:20px; }
@@ -214,14 +219,14 @@ body {
   }
 
   .qp-clean-home__header {
-    height: 82px;
-    padding: 20px 34px 14px;
+    height: 110px;
+    padding: 12px 34px 10px;
   }
 
   .qp-clean-home__title { font-size: 15px; }
   .qp-club-mark { width:112px; height:38px; }
   .qp-clean-home__panel {
-    height: calc(100% - 82px);
+    height: calc(100% - 110px);
     padding: 42px 48px 34px;
   }
 

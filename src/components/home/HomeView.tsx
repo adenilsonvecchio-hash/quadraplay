@@ -2,7 +2,6 @@ import React from 'react';
 import { Bell, CalendarDays, CalendarPlus, ChevronRight, MapPin, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../common/BrandLogo';
-import { useMatchNotifications } from '../../hooks/useMatchNotifications';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -13,7 +12,6 @@ interface HomeViewProps {
 
 export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers }) => {
   const { currentUser } = useAuth();
-  const { unreadCount } = useMatchNotifications();
   const firstName = currentUser?.name.split(' ')[0] || 'Jogador';
   const actions = [
     { label: 'Agendar', helper: 'Escolha a quadra e o horário', icon: CalendarPlus, image: undefined, onClick: onStartBooking, tone: 'featured' },
@@ -35,7 +33,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
             </div>
           </div>
           <div className="qp-clean-home__title">Início</div>
-          <button type="button" onClick={onViewAllMatches} className="qp-clean-home__bell" aria-label={unreadCount ? `${unreadCount} notificações pendentes` : 'Notificações'}><Bell size={18} />{unreadCount > 0 && <span />}</button>
+          <button type="button" className="qp-clean-home__bell" aria-label="Notificações em breve"><Bell size={18} /></button>
         </div>
       </header>
 

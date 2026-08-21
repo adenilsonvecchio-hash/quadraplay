@@ -153,6 +153,18 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - As notificações acompanham as alterações de `partidas` em tempo real.
 - Na tela inicial, o sino direciona o usuário para seus jogos e só exibe o ponto quando há convite pendente.
 
+### Painel de notificações na tela inicial — versão 32
+
+- O sino da tela inicial abre o painel sobre a própria página, sem navegar nem ocultar o conteúdo.
+- O painel pode ser fechado pelo sino ou pelo botão **X**.
+- Ao selecionar uma notificação, o aplicativo abre **Meus jogos**.
+
+### Restauração da navegação estável — versão 33
+
+- Removida a consulta de notificações do cabeçalho compartilhado para impedir falhas simultâneas nas páginas.
+- Agenda, Meus jogos, Jogadores, Jogos agendados e Perfil voltam a funcionar sem depender do sino.
+- O sino permanece visível, sem contador fixo e temporariamente sem ação.
+
 ## Aceite, recusa e cancelamento — versão 24
 
 - **Meus jogos** carrega as partidas do usuário diretamente do Supabase.

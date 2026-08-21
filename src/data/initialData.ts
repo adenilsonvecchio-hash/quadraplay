@@ -1,16 +1,23 @@
-import { Player, Match, BlockedSlot, CourtConfig, TennisClass } from '../types';
+import { Player, Match, BlockedSlot, CourtConfig, TennisClass, Court } from '../types';
 import { getBrasiliaToday, addDays } from '../utils/dateUtils';
 
 export const DEFAULT_COURT_CONFIG: CourtConfig = {
-  courtName: "Quadra Central (Saibro)",
+  courtName: "Quadra 1",
   clubName: "Tangará Country Clube",
   groupName: "Nosso Tênis",
-  slotDurationMinutes: 60,
-  openTime: "06:00",
-  closeTime: "22:00",
+  slotDurationMinutes: 90,
+  openTime: "07:00",
+  closeTime: "19:00",
   activeDays: [0, 1, 2, 3, 4, 5, 6], // Sunday to Saturday
   maxAdvanceBookingDays: 14,
 };
+
+export const COURTS: Court[] = [
+  { id: 'court-1', name: 'Quadra 1', surface: 'Saibro', active: true },
+  { id: 'court-2', name: 'Quadra 2', surface: 'Saibro', active: true },
+  { id: 'court-3', name: 'Quadra 3', surface: 'Rápida', active: true },
+  { id: 'court-4', name: 'Quadra 4', surface: 'Rápida', active: true },
+];
 
 // 10 players for each of the 5 classes (50 players total)
 const initialPlayersData: { name: string; tennisClass: TennisClass; email: string; phone: string; isAdmin?: boolean }[] = [
@@ -102,6 +109,7 @@ export function generateInitialMatches(): Match[] {
       player2Id: 'player-2', // Lucas Faria (A)
       player2Name: 'Lucas Faria',
       tennisClass: 'A',
+      courtId: 'court-1',
       courtName: DEFAULT_COURT_CONFIG.courtName,
       date: dayPlus1,
       startTime: '18:00',
@@ -116,6 +124,7 @@ export function generateInitialMatches(): Match[] {
       player2Id: 'player-12', // André Luiz Castro (B)
       player2Name: 'André Luiz Castro',
       tennisClass: 'B',
+      courtId: 'court-1',
       courtName: DEFAULT_COURT_CONFIG.courtName,
       date: dayPlus2,
       startTime: '19:00',
@@ -130,6 +139,7 @@ export function generateInitialMatches(): Match[] {
       player2Id: 'player-22', // Leonardo Rocha (C)
       player2Name: 'Leonardo Rocha',
       tennisClass: 'C',
+      courtId: 'court-1',
       courtName: DEFAULT_COURT_CONFIG.courtName,
       date: dayPlus3,
       startTime: '08:00',
@@ -145,6 +155,7 @@ export function generateInitialMatches(): Match[] {
       player2Id: 'player-13', // Gustavo Henrique (B)
       player2Name: 'Gustavo Henrique',
       tennisClass: 'B',
+      courtId: 'court-1',
       courtName: DEFAULT_COURT_CONFIG.courtName,
       date: dayMinus2,
       startTime: '18:00',
@@ -160,6 +171,7 @@ export function generateInitialMatches(): Match[] {
       player2Id: 'player-14',
       player2Name: 'Fernando Duarte',
       tennisClass: 'B',
+      courtId: 'court-1',
       courtName: DEFAULT_COURT_CONFIG.courtName,
       date: dayMinus5,
       startTime: '20:00',

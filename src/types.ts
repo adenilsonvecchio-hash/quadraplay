@@ -11,7 +11,14 @@ export interface Player {
   createdAt: string;
 }
 
-export type MatchStatus = 'scheduled' | 'completed' | 'cancelled';
+export type MatchStatus = 'pending' | 'scheduled' | 'completed' | 'cancelled';
+
+export interface Court {
+  id: string;
+  name: string;
+  surface: string;
+  active: boolean;
+}
 
 export interface Match {
   id: string;
@@ -20,6 +27,7 @@ export interface Match {
   player2Id: string;
   player2Name: string;
   tennisClass: TennisClass;
+  courtId: string;
   courtName: string;
   date: string; // YYYY-MM-DD
   startTime: string; // HH:mm
@@ -41,6 +49,7 @@ export interface CourtSlot {
 }
 
 export interface BlockedSlot {
+  courtId?: string; // undefined = bloqueio em todas as quadras
   id: string;
   date: string; // YYYY-MM-DD
   startTime?: string; // HH:mm or undefined for full day

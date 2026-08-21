@@ -1,5 +1,5 @@
 import { Player, Match, BlockedSlot, CourtConfig, TennisClass, CourtSlot } from '../types';
-import { INITIAL_PLAYERS, generateInitialMatches, generateInitialBlockedSlots, DEFAULT_COURT_CONFIG } from '../data/initialData';
+import { INITIAL_PLAYERS, generateInitialMatches, generateInitialBlockedSlots, DEFAULT_COURT_CONFIG, COURTS } from '../data/initialData';
 import { getBrasiliaToday, isSlotInPast, generateDaySlots, isBeforeDate } from '../utils/dateUtils';
 
 const STORAGE_KEYS = {
@@ -33,7 +33,7 @@ class StorageService {
 
       const storedMatches = localStorage.getItem(STORAGE_KEYS.MATCHES);
       if (storedMatches) {
-        this.matches = JSON.parse(storedMatches);
+        this.matches = JSON.parse(storedMatches).map((m: Match) => ({ ...m, courtId: m.courtId || 'court-1' }));
       } else {
         this.matches = generateInitialMatches();
         this.saveMatches();
@@ -141,7 +141,7 @@ class StorageService {
   public deletePlayer(id: string): { success: boolean; message?: string } {
     // Check if player has scheduled matches
     const hasScheduled = this.matches.some(
-      (m) => m.status === 'scheduled' && (m.player1Id === id || m.player2Id === id)
+      (m) => (m.status === 'scheduled' || m.status === 'pending') && (m.player1Id === id || m.player2Id === id)
     );
     if (hasScheduled) {
       return { success: false, message: 'O jogador possui jogos agendados futuros. Cancele os jogos antes de excluí-lo.' };
@@ -174,7 +174,7 @@ class StorageService {
     playerMatches.forEach((m) => {
       if (m.status === 'cancelled') {
         cancelled.push(m);
-      } else if (m.status === 'scheduled') {
+      } else if (m.status === 'scheduled' || m.status === 'pending') {
         if (m.date < today || (m.date === today && isSlotInPast(m.date, m.startTime))) {
           past.push({ ...m, status: 'completed' });
         } else {
@@ -195,10 +195,14 @@ class StorageService {
     return { upcoming, past, cancelled };
   }
 
-  public getCourtScheduleForDate(date: string): CourtSlot[] {
+  public getCourts() {
+    return COURTS.filter((court) => court.active);
+  }
+
+  public getCourtScheduleForDate(date: string, courtId: string = 'court-1'): CourtSlot[] {
     const baseSlots = generateDaySlots(this.config.openTime, this.config.closeTime, this.config.slotDurationMinutes);
-    const dateMatches = this.matches.filter((m) => m.date === date && m.status === 'scheduled');
-    const dateBlocks = this.blockedSlots.filter((b) => b.date === date);
+    const dateMatches = this.matches.filter((m) => m.date === date && m.courtId === courtId && (m.status === 'scheduled' || m.status === 'pending'));
+    const dateBlocks = this.blockedSlots.filter((b) => b.date === date && (!b.courtId || b.courtId === courtId));
 
     return baseSlots.map((slot) => {
       // 1. Check if past
@@ -257,6 +261,7 @@ class StorageService {
     date: string;
     startTime: string;
     endTime: string;
+    courtId: string;
   }): { success: boolean; match?: Match; error?: string } {
     const today = getBrasiliaToday();
 
@@ -277,6 +282,11 @@ class StorageService {
 
     const player1 = this.getPlayerById(params.player1Id);
     const player2 = this.getPlayerById(params.player2Id);
+    const court = COURTS.find((c) => c.id === params.courtId && c.active);
+
+    if (!court) {
+      return { success: false, error: 'Quadra inválida ou indisponível.' };
+    }
 
     if (!player1 || !player2) {
       return { success: false, error: 'Jogadores não encontrados.' };
@@ -292,7 +302,7 @@ class StorageService {
 
     // 5. Validation: court slot already taken
     const existingCourtMatch = this.matches.find(
-      (m) => m.date === params.date && m.startTime === params.startTime && m.status === 'scheduled'
+      (m) => m.date === params.date && m.courtId === params.courtId && m.startTime === params.startTime && (m.status === 'scheduled' || m.status === 'pending')
     );
     if (existingCourtMatch) {
       return { success: false, error: 'A quadra já está reservada para este dia e horário.' };
@@ -300,7 +310,7 @@ class StorageService {
 
     // 6. Validation: blocked slot
     const isBlocked = this.blockedSlots.some((b) => {
-      if (b.date !== params.date) return false;
+      if (b.date !== params.date || (b.courtId && b.courtId !== params.courtId)) return false;
       if (b.allDay) return true;
       if (b.startTime && b.endTime) {
         return params.startTime >= b.startTime && params.startTime < b.endTime;
@@ -316,7 +326,7 @@ class StorageService {
       (m) =>
         m.date === params.date &&
         m.startTime === params.startTime &&
-        m.status === 'scheduled' &&
+        (m.status === 'scheduled' || m.status === 'pending') &&
         (m.player1Id === player1.id || m.player2Id === player1.id)
     );
     if (player1Clash) {
@@ -327,7 +337,7 @@ class StorageService {
       (m) =>
         m.date === params.date &&
         m.startTime === params.startTime &&
-        m.status === 'scheduled' &&
+        (m.status === 'scheduled' || m.status === 'pending') &&
         (m.player1Id === player2.id || m.player2Id === player2.id)
     );
     if (player2Clash) {
@@ -342,11 +352,12 @@ class StorageService {
       player2Id: player2.id,
       player2Name: player2.name,
       tennisClass: player1.tennisClass,
-      courtName: this.config.courtName,
+      courtId: court.id,
+      courtName: court.name,
       date: params.date,
       startTime: params.startTime,
       endTime: params.endTime,
-      status: 'scheduled',
+      status: 'pending',
       createdAt: new Date().toISOString(),
     };
 
@@ -367,7 +378,7 @@ class StorageService {
     }
 
     const match = this.matches[matchIndex];
-    if (match.status !== 'scheduled') {
+    if (match.status !== 'scheduled' && match.status !== 'pending') {
       return { success: false, error: 'Este jogo não pode mais ser cancelado.' };
     }
 
@@ -379,6 +390,17 @@ class StorageService {
       cancelReason: cancelReason || 'Cancelado pelo usuário',
     };
 
+    this.saveMatches();
+    return { success: true };
+  }
+
+  public respondToMatch(matchId: string, playerId: string, accept: boolean): { success: boolean; error?: string } {
+    const index = this.matches.findIndex((m) => m.id === matchId);
+    if (index === -1) return { success: false, error: 'Jogo não encontrado.' };
+    const match = this.matches[index];
+    if (match.status !== 'pending') return { success: false, error: 'Este convite já foi respondido.' };
+    if (match.player2Id !== playerId) return { success: false, error: 'Somente o jogador convidado pode responder.' };
+    this.matches[index] = { ...match, status: accept ? 'scheduled' : 'cancelled', ...(accept ? {} : { cancelledAt: new Date().toISOString(), cancelledBy: playerId, cancelReason: 'Convite recusado' }) };
     this.saveMatches();
     return { success: true };
   }

@@ -50,6 +50,11 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
     setCancellingMatch(null);
   };
 
+  const handleRespond = (match: Match, accept: boolean) => {
+    storageService.respondToMatch(match.id, currentUser.id, accept);
+    loadMatches();
+  };
+
   return (
     <div className="space-y-4 pb-8">
       {/* Header title */}
@@ -155,8 +160,8 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
                       Classe {match.tennisClass}
                     </span>
                     {activeSubTab === 'upcoming' && (
-                      <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60 text-[11px]">
-                        Confirmado
+                      <span className={`font-bold px-2 py-0.5 rounded border text-[11px] ${match.status === 'pending' ? 'text-orange-700 bg-orange-50 border-orange-200/60' : 'text-emerald-700 bg-emerald-50 border-emerald-200/60'}`}>
+                        {match.status === 'pending' ? (match.player2Id === currentUser.id ? 'Convite recebido' : 'Aguardando confirmação') : 'Confirmado'}
                       </span>
                     )}
                     {activeSubTab === 'past' && (
@@ -171,7 +176,12 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
                     )}
                   </div>
 
-                  {activeSubTab === 'upcoming' && (
+                  {activeSubTab === 'upcoming' && match.status === 'pending' && match.player2Id === currentUser.id ? (
+                    <div className="flex items-center gap-1.5">
+                      <button onClick={() => handleRespond(match, false)} className="text-[10px] font-black text-rose-600 bg-rose-50 px-2 py-1.5 rounded-lg">Recusar</button>
+                      <button onClick={() => handleRespond(match, true)} className="text-[10px] font-black text-emerald-700 bg-emerald-50 px-2 py-1.5 rounded-lg">Aceitar</button>
+                    </div>
+                  ) : activeSubTab === 'upcoming' ? (
                     <button
                       id={`btn-cancel-match-${match.id}`}
                       onClick={() => setCancellingMatch(match)}
@@ -180,7 +190,7 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
                       <XCircle className="w-3.5 h-3.5" />
                       <span>Cancelar</span>
                     </button>
-                  )}
+                  ) : null}
                 </div>
 
                 {/* Opponents and details */}

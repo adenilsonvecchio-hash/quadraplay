@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { CourtSlot } from '../../types';
+import { COURTS } from '../../data/initialData';
 import { storageService } from '../../services/storageService';
 import { addDays, formatFriendlyDate, getBrasiliaToday } from '../../utils/dateUtils';
 import {
@@ -15,24 +16,23 @@ import {
 } from 'lucide-react';
 
 interface CourtScheduleViewProps {
-  onScheduleSlot?: (date: string, startTime: string) => void;
+  onScheduleSlot?: (date: string, startTime: string, courtId: string) => void;
 }
 
-const COURTS = ['Quadra 1', 'Quadra 2', 'Quadra 3', 'Quadra 4'];
 
 export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onScheduleSlot }) => {
   const { currentUser } = useAuth();
   const today = getBrasiliaToday();
   const [selectedDate, setSelectedDate] = useState(today);
-  const [selectedCourt, setSelectedCourt] = useState(0);
+  const [selectedCourtId, setSelectedCourtId] = useState('court-1');
   const [slots, setSlots] = useState<CourtSlot[]>([]);
 
-  const loadSlots = () => setSlots(storageService.getCourtScheduleForDate(selectedDate));
+  const loadSlots = () => setSlots(storageService.getCourtScheduleForDate(selectedDate, selectedCourtId));
 
   useEffect(() => {
     loadSlots();
     return storageService.subscribe(loadSlots);
-  }, [selectedDate]);
+  }, [selectedDate, selectedCourtId]);
 
   const dateTitle = useMemo(() => formatFriendlyDate(selectedDate, false), [selectedDate]);
   const weekday = useMemo(() => {
@@ -96,12 +96,12 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
           <span className="text-[10px] font-bold text-slate-400">Selecione uma quadra</span>
         </div>
         <div className="grid grid-cols-4 gap-2">
-          {COURTS.map((court, index) => {
-            const active = selectedCourt === index;
+          {COURTS.map((court) => {
+            const active = selectedCourtId === court.id;
             return (
               <button
-                key={court}
-                onClick={() => setSelectedCourt(index)}
+                key={court.id}
+                onClick={() => setSelectedCourtId(court.id)}
                 className={`rounded-[19px] px-1 py-3.5 flex flex-col items-center justify-center gap-2 transition-all ${
                   active
                     ? 'bg-gradient-to-br from-[#725cff] to-[#5038eb] text-white shadow-[0_9px_24px_rgba(91,70,238,0.34)] ring-1 ring-white/80'
@@ -111,23 +111,14 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
                 <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center ${active ? 'border-white/90' : 'border-slate-300'}`}>
                   <span className="w-4 h-px bg-current opacity-70" />
                 </div>
-                <span className="text-[10px] sm:text-[11px] font-black whitespace-nowrap">{court}</span>
+                <span className="text-[10px] sm:text-[11px] font-black whitespace-nowrap">{court.name}</span>
               </button>
             );
           })}
         </div>
       </section>
 
-      {selectedCourt !== 0 ? (
-        <section className="qp-glass rounded-[26px] py-10 px-5 text-center">
-          <div className="w-12 h-12 rounded-full bg-violet-100 text-violet-600 mx-auto flex items-center justify-center mb-3">
-            <Clock3 className="w-6 h-6" />
-          </div>
-          <h3 className="font-black text-[#101b3d]">{COURTS[selectedCourt]}</h3>
-          <p className="text-xs text-slate-500 mt-1">A estrutura já está preparada. Esta quadra será ligada ao banco na próxima etapa.</p>
-        </section>
-      ) : (
-        <>
+      <>
           <div className="qp-glass rounded-[20px] px-3 py-2.5 grid grid-cols-4 gap-2 text-[10px] font-semibold text-slate-700">
             <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />Disponível</div>
             <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-blue-600" />Reservado</div>
@@ -138,6 +129,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
           <section className="qp-glass rounded-[26px] p-2 space-y-1.5">
             {slots.map((slot) => {
               const isMyMatch = !!currentUser && !!slot.match && (slot.match.player1Id === currentUser.id || slot.match.player2Id === currentUser.id);
+              const isPending = slot.match?.status === 'pending';
 
               if (slot.isBlocked) {
                 return (
@@ -158,13 +150,13 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
                 return (
                   <div key={slot.startTime} className="grid grid-cols-[86px_1fr] gap-2 items-stretch">
                     <TimeBlock start={slot.startTime} end={slot.endTime} />
-                    <div className={`rounded-[20px] px-3 py-3 border border-white flex items-center gap-3 min-h-[72px] ${isMyMatch ? 'bg-orange-50/90' : 'bg-blue-50/90'}`}>
-                      <StatusIcon tone={isMyMatch ? 'orange' : 'blue'}>{isMyMatch ? <Clock3 className="w-4 h-4" /> : <Users className="w-4 h-4" />}</StatusIcon>
+                    <div className={`rounded-[20px] px-3 py-3 border border-white flex items-center gap-3 min-h-[72px] ${isPending ? 'bg-orange-50/90' : 'bg-blue-50/90'}`}>
+                      <StatusIcon tone={isPending ? 'orange' : 'blue'}>{isPending ? <Clock3 className="w-4 h-4" /> : <Users className="w-4 h-4" />}</StatusIcon>
                       <div className="min-w-0 flex-1">
-                        <p className={`text-sm font-black ${isMyMatch ? 'text-orange-700' : 'text-blue-800'}`}>{isMyMatch ? 'Aguardando confirmação' : 'Reservado'}</p>
+                        <p className={`text-sm font-black ${isPending ? 'text-orange-700' : 'text-blue-800'}`}>{isPending ? 'Aguardando confirmação' : 'Reservado'}</p>
                         <p className="text-[11px] text-[#101b3d] truncate">{slot.match.player1Name} & {slot.match.player2Name}</p>
                       </div>
-                      <ChevronRight className={`w-5 h-5 ${isMyMatch ? 'text-orange-500' : 'text-blue-600'}`} />
+                      <ChevronRight className={`w-5 h-5 ${isPending ? 'text-orange-500' : 'text-blue-600'}`} />
                     </div>
                   </div>
                 );
@@ -188,7 +180,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
               return (
                 <button
                   key={slot.startTime}
-                  onClick={() => onScheduleSlot?.(selectedDate, slot.startTime)}
+                  onClick={() => onScheduleSlot?.(selectedDate, slot.startTime, selectedCourtId)}
                   className="w-full grid grid-cols-[86px_1fr] gap-2 items-stretch text-left"
                 >
                   <TimeBlock start={slot.startTime} end={slot.endTime} />
@@ -206,7 +198,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
           </section>
 
           <button
-            onClick={() => onScheduleSlot?.(selectedDate, '')}
+            onClick={() => onScheduleSlot?.(selectedDate, '', selectedCourtId)}
             className="w-full qp-glass rounded-[24px] px-4 py-3.5 flex items-center gap-3 text-left active:scale-[0.99] transition"
           >
             <div className="w-11 h-11 rounded-[16px] bg-gradient-to-br from-[#7c63ff] to-[#5c43ed] text-white flex items-center justify-center shadow-[0_8px_20px_rgba(92,67,237,0.3)]">
@@ -219,7 +211,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
             <ChevronRight className="w-5 h-5 text-violet-600" />
           </button>
         </>
-      )}
+
     </div>
   );
 };
@@ -228,7 +220,7 @@ const TimeBlock: React.FC<{ start: string; end: string }> = ({ start, end }) => 
   <div className="rounded-[18px] bg-white/55 border border-white px-2 py-2.5 flex flex-col justify-center">
     <span className="text-sm font-black leading-none text-[#101b3d]">{start}</span>
     <span className="text-sm font-black leading-none text-[#101b3d] mt-1">{end}</span>
-    <span className="text-[10px] text-slate-400 mt-1">1h00</span>
+    <span className="text-[10px] text-slate-400 mt-1">1h30</span>
   </div>
 );
 

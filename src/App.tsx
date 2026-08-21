@@ -15,6 +15,7 @@ function MainApp() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [preselectedOpponentId, setPreselectedOpponentId] = useState<string | undefined>(undefined);
+  const [bookingSeed, setBookingSeed] = useState<{date?: string; startTime?: string; courtId?: string}>({});
 
   if (!currentUser) {
     return <LoginView onSuccess={() => setActiveTab('home')} />;
@@ -22,11 +23,13 @@ function MainApp() {
 
   const handleStartBookingWithOpponent = (opponentId: string) => {
     setPreselectedOpponentId(opponentId);
+    setBookingSeed({});
     setActiveTab('book');
   };
 
   const handleStartGeneralBooking = () => {
     setPreselectedOpponentId(undefined);
+    setBookingSeed({});
     setActiveTab('book');
   };
 
@@ -54,6 +57,9 @@ function MainApp() {
           {activeTab === 'book' && (
             <BookingWizard
               preselectedOpponentId={preselectedOpponentId}
+              preselectedDate={bookingSeed.date}
+              preselectedStartTime={bookingSeed.startTime}
+              preselectedCourtId={bookingSeed.courtId}
               onSuccess={() => setActiveTab('home')}
               onCancel={() => setActiveTab('home')}
             />
@@ -65,7 +71,9 @@ function MainApp() {
 
           {activeTab === 'schedule' && (
             <CourtScheduleView
-              onScheduleSlot={(_date, _time) => {
+              onScheduleSlot={(date, startTime, courtId) => {
+                setPreselectedOpponentId(undefined);
+                setBookingSeed({ date, startTime: startTime || undefined, courtId });
                 setActiveTab('book');
               }}
             />

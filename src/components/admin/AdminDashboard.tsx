@@ -199,24 +199,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   return (
     <div className="space-y-4 pb-12">
       {/* Top Header */}
-      <div className="bg-[#0b1742] text-white rounded-3xl p-5 border border-slate-800 shadow-sm">
+      <div className="bg-gradient-to-br from-white via-[#f7f5ff] to-[#eef7ff] text-[#101b3d] rounded-3xl p-5 border border-white shadow-[0_12px_34px_rgba(91,70,238,0.10)]">
         <div className="flex items-center justify-between">
           <button
             id="btn-admin-back"
             onClick={onBack}
-            className="text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 p-1.5 -ml-1.5 rounded-lg hover:bg-slate-800"
+            className="text-xs font-bold text-violet-700 hover:text-violet-900 flex items-center gap-1.5 p-1.5 -ml-1.5 rounded-lg hover:bg-violet-100"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Voltar ao App</span>
           </button>
-          <span className="text-[10px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-300 px-2.5 py-1 rounded-full border border-amber-400/30">
+          <span className="text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full border border-amber-200">
             Painel Administrativo
           </span>
         </div>
 
         <div className="mt-3">
           <h2 className="text-xl font-black">Gestão do Nosso Tênis</h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-500 mt-0.5">
             Tangará Country Clube • Controle de Atletas, Agendamentos e Horários
           </p>
         </div>
@@ -229,7 +229,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('players')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'players'
-              ? 'bg-white text-[#0b1742] shadow-sm'
+              ? 'bg-violet-100 text-violet-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -240,7 +240,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('matches')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'matches'
-              ? 'bg-white text-[#0b1742] shadow-sm'
+              ? 'bg-violet-100 text-violet-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -251,7 +251,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('blocks')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'blocks'
-              ? 'bg-white text-[#0b1742] shadow-sm'
+              ? 'bg-violet-100 text-violet-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -262,7 +262,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('config')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'config'
-              ? 'bg-white text-[#0b1742] shadow-sm'
+              ? 'bg-violet-100 text-violet-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -350,7 +350,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 onClick={() => setMatchClassFilter(cls)}
                 className={`text-xs px-2.5 py-1 rounded-lg font-bold transition-colors ${
                   matchClassFilter === cls
-                    ? 'bg-[#0b1742] text-white'
+                    ? 'bg-violet-100 text-violet-700 border border-violet-200'
                     : 'bg-white text-slate-600 border border-slate-200'
                 }`}
               >
@@ -594,7 +594,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           <button
             id="btn-save-court-config"
             type="submit"
-            className="w-full py-3 bg-[#0b1742] hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-colors"
+            className="w-full py-3 bg-gradient-to-r from-[#765fff] to-[#5d45ed] hover:from-[#6d55f7] hover:to-[#553de2] text-white font-bold text-xs rounded-xl shadow-[0_8px_20px_rgba(93,69,237,0.22)] transition-colors"
           >
             Salvar Configurações da Quadra
           </button>
@@ -675,7 +675,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                       onClick={() => setPlayerClass(cls)}
                       className={`py-2 rounded-xl text-xs font-black transition-all ${
                         playerClass === cls
-                          ? 'bg-[#0b1742] text-white shadow-sm'
+                          ? 'bg-violet-100 text-violet-700 ring-1 ring-violet-200 shadow-sm'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
@@ -816,7 +816,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 text-xs font-bold text-white bg-slate-900 hover:bg-slate-800 rounded-xl"
+                  className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm"
                 >
                   Confirmar Bloqueio
                 </button>

@@ -13,10 +13,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
     <button
       type="button"
       onClick={() => onChangeTab(tab)}
-      className={`flex flex-col items-center justify-center min-w-[76px] h-[58px] rounded-2xl transition-all ${activeTab === tab ? 'text-[#6855df]' : 'text-[#a7abba]'}`}
+      className={`flex flex-col items-center justify-center min-w-[72px] h-[62px] rounded-2xl transition-all ${activeTab === tab ? 'text-[#6855df]' : 'text-[#a7abba]'}`}
     >
       <span className={`grid place-items-center w-9 h-9 rounded-full ${activeTab === tab ? 'bg-[#eeeaff]' : ''}`}>{icon}</span>
-      <span className="text-[10px] font-bold mt-0.5">{label}</span>
+      <span className="max-w-[76px] text-center text-[9px] sm:text-[10px] font-bold leading-tight mt-0.5">{label}</span>
     </button>
   );
 
@@ -25,7 +25,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
       <div className="qp-bottom-nav__inner max-w-md lg:max-w-6xl mx-auto qp-nav pointer-events-auto px-5 lg:px-14 py-2 flex items-center justify-between lg:justify-center lg:gap-24">
         {item('home', 'Início', <Home className="w-[19px] h-[19px]" />)}
         {item('schedule', 'Agenda', <CalendarDays className="w-[19px] h-[19px]" />)}
-        {item('games', 'Jogos', <ListChecks className="w-[19px] h-[19px]" />)}
+        {item('games', 'Jogos agendados', <ListChecks className="w-[19px] h-[19px]" />)}
         {item('profile', 'Perfil', <User className="w-[19px] h-[19px]" />)}
       </div>
     </nav>

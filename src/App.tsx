@@ -60,7 +60,7 @@ function MainApp() {
               preselectedDate={bookingSeed.date}
               preselectedStartTime={bookingSeed.startTime}
               preselectedCourtId={bookingSeed.courtId}
-              onSuccess={() => setActiveTab('matches')}
+              onSuccess={() => setActiveTab('games')}
               onCancel={() => setActiveTab('home')}
             />
           )}

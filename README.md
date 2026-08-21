@@ -106,3 +106,31 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Agenda e Jogos agendados são carregados de `partidas`, incluindo nomes dos dois jogadores.
 - Alterações nas partidas são atualizadas em tempo real.
 - O modo local continua disponível somente quando o Supabase não está configurado.
+
+## Confirmação de reserva no Supabase — versão 23
+
+- O fluxo de reserva carrega adversários aprovados da mesma classe em `membros_grupo` e `perfis`.
+- Somente quadras ativas do grupo podem ser escolhidas.
+- A disponibilidade é conferida novamente no banco antes da confirmação.
+- **Confirmar reserva** insere uma nova partida com status `PENDENTE` em `partidas`.
+- As validações do banco impedem horário duplicado, jogador ocupado, quadra bloqueada, data passada e classes diferentes.
+- Após a confirmação, o aplicativo abre **Jogos agendados**, onde a nova partida aparece em tempo real.
+
+## Aceite, recusa e cancelamento — versão 24
+
+- **Meus jogos** carrega as partidas do usuário diretamente do Supabase.
+- Somente o jogador convidado pode aceitar ou recusar um convite pendente.
+- Aceitar altera o status para `ACEITA` e mantém o horário ocupado.
+- Recusar altera o status para `RECUSADA` e libera o horário da quadra.
+- Jogadores envolvidos e administradores podem cancelar partidas pendentes ou aceitas conforme as políticas RLS.
+- Cancelamentos registram responsável, motivo e data.
+- Todas as mudanças são refletidas em tempo real na Agenda e em Jogos agendados.
+
+## Administração conectada ao Supabase — versão 25
+
+- O painel administrativo carrega as quadras, partidas, bloqueios e configurações reais do grupo.
+- O administrador pode renomear cada quadra, alterar o piso e liberá-la ou bloqueá-la.
+- Os horários oficiais podem ser adicionados, editados e removidos pelo painel.
+- Bloqueios de dia inteiro ou de uma faixa de horário podem ser aplicados a uma quadra ou a todas.
+- A migração `002_horarios_administraveis.sql` cria os horários por grupo e atualiza as validações das reservas.
+- O banco impede reserva fora dos horários cadastrados, em quadra bloqueada, sobre outro jogo ou com jogador ocupado.

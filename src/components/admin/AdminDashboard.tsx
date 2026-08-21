@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Player, Match, BlockedSlot, CourtConfig, TennisClass, Court } from '../../types';
 import { storageService } from '../../services/storageService';
+import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { formatFriendlyDate, getBrasiliaToday } from '../../utils/dateUtils';
 import {
   Users,
@@ -28,7 +29,7 @@ interface AdminDashboardProps {
 type AdminTab = 'players' | 'matches' | 'blocks' | 'config';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, usingSupabase, groupId } = useAuth();
   const [activeTab, setActiveTab] = useState<AdminTab>('players');
 
   // State
@@ -38,6 +39,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const [courtConfig, setCourtConfig] = useState<CourtConfig>(storageService.getConfig());
   const [courts, setCourts] = useState<Court[]>(storageService.getCourts(false));
   const [configSaved, setConfigSaved] = useState(false);
+  const [adminError, setAdminError] = useState('');
 
   // Player Form Modal State
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
@@ -68,19 +70,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   // Filter state for matches
   const [matchClassFilter, setMatchClassFilter] = useState<TennisClass | 'ALL'>('ALL');
 
-  const loadAll = () => {
-    setPlayers(storageService.getPlayers());
-    setMatches(storageService.getMatches());
-    setBlockedSlots(storageService.getBlockedSlots());
-    setCourtConfig(storageService.getConfig());
-    setCourts(storageService.getCourts(false));
+  const loadAll = async () => {
+    try {
+      setAdminError('');
+      setPlayers(storageService.getPlayers());
+      if (usingSupabase && groupId) {
+        const [nextMatches, nextBlocks, nextConfig, nextCourts] = await Promise.all([
+          supabaseAgendaService.getMatches(groupId), supabaseAgendaService.getBlockedSlots(groupId),
+          supabaseAgendaService.getConfig(groupId), supabaseAgendaService.getCourts(groupId),
+        ]);
+        setMatches(nextMatches); setBlockedSlots(nextBlocks); setCourts(nextCourts);
+        if (nextConfig) setCourtConfig(nextConfig);
+      } else {
+        setMatches(storageService.getMatches()); setBlockedSlots(storageService.getBlockedSlots());
+        setCourtConfig(storageService.getConfig()); setCourts(storageService.getCourts(false));
+      }
+    } catch {
+      setAdminError('Não foi possível carregar as configurações administrativas do banco.');
+    }
   };
 
   useEffect(() => {
-    loadAll();
-    const unsub = storageService.subscribe(loadAll);
-    return unsub;
-  }, []);
+    void loadAll();
+    if (usingSupabase && groupId) return supabaseAgendaService.subscribeToMatches(groupId, () => void loadAll());
+    return storageService.subscribe(() => void loadAll());
+  }, [usingSupabase, groupId]);
 
   // Player Management
   const handleOpenNewPlayer = () => {
@@ -136,43 +150,62 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   };
 
   // Match Cancellation
-  const handleConfirmCancelMatch = (reason?: string) => {
+  const handleConfirmCancelMatch = async (reason?: string) => {
     if (!cancellingMatch || !currentUser) return;
-    storageService.cancelMatch(
-      cancellingMatch.id,
-      `Admin (${currentUser.name})`,
-      reason || 'Cancelado pela Administração do Clube'
-    );
-    setCancellingMatch(null);
+    try {
+      if (usingSupabase) await supabaseAgendaService.cancelMatch(cancellingMatch.id, currentUser.id, reason || 'Cancelado pela Administração do Clube');
+      else storageService.cancelMatch(cancellingMatch.id, `Admin (${currentUser.name})`, reason || 'Cancelado pela Administração do Clube');
+      setCancellingMatch(null); await loadAll();
+    } catch { setAdminError('Não foi possível cancelar esta partida.'); }
   };
 
   // Blocked Slots Management
-  const handleSaveBlock = (e: React.FormEvent) => {
+  const handleSaveBlock = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!blockDate || !blockReason.trim()) return;
 
-    storageService.addBlockedSlot({
+    const block = {
       courtId: blockCourtId || undefined,
       date: blockDate,
       startTime: blockAllDay ? undefined : blockStartTime,
       endTime: blockAllDay ? undefined : blockEndTime,
       allDay: blockAllDay,
       reason: blockReason.trim(),
-    });
-
-    setIsBlockModalOpen(false);
+    };
+    try {
+      if (usingSupabase && groupId && currentUser) await supabaseAgendaService.addBlockedSlot(groupId, currentUser.id, block);
+      else storageService.addBlockedSlot(block);
+      setIsBlockModalOpen(false); await loadAll();
+    } catch { setAdminError('Não foi possível criar o bloqueio.'); }
   };
 
-  const handleRemoveBlock = (id: string) => {
-    storageService.removeBlockedSlot(id);
+  const handleRemoveBlock = async (id: string) => {
+    try {
+      if (usingSupabase) await supabaseAgendaService.removeBlockedSlot(id);
+      else storageService.removeBlockedSlot(id);
+      await loadAll();
+    } catch { setAdminError('Não foi possível remover o bloqueio.'); }
   };
 
   // Config Update
-  const handleSaveConfig = (e: React.FormEvent) => {
+  const handleSaveConfig = async (e: React.FormEvent) => {
     e.preventDefault();
-    storageService.updateConfig(courtConfig);
-    setConfigSaved(true);
+    try {
+      if (usingSupabase && groupId) await supabaseAgendaService.saveAdminConfig(groupId, courtConfig);
+      else storageService.updateConfig(courtConfig);
+      setConfigSaved(true); setAdminError(''); await loadAll();
+    } catch { setAdminError('Execute primeiro a migração 002 de horários no Supabase e tente novamente.'); }
     window.setTimeout(() => setConfigSaved(false), 2500);
+  };
+
+  const saveCourt = async (court: Court, changes: Partial<Omit<Court, 'id'>>) => {
+    const updated = { ...court, ...changes };
+    setCourts((items) => items.map((item) => item.id === court.id ? updated : item));
+    try {
+      if (usingSupabase) await supabaseAgendaService.updateCourt(court.id, changes);
+      else storageService.updateCourt(court.id, changes);
+      setAdminError('');
+    } catch { setAdminError('Não foi possível atualizar a quadra.'); await loadAll(); }
   };
 
   const updateSlot = (index: number, field: 'startTime' | 'endTime', value: string) => {
@@ -221,6 +254,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           </p>
         </div>
       </div>
+
+      {adminError && (
+        <div className="rounded-2xl bg-rose-50 border border-rose-100 p-3 text-xs font-bold text-rose-700">
+          {adminError}
+        </div>
+      )}
 
       {/* Admin Nav Tabs */}
       <div className="grid grid-cols-4 gap-1 p-1 bg-slate-100 rounded-2xl text-xs font-black">
@@ -473,7 +512,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
                   <button
                     id={`btn-remove-block-${b.id}`}
-                    onClick={() => handleRemoveBlock(b.id)}
+                    onClick={() => void handleRemoveBlock(b.id)}
                     className="p-2 rounded-xl text-rose-600 hover:bg-rose-100 transition-colors"
                     title="Remover bloqueio"
                   >
@@ -499,13 +538,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
               <div key={court.id} className="grid grid-cols-[1fr_92px_auto] gap-2 items-center rounded-2xl bg-slate-50 p-2.5 border border-slate-200">
                 <input
                   value={court.name}
-                  onChange={(event) => storageService.updateCourt(court.id, { name: event.target.value })}
+                  onChange={(event) => setCourts((items) => items.map((item) => item.id === court.id ? { ...item, name: event.target.value } : item))}
+                  onBlur={(event) => void saveCourt(court, { name: event.target.value.trim() || court.name })}
                   className="min-w-0 text-xs font-bold p-2 rounded-xl border border-slate-200"
                   aria-label={`Nome da ${court.name}`}
                 />
                 <select
                   value={court.surface}
-                  onChange={(event) => storageService.updateCourt(court.id, { surface: event.target.value })}
+                  onChange={(event) => void saveCourt(court, { surface: event.target.value })}
                   className="text-[11px] font-semibold p-2 rounded-xl border border-slate-200"
                 >
                   <option>Saibro</option>
@@ -514,7 +554,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 </select>
                 <button
                   type="button"
-                  onClick={() => storageService.updateCourt(court.id, { active: !court.active })}
+                  onClick={() => void saveCourt(court, { active: !court.active })}
                   className={`px-2.5 py-2 rounded-xl text-[10px] font-black ${court.active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}
                 >
                   {court.active ? 'Liberada' : 'Bloqueada'}

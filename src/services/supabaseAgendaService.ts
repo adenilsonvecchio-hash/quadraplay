@@ -1,4 +1,4 @@
-import { Court, CourtConfig, CourtSlot, Match, TennisClass } from '../types';
+import { BlockedSlot, Court, CourtConfig, CourtSlot, Match, Player, TennisClass } from '../types';
 import { supabase } from '../lib/supabase';
 import { generateDaySlots, isSlotInPast } from '../utils/dateUtils';
 
@@ -39,6 +39,31 @@ const matchSelect = `
 `;
 
 export const supabaseAgendaService = {
+  async getPlayersByClass(groupId: string, tennisClass: TennisClass, currentUserId: string): Promise<Player[]> {
+    if (!supabase) return [];
+    const { data, error } = await supabase
+      .from('membros_grupo')
+      .select('usuario_id, classe, perfil, perfil_usuario:perfis!membros_grupo_usuario_id_fkey(nome, email, telefone, avatar_url, criado_em)')
+      .eq('grupo_id', groupId)
+      .eq('classe', tennisClass)
+      .eq('aprovado', true)
+      .neq('usuario_id', currentUserId);
+    if (error) throw error;
+    return (data || []).map((row: any) => {
+      const profile = Array.isArray(row.perfil_usuario) ? row.perfil_usuario[0] : row.perfil_usuario;
+      return {
+        id: row.usuario_id,
+        name: profile?.nome || 'Jogador',
+        email: profile?.email || '',
+        phone: profile?.telefone || undefined,
+        avatarUrl: profile?.avatar_url || undefined,
+        tennisClass: row.classe as TennisClass,
+        isAdmin: row.perfil === 'ADMINISTRADOR' || row.perfil === 'PROPRIETARIO',
+        createdAt: profile?.criado_em || new Date().toISOString(),
+      };
+    }).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  },
+
   async getCourts(groupId: string): Promise<Court[]> {
     if (!supabase) return [];
     const { data, error } = await supabase.from('quadras').select('id, nome, piso, ativa, ordem').eq('grupo_id', groupId).order('ordem');
@@ -51,6 +76,7 @@ export const supabaseAgendaService = {
     const { data, error } = await supabase.from('configuracoes_agenda').select('*').eq('grupo_id', groupId).maybeSingle();
     if (error) throw error;
     if (!data) return null;
+    const timeSlots = await this.getTimeSlots(groupId);
     return {
       courtName: 'Quadra 1',
       clubName: 'Tangará Country Clube',
@@ -60,7 +86,79 @@ export const supabaseAgendaService = {
       closeTime: shortTime(data.fecha_as),
       activeDays: data.dias_ativos,
       maxAdvanceBookingDays: data.antecedencia_maxima_dias,
+      timeSlots,
     };
+  },
+
+  async getTimeSlots(groupId: string): Promise<Array<{ startTime: string; endTime: string }>> {
+    if (!supabase) return [];
+    const { data, error } = await supabase.from('horarios_agenda').select('hora_inicio, hora_fim').eq('grupo_id', groupId).eq('ativo', true).order('ordem');
+    if (error) {
+      if ((error as any).code === '42P01') return [];
+      throw error;
+    }
+    return (data || []).map((row) => ({ startTime: shortTime(row.hora_inicio), endTime: shortTime(row.hora_fim) }));
+  },
+
+  async getBlockedSlots(groupId: string): Promise<BlockedSlot[]> {
+    if (!supabase) return [];
+    const { data, error } = await supabase.from('bloqueios_agenda').select('*').eq('grupo_id', groupId).order('data').order('hora_inicio');
+    if (error) throw error;
+    return (data || []).map((row) => ({
+      id: row.id, courtId: row.quadra_id || undefined, date: row.data,
+      startTime: shortTime(row.hora_inicio) || undefined, endTime: shortTime(row.hora_fim) || undefined,
+      allDay: row.dia_inteiro, reason: row.motivo, createdAt: row.criado_em,
+    }));
+  },
+
+  async updateCourt(courtId: string, changes: Partial<Omit<Court, 'id'>>): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const payload: Record<string, unknown> = {};
+    if (changes.name !== undefined) payload.nome = changes.name;
+    if (changes.surface !== undefined) payload.piso = changes.surface;
+    if (changes.active !== undefined) payload.ativa = changes.active;
+    const { error } = await supabase.from('quadras').update(payload).eq('id', courtId);
+    if (error) throw error;
+  },
+
+  async saveAdminConfig(groupId: string, config: CourtConfig): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { error: configError } = await supabase.from('configuracoes_agenda').update({
+      duracao_minutos: config.slotDurationMinutes,
+      abre_as: config.openTime,
+      fecha_as: config.closeTime,
+      dias_ativos: config.activeDays,
+      antecedencia_maxima_dias: config.maxAdvanceBookingDays,
+      atualizado_em: new Date().toISOString(),
+    }).eq('grupo_id', groupId);
+    if (configError) throw configError;
+
+    if (config.timeSlots) {
+      const { error: deleteError } = await supabase.from('horarios_agenda').delete().eq('grupo_id', groupId);
+      if (deleteError) throw deleteError;
+      if (config.timeSlots.length) {
+        const { error: insertError } = await supabase.from('horarios_agenda').insert(config.timeSlots.map((slot, index) => ({
+          grupo_id: groupId, hora_inicio: slot.startTime, hora_fim: slot.endTime, ativo: true, ordem: index + 1,
+        })));
+        if (insertError) throw insertError;
+      }
+    }
+  },
+
+  async addBlockedSlot(groupId: string, userId: string, block: Omit<BlockedSlot, 'id' | 'createdAt'>): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { error } = await supabase.from('bloqueios_agenda').insert({
+      grupo_id: groupId, quadra_id: block.courtId || null, data: block.date,
+      hora_inicio: block.allDay ? null : block.startTime, hora_fim: block.allDay ? null : block.endTime,
+      dia_inteiro: block.allDay, motivo: block.reason, criado_por: userId,
+    });
+    if (error) throw error;
+  },
+
+  async removeBlockedSlot(blockId: string): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { error } = await supabase.from('bloqueios_agenda').delete().eq('id', blockId);
+    if (error) throw error;
   },
 
   async getMatches(groupId: string): Promise<Match[]> {
@@ -68,6 +166,71 @@ export const supabaseAgendaService = {
     const { data, error } = await supabase.from('partidas').select(matchSelect).eq('grupo_id', groupId).order('data').order('hora_inicio');
     if (error) throw error;
     return (data || []).map(mapMatch);
+  },
+
+  async createMatch(params: {
+    groupId: string;
+    courtId: string;
+    player1Id: string;
+    player2Id: string;
+    tennisClass: TennisClass;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }): Promise<Match> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { data, error } = await supabase.from('partidas').insert({
+      grupo_id: params.groupId,
+      quadra_id: params.courtId,
+      jogador_1_id: params.player1Id,
+      jogador_2_id: params.player2Id,
+      classe: params.tennisClass,
+      data: params.date,
+      hora_inicio: params.startTime,
+      hora_fim: params.endTime,
+      status: 'PENDENTE',
+    }).select(matchSelect).single();
+    if (error) throw error;
+    return mapMatch(data);
+  },
+
+  async respondToMatch(matchId: string, playerId: string, accept: boolean): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { data, error } = await supabase
+      .from('partidas')
+      .update({
+        status: accept ? 'ACEITA' : 'RECUSADA',
+        ...(accept ? {} : {
+          cancelado_por: playerId,
+          motivo_cancelamento: 'Convite recusado pelo adversário',
+          cancelado_em: new Date().toISOString(),
+        }),
+      })
+      .eq('id', matchId)
+      .eq('jogador_2_id', playerId)
+      .eq('status', 'PENDENTE')
+      .select('id')
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Este convite já foi respondido ou não pertence ao jogador.');
+  },
+
+  async cancelMatch(matchId: string, playerId: string, reason?: string): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { data, error } = await supabase
+      .from('partidas')
+      .update({
+        status: 'CANCELADA',
+        cancelado_por: playerId,
+        motivo_cancelamento: reason?.trim() || 'Cancelado pelo jogador',
+        cancelado_em: new Date().toISOString(),
+      })
+      .eq('id', matchId)
+      .in('status', ['PENDENTE', 'ACEITA'])
+      .select('id')
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Esta partida já foi alterada.');
   },
 
   async getSchedule(groupId: string, date: string, courtId: string): Promise<CourtSlot[]> {
@@ -81,7 +244,9 @@ export const supabaseAgendaService = {
     if (blocksResult.error) throw blocksResult.error;
     const matches = (matchesResult.data || []).map(mapMatch);
     const blocks = (blocksResult.data || []).filter((block) => !block.quadra_id || block.quadra_id === courtId);
-    const slots = generateDaySlots(config?.openTime || '07:00', config?.closeTime || '17:30', config?.slotDurationMinutes || 90);
+    const slots = config?.timeSlots?.length
+      ? config.timeSlots
+      : generateDaySlots(config?.openTime || '07:00', config?.closeTime || '17:30', config?.slotDurationMinutes || 90);
 
     return slots.map((slot) => {
       if (isSlotInPast(date, slot.startTime)) return { ...slot, available: false, blockReason: 'Horário já transcorrido' };

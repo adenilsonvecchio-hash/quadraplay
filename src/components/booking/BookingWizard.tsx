@@ -3,8 +3,8 @@ import { motion } from 'motion/react';
 import { ArrowLeft, CalendarDays, Check, CheckCircle2, ChevronRight, Clock3, MapPin, ShieldAlert, UserRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Court, CourtSlot, Player } from '../../types';
-import { COURTS } from '../../data/initialData';
 import { storageService } from '../../services/storageService';
+import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { addDays, formatFriendlyDate, getBrasiliaToday, isBeforeDate } from '../../utils/dateUtils';
 
 interface BookingWizardProps {
@@ -26,11 +26,12 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
   onSuccess,
   onCancel,
 }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, usingSupabase, groupId } = useAuth();
   const today = getBrasiliaToday();
   const [step, setStep] = useState<Step>(1);
   const [selectedDate, setSelectedDate] = useState(preselectedDate && !isBeforeDate(preselectedDate, today) ? preselectedDate : today);
-  const [selectedCourt, setSelectedCourt] = useState<Court>(COURTS.find(c => c.id === preselectedCourtId) || COURTS[0]);
+  const [courts, setCourts] = useState<Court[]>(() => storageService.getCourts());
+  const [selectedCourt, setSelectedCourt] = useState<Court | null>(() => storageService.getCourts().find(c => c.id === preselectedCourtId) || storageService.getCourts()[0] || null);
   const [selectedSlot, setSelectedSlot] = useState<CourtSlot | null>(null);
   const [selectedOpponent, setSelectedOpponent] = useState<Player | null>(null);
   const [slots, setSlots] = useState<CourtSlot[]>([]);
@@ -41,21 +42,46 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
 
   useEffect(() => {
     if (!currentUser) return;
-    const list = storageService.getPlayersByClass(currentUser.tennisClass).filter(p => p.id !== currentUser.id);
-    setOpponents(list);
-    if (preselectedOpponentId) {
-      const found = list.find(p => p.id === preselectedOpponentId);
-      if (found) setSelectedOpponent(found);
-    }
-  }, [currentUser, preselectedOpponentId]);
+    const loadPlayersAndCourts = async () => {
+      try {
+        const [list, nextCourts] = usingSupabase && groupId
+          ? await Promise.all([
+              supabaseAgendaService.getPlayersByClass(groupId, currentUser.tennisClass, currentUser.id),
+              supabaseAgendaService.getCourts(groupId),
+            ])
+          : [storageService.getPlayersByClass(currentUser.tennisClass).filter(p => p.id !== currentUser.id), storageService.getCourts()];
+        const activeCourts = nextCourts.filter((court) => court.active);
+        setOpponents(list);
+        setCourts(activeCourts);
+        setSelectedCourt((current) => activeCourts.find((court) => court.id === preselectedCourtId) || activeCourts.find((court) => court.id === current?.id) || activeCourts[0] || null);
+        if (preselectedOpponentId) {
+          const found = list.find(p => p.id === preselectedOpponentId);
+          if (found) setSelectedOpponent(found);
+        }
+      } catch {
+        setErrorMsg('Não foi possível carregar jogadores e quadras do banco.');
+      }
+    };
+    void loadPlayersAndCourts();
+  }, [currentUser, preselectedOpponentId, preselectedCourtId, usingSupabase, groupId]);
 
   useEffect(() => {
-    const nextSlots = storageService.getCourtScheduleForDate(selectedDate, selectedCourt.id);
-    setSlots(nextSlots);
-    const preset = preselectedStartTime ? nextSlots.find(s => s.startTime === preselectedStartTime && s.available) : undefined;
-    setSelectedSlot(preset || null);
-    if (preselectedDate && preselectedCourtId && preset) setStep(3);
-  }, [selectedDate, selectedCourt.id, preselectedDate, preselectedCourtId, preselectedStartTime]);
+    if (!selectedCourt) return;
+    const loadSlots = async () => {
+      try {
+        const nextSlots = usingSupabase && groupId
+          ? await supabaseAgendaService.getSchedule(groupId, selectedDate, selectedCourt.id)
+          : storageService.getCourtScheduleForDate(selectedDate, selectedCourt.id);
+        setSlots(nextSlots);
+        const preset = preselectedStartTime ? nextSlots.find(s => s.startTime === preselectedStartTime && s.available) : undefined;
+        setSelectedSlot(preset || null);
+        if (preselectedDate && preselectedCourtId && preset) setStep(3);
+      } catch {
+        setErrorMsg('Não foi possível carregar os horários disponíveis.');
+      }
+    };
+    void loadSlots();
+  }, [selectedDate, selectedCourt?.id, preselectedDate, preselectedCourtId, preselectedStartTime, usingSupabase, groupId]);
 
   const dates = useMemo(() => Array.from({ length: 14 }, (_, i) => addDays(today, i)), [today]);
   if (!currentUser) return null;
@@ -72,21 +98,34 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
   const chooseOpponent = (player: Player) => {
     setSelectedOpponent(player); setErrorMsg(null); setStep(4);
   };
-  const confirm = () => {
-    if (!selectedSlot || !selectedOpponent) return setErrorMsg('Complete todas as etapas do agendamento.');
+  const confirm = async () => {
+    if (!selectedSlot || !selectedOpponent || !selectedCourt) return setErrorMsg('Complete todas as etapas do agendamento.');
     setSaving(true); setErrorMsg(null);
-    const result = storageService.createMatch({
-      player1Id: currentUser.id,
-      player2Id: selectedOpponent.id,
-      date: selectedDate,
-      startTime: selectedSlot.startTime,
-      endTime: selectedSlot.endTime,
-      courtId: selectedCourt.id,
-    });
-    setSaving(false);
-    if (!result.success) return setErrorMsg(result.error || 'Não foi possível criar a reserva.');
-    setSuccess(true);
-    window.setTimeout(onSuccess, 1200);
+    try {
+      if (usingSupabase && groupId) {
+        await supabaseAgendaService.createMatch({
+          groupId, courtId: selectedCourt.id, player1Id: currentUser.id,
+          player2Id: selectedOpponent.id, tennisClass: currentUser.tennisClass,
+          date: selectedDate, startTime: selectedSlot.startTime, endTime: selectedSlot.endTime,
+        });
+      } else {
+        const result = storageService.createMatch({
+          player1Id: currentUser.id, player2Id: selectedOpponent.id, date: selectedDate,
+          startTime: selectedSlot.startTime, endTime: selectedSlot.endTime, courtId: selectedCourt.id,
+        });
+        if (!result.success) throw new Error(result.error || 'Não foi possível criar a reserva.');
+      }
+      setSuccess(true);
+      window.setTimeout(onSuccess, 1200);
+    } catch (error: any) {
+      const message = String(error?.message || '');
+      if (message.includes('duplicate') || message.includes('partidas_quadra_horario')) setErrorMsg('Este horário acabou de ser reservado por outro jogador. Escolha outro período.');
+      else if (message.includes('bloqueado')) setErrorMsg('Este horário está bloqueado pela administração.');
+      else if (message.includes('já possui jogo')) setErrorMsg('Um dos jogadores já possui jogo neste horário.');
+      else setErrorMsg(message || 'Não foi possível criar a reserva.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const stepTitles = ['Data', 'Quadra e horário', 'Adversário', 'Confirmar'];
@@ -121,8 +160,8 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
     </motion.section>}
 
     {step === 2 && <motion.section initial={{opacity:0,x:12}} animate={{opacity:1,x:0}} className="space-y-3">
-      <div className="qp-glass rounded-[26px] p-4"><div className="flex items-center justify-between mb-3"><div><h3 className="font-black text-[#101b3d]">Escolha a quadra</h3><p className="text-xs text-slate-500">{formatFriendlyDate(selectedDate)}</p></div><MapPin className="w-5 h-5 text-violet-500" /></div><div className="grid grid-cols-4 gap-2">{COURTS.map(c => <button key={c.id} onClick={() => {setSelectedCourt(c);setSelectedSlot(null)}} className={`rounded-[18px] py-3 px-1 text-[10px] font-black ${selectedCourt.id===c.id?'bg-gradient-to-br from-[#725cff] to-[#5038eb] text-white shadow-lg':'qp-button text-slate-600'}`}><div className="w-7 h-7 rounded-lg border-2 border-current mx-auto mb-1.5 flex items-center justify-center"><span className="w-4 h-px bg-current" /></div>{c.name}</button>)}</div></div>
-      <div className="qp-glass rounded-[26px] p-3"><div className="flex items-center gap-2 px-1 pb-2"><Clock3 className="w-4 h-4 text-violet-600" /><h3 className="text-sm font-black text-[#101b3d]">Horários de {selectedCourt.name}</h3></div><div className="grid grid-cols-2 gap-2">{slots.map(slot => <button key={slot.startTime} disabled={!slot.available} onClick={() => chooseSlot(slot)} className={`rounded-[18px] p-3 text-left border ${slot.available?'bg-emerald-50/80 border-white text-emerald-800':'bg-slate-100/75 border-white text-slate-400'} disabled:cursor-not-allowed`}><div className="flex items-center justify-between"><span className="text-sm font-black">{slot.startTime}</span>{slot.available?<Check className="w-4 h-4"/>:<span className="text-[9px] font-bold">OCUPADO</span>}</div><p className="text-[10px] mt-1">até {slot.endTime}</p></button>)}</div></div>
+      <div className="qp-glass rounded-[26px] p-4"><div className="flex items-center justify-between mb-3"><div><h3 className="font-black text-[#101b3d]">Escolha a quadra</h3><p className="text-xs text-slate-500">{formatFriendlyDate(selectedDate)}</p></div><MapPin className="w-5 h-5 text-violet-500" /></div><div className="grid grid-cols-3 gap-2">{courts.map(c => <button key={c.id} onClick={() => {setSelectedCourt(c);setSelectedSlot(null)}} className={`rounded-[18px] py-3 px-1 text-[10px] font-black ${selectedCourt?.id===c.id?'bg-gradient-to-br from-[#725cff] to-[#5038eb] text-white shadow-lg':'qp-button text-slate-600'}`}><div className="w-7 h-7 rounded-lg border-2 border-current mx-auto mb-1.5 flex items-center justify-center"><span className="w-4 h-px bg-current" /></div>{c.name}</button>)}</div></div>
+      <div className="qp-glass rounded-[26px] p-3"><div className="flex items-center gap-2 px-1 pb-2"><Clock3 className="w-4 h-4 text-violet-600" /><h3 className="text-sm font-black text-[#101b3d]">Horários de {selectedCourt?.name || 'quadra'}</h3></div><div className="grid grid-cols-2 gap-2">{slots.map(slot => <button key={slot.startTime} disabled={!slot.available} onClick={() => chooseSlot(slot)} className={`rounded-[18px] p-3 text-left border ${slot.available?'bg-emerald-50/80 border-white text-emerald-800':'bg-slate-100/75 border-white text-slate-400'} disabled:cursor-not-allowed`}><div className="flex items-center justify-between"><span className="text-sm font-black">{slot.startTime}</span>{slot.available?<Check className="w-4 h-4"/>:<span className="text-[9px] font-bold">OCUPADO</span>}</div><p className="text-[10px] mt-1">até {slot.endTime}</p></button>)}</div></div>
     </motion.section>}
 
     {step === 3 && <motion.section initial={{opacity:0,x:12}} animate={{opacity:1,x:0}} className="qp-glass rounded-[26px] p-4">
@@ -131,7 +170,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
     </motion.section>}
 
     {step === 4 && <motion.section initial={{opacity:0,x:12}} animate={{opacity:1,x:0}} className="space-y-3">
-      <div className="qp-glass rounded-[26px] p-4"><h3 className="font-black text-[#101b3d] mb-3">Resumo da reserva</h3><div className="space-y-2 text-sm"><Summary label="Data" value={formatFriendlyDate(selectedDate, false)} /><Summary label="Horário" value={`${selectedSlot?.startTime} - ${selectedSlot?.endTime}`} /><Summary label="Quadra" value={`${selectedCourt.name} · ${selectedCourt.surface}`} /><Summary label="Adversário" value={`${selectedOpponent?.name} · Classe ${selectedOpponent?.tennisClass}`} /></div></div>
+      <div className="qp-glass rounded-[26px] p-4"><h3 className="font-black text-[#101b3d] mb-3">Resumo da reserva</h3><div className="space-y-2 text-sm"><Summary label="Data" value={formatFriendlyDate(selectedDate, false)} /><Summary label="Horário" value={`${selectedSlot?.startTime} - ${selectedSlot?.endTime}`} /><Summary label="Quadra" value={`${selectedCourt?.name || ''} · ${selectedCourt?.surface || ''}`} /><Summary label="Adversário" value={`${selectedOpponent?.name} · Classe ${selectedOpponent?.tennisClass}`} /></div></div>
       <div className="rounded-[22px] bg-orange-50 border border-orange-100 p-3 text-xs text-orange-800"><strong>Após confirmar:</strong> o horário ficará como “Aguardando confirmação” até o adversário aceitar.</div>
       <button disabled={saving} onClick={confirm} className="w-full h-14 rounded-[20px] bg-gradient-to-r from-[#765cff] to-[#543beb] text-white font-black shadow-[0_12px_28px_rgba(91,70,238,0.28)] disabled:opacity-60">{saving?'Confirmando...':'Confirmar reserva'}</button>
     </motion.section>}

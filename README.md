@@ -2,11 +2,15 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
-# Run and deploy your AI Studio app
+# QuadraPlay
 
-This contains everything you need to run your app locally.
+Projeto mobile de agendamento de jogos do Tangará Country Clube.
 
-View your app in AI Studio: https://ai.studio/apps/1a1283ef-3137-44f6-af77-d002040f8842
+## Como abrir
+
+- Para desenvolver: execute `npm install` e depois `npm run dev`.
+- Para publicar: use a pasta `dist`, já compilada e validada.
+- Para testar a versão compilada: execute `npm run preview`.
 
 ## Run Locally
 
@@ -15,8 +19,7 @@ View your app in AI Studio: https://ai.studio/apps/1a1283ef-3137-44f6-af77-d0020
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
+2. Run the app:
    `npm run dev`
 
 ## Atualização da Agenda — modelo aprovado
@@ -44,7 +47,26 @@ O projeto foi padronizado para o novo design aprovado: fundo branco, cartões su
 - Banco real: ainda não conectado ao runtime. Existe apenas um schema SQL de referência em `initialData.ts`.
 - Agenda: 4 quadras, blocos de horário, bloqueios, datas passadas e conflito de quadra já são validados localmente.
 - Partidas: fluxo pendente → aceita/recusada/cancelada já existe localmente.
-- Ranking: tela adicionada com participação por quantidade de jogos, sem pontuação automática por vitória.
+- Ranking: removido do produto. O QuadraPlay é somente agenda de jogos.
 
-### Próxima etapa recomendada
-Substituir `storageService` por um repositório Supabase mantendo as mesmas interfaces do frontend, implementar Auth real, tabelas, RLS, RPC/constraints e Realtime sem alterar o design aprovado.
+## Nova capa clean — 2026-08-21
+
+- fotografia grande removida por decisão de design;
+- cabeçalho azul compacto com marca QuadraPlay+ e identificação do clube;
+- painel branco arredondado inspirado no modelo de referência aprovado;
+- quatro acessos: Agendar horário, Ver agenda, Meus jogos e Jogadores;
+- navegação inferior restrita a Início, Agenda e Perfil;
+- layout mobile em uma tela, sem rolagem na capa.
+
+## Migração Supabase — etapa 1
+
+O arquivo `supabase/migrations/001_quadraplay_schema.sql` prepara o banco real com:
+
+- perfis, grupos, membros, classes A–E e aprovação de jogador;
+- 4 quadras configuráveis e bloqueios administrativos;
+- partidas pendentes, aceitas, recusadas, canceladas ou concluídas;
+- bloqueio de data/horário passado, conflito de quadra e conflito de jogador;
+- RLS por grupo e permissões de jogador, administrador e proprietário;
+- Realtime na agenda.
+
+Próxima etapa: adicionar o cliente Supabase ao frontend e trocar gradualmente o `storageService`, mantendo as interfaces visuais existentes.

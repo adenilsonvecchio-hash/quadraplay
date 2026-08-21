@@ -5,6 +5,8 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    // Mantém os arquivos compilados portáveis em hospedagens e previews.
+    base: './',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

@@ -78,7 +78,7 @@ function MainApp() {
           {activeTab === 'admin' && <AdminDashboard onBack={() => setActiveTab('home')} />}
         </main>
 
-        {activeTab !== 'admin' && activeTab !== 'home' && <BottomNav activeTab={activeTab} onChangeTab={setActiveTab} />}
+        {activeTab !== 'admin' && <BottomNav activeTab={activeTab} onChangeTab={setActiveTab} />}
       </div>
     </div>
   );

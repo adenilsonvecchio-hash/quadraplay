@@ -128,6 +128,19 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Ao aceitar, o status muda imediatamente de **Aguardando** para **Confirmado**.
 - Os botões aparecem somente para o jogador 2 da partida e desaparecem após a resposta.
 
+### Compatibilidade de identificação do convidado — versão 28
+
+- A interface identifica o convite pendente pelo criador da partida, evitando falha visual em bancos migrados.
+- O selo **Convite para você** acompanha os botões **Aceitar** e **Recusar**.
+- A segurança do Supabase permanece responsável por autorizar a resposta somente ao `jogador_2_id`.
+
+### Contadores do Perfil Esportivo — versão 29
+
+- **Jogos**, **Próximos** e **Realizados** são calculados com as partidas reais do usuário no Supabase.
+- Partidas canceladas ou recusadas não entram nos números do perfil.
+- Partidas futuras pendentes ou confirmadas entram em **Próximos**; concluídas ou já transcorridas entram em **Realizados**.
+- Os contadores são atualizados em tempo real quando uma partida muda de status.
+
 ## Aceite, recusa e cancelamento — versão 24
 
 - **Meus jogos** carrega as partidas do usuário diretamente do Supabase.

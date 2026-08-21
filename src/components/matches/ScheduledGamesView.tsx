@@ -79,7 +79,12 @@ export const ScheduledGamesView: React.FC = () => {
       ) : (
         <div className="grid gap-3 lg:grid-cols-2">
           {upcoming.map((match) => {
-            const incoming = match.status === 'pending' && match.player2Id === currentUser?.id;
+            // Em bancos migrados, usa o ID como regra principal e o nome do
+            // perfil como compatibilidade para identificar o convidado.
+            const incoming = match.status === 'pending' && !!currentUser && (
+              match.player2Id === currentUser.id
+              || match.player2Name.trim().toLocaleLowerCase('pt-BR') === currentUser.name.trim().toLocaleLowerCase('pt-BR')
+            );
             return <article key={match.id} className="qp-glass rounded-[24px] p-4 border border-white">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -89,8 +94,8 @@ export const ScheduledGamesView: React.FC = () => {
                     {match.startTime} às {match.endTime}
                   </div>
                 </div>
-                <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${match.status === 'scheduled' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'}`}>
-                  {match.status === 'scheduled' ? 'Confirmado' : 'Aguardando'}
+                <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${match.status === 'scheduled' ? 'bg-emerald-100 text-emerald-700' : incoming ? 'bg-violet-100 text-violet-700' : 'bg-orange-100 text-orange-700'}`}>
+                  {match.status === 'scheduled' ? 'Confirmado' : incoming ? 'Convite para você' : 'Aguardando'}
                 </span>
               </div>
               <div className="mt-4 rounded-[18px] bg-white/65 p-3">

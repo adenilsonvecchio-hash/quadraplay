@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, Clock3, MapPin, Users } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Clock3, MapPin, Users, XCircle } from 'lucide-react';
 import { Match } from '../../types';
 import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
@@ -7,10 +7,11 @@ import { useAuth } from '../../context/AuthContext';
 import { formatFriendlyDate, getBrasiliaToday } from '../../utils/dateUtils';
 
 export const ScheduledGamesView: React.FC = () => {
-  const { usingSupabase, groupId } = useAuth();
+  const { currentUser, usingSupabase, groupId } = useAuth();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [busyMatchId, setBusyMatchId] = useState<string | null>(null);
 
   const load = async () => {
     try {
@@ -34,6 +35,24 @@ export const ScheduledGamesView: React.FC = () => {
       .filter((match) => (match.status === 'scheduled' || match.status === 'pending') && match.date >= today)
       .sort((a, b) => `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`));
   }, [matches]);
+
+  const respond = async (match: Match, accept: boolean) => {
+    if (!currentUser) return;
+    setBusyMatchId(match.id);
+    setLoadError('');
+    try {
+      if (usingSupabase) await supabaseAgendaService.respondToMatch(match.id, currentUser.id, accept);
+      else {
+        const result = storageService.respondToMatch(match.id, currentUser.id, accept);
+        if (!result.success) throw new Error(result.error);
+      }
+      await load();
+    } catch {
+      setLoadError('Não foi possível responder ao convite. Tente novamente.');
+    } finally {
+      setBusyMatchId(null);
+    }
+  };
 
   return (
     <div className="space-y-3 pb-4">
@@ -59,8 +78,9 @@ export const ScheduledGamesView: React.FC = () => {
         </div>
       ) : (
         <div className="grid gap-3 lg:grid-cols-2">
-          {upcoming.map((match) => (
-            <article key={match.id} className="qp-glass rounded-[24px] p-4 border border-white">
+          {upcoming.map((match) => {
+            const incoming = match.status === 'pending' && match.player2Id === currentUser?.id;
+            return <article key={match.id} className="qp-glass rounded-[24px] p-4 border border-white">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-black text-violet-700">{formatFriendlyDate(match.date)}</p>
@@ -83,8 +103,12 @@ export const ScheduledGamesView: React.FC = () => {
                   <span>Classe {match.tennisClass}</span>
                 </div>
               </div>
+              {incoming && <div className="mt-3 pt-3 border-t border-slate-100 flex gap-2">
+                <button disabled={busyMatchId === match.id} onClick={() => void respond(match, false)} className="flex-1 rounded-[15px] py-2.5 text-xs font-black bg-rose-50 text-rose-600 flex items-center justify-center gap-1.5 disabled:opacity-50"><XCircle className="w-4 h-4" />Recusar</button>
+                <button disabled={busyMatchId === match.id} onClick={() => void respond(match, true)} className="flex-1 rounded-[15px] py-2.5 text-xs font-black bg-emerald-500 text-white shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-50"><CheckCircle2 className="w-4 h-4" />{busyMatchId === match.id ? 'Salvando...' : 'Aceitar'}</button>
+              </div>}
             </article>
-          ))}
+          })}
         </div>
       )}
     </div>

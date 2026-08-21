@@ -122,6 +122,12 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - A etapa **Adversário** agora informa quando está carregando e quando ainda não existe outro jogador aprovado na mesma classe.
 - O adversário selecionado permanece visível no resumo e seu ID é gravado em `jogador_2_id` ao confirmar a reserva.
 
+### Resposta ao convite em Jogos agendados — versão 27
+
+- O jogador convidado visualiza **Aceitar** e **Recusar** diretamente no cartão da partida pendente.
+- Ao aceitar, o status muda imediatamente de **Aguardando** para **Confirmado**.
+- Os botões aparecem somente para o jogador 2 da partida e desaparecem após a resposta.
+
 ## Aceite, recusa e cancelamento — versão 24
 
 - **Meus jogos** carrega as partidas do usuário diretamente do Supabase.

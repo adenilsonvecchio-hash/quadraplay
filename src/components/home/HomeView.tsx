@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bell, CalendarDays, CalendarPlus, ChevronRight, MapPin, Swords, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { BrandLogo } from '../common/BrandLogo';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -32,7 +33,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
       <div className="qp-clean-home__panel">
         <div className="qp-clean-home__intro">
           <div>
-            <div className="qp-clean-home__brand" aria-label="QuadraPlay mais"><span>Quadra</span><strong>Play</strong><b>+</b></div>
+            <BrandLogo className="qp-clean-home__brand" />
             <h1>Olá, {firstName}</h1>
             <p>Organize seu próximo jogo</p>
             <div className="qp-clean-home__club"><MapPin size={12} /> Tangará Country Clube</div>

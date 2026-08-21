@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Mail, ChevronRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { BrandLogo } from '../common/BrandLogo';
 
 interface LoginViewProps { onSuccess?: () => void; }
 
@@ -22,7 +23,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
     <div className="min-h-screen bg-[#eef1f8] flex items-center justify-center px-4 py-7">
       <div className="qp-shell w-full max-w-md rounded-[38px] border border-white p-5 sm:p-7">
         <div className="text-center pt-3 pb-7">
-          <div className="text-[38px] leading-none select-none"><span className="font-black tracking-[-2px] text-[#0b1742]">Quadra</span><span className="font-black italic tracking-[-2.3px] text-[#5b37ff]">Play</span></div>
+          <BrandLogo className="justify-center" />
           <p className="text-sm font-bold text-slate-500 mt-3">Agende, desafie e jogue.</p>
         </div>
 

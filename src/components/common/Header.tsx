@@ -1,6 +1,7 @@
 import React from 'react';
 import { Bell, Menu, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { BrandLogo } from './BrandLogo';
 
 interface HeaderProps {
   onOpenAdmin?: () => void;
@@ -21,10 +22,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab }) => {
           <Menu className="w-6 h-6 stroke-[2.2]" />
         </button>
 
-        <div className="text-center select-none leading-none">
-          <span className="text-[27px] font-black tracking-[-1.5px] text-[#0b1742]">Quadra</span>
-          <span className="text-[27px] font-black italic tracking-[-1.7px] text-[#5b37ff]">Play</span>
-        </div>
+        <BrandLogo compact className="justify-self-center" />
 
         <div className="relative">
           <button

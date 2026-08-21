@@ -146,6 +146,13 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Removidos **Alternar jogador**, **Estrutura Supabase** e **Restaurar dados de demonstração**.
 - O perfil mantém somente os dados reais, os contadores esportivos, a Administração para usuários autorizados e **Sair da conta**.
 
+### Notificações reais — versão 31
+
+- Removido o número fixo do sino; o contador agora representa convites pendentes recebidos.
+- O painel do sino mostra convites, confirmações, cancelamentos e partidas realizadas do usuário.
+- As notificações acompanham as alterações de `partidas` em tempo real.
+- Na tela inicial, o sino direciona o usuário para seus jogos e só exibe o ponto quando há convite pendente.
+
 ## Aceite, recusa e cancelamento — versão 24
 
 - **Meus jogos** carrega as partidas do usuário diretamente do Supabase.

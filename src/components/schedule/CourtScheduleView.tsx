@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { CourtSlot } from '../../types';
-import { COURTS } from '../../data/initialData';
 import { storageService } from '../../services/storageService';
 import { addDays, formatFriendlyDate, getBrasiliaToday } from '../../utils/dateUtils';
 import {
@@ -26,8 +25,13 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedCourtId, setSelectedCourtId] = useState('court-1');
   const [slots, setSlots] = useState<CourtSlot[]>([]);
+  const [courts, setCourts] = useState(() => storageService.getCourts(false));
 
-  const loadSlots = () => setSlots(storageService.getCourtScheduleForDate(selectedDate, selectedCourtId));
+  const loadSlots = () => {
+    const nextCourts = storageService.getCourts(false);
+    setCourts(nextCourts);
+    setSlots(storageService.getCourtScheduleForDate(selectedDate, selectedCourtId));
+  };
 
   useEffect(() => {
     loadSlots();
@@ -95,23 +99,25 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
           <h3 className="font-black text-sm text-[#101b3d]">Quadras</h3>
           <span className="text-[10px] font-bold text-slate-400">Selecione uma quadra</span>
         </div>
-        <div className="grid grid-cols-4 gap-2">
-          {COURTS.map((court) => {
+        <div className="grid grid-cols-3 gap-2">
+          {courts.map((court) => {
             const active = selectedCourtId === court.id;
             return (
               <button
                 key={court.id}
+                disabled={!court.active}
                 onClick={() => setSelectedCourtId(court.id)}
                 className={`rounded-[19px] px-1 py-3.5 flex flex-col items-center justify-center gap-2 transition-all ${
                   active
                     ? 'bg-gradient-to-br from-[#725cff] to-[#5038eb] text-white shadow-[0_9px_24px_rgba(91,70,238,0.34)] ring-1 ring-white/80'
-                    : 'qp-button text-slate-500'
+                    : court.active ? 'qp-button text-slate-500' : 'bg-slate-100 text-slate-400 opacity-65 cursor-not-allowed'
                 }`}
               >
                 <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center ${active ? 'border-white/90' : 'border-slate-300'}`}>
                   <span className="w-4 h-px bg-current opacity-70" />
                 </div>
                 <span className="text-[10px] sm:text-[11px] font-black whitespace-nowrap">{court.name}</span>
+                {!court.active && <span className="text-[8px] font-bold">Indisponível</span>}
               </button>
             );
           })}

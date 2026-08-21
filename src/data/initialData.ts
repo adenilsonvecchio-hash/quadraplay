@@ -10,13 +10,21 @@ export const DEFAULT_COURT_CONFIG: CourtConfig = {
   closeTime: "17:30",
   activeDays: [0, 1, 2, 3, 4, 5, 6], // Sunday to Saturday
   maxAdvanceBookingDays: 14,
+  timeSlots: [
+    { startTime: '07:00', endTime: '08:30' },
+    { startTime: '08:30', endTime: '10:00' },
+    { startTime: '10:00', endTime: '11:30' },
+    { startTime: '11:30', endTime: '13:00' },
+    { startTime: '13:00', endTime: '14:30' },
+    { startTime: '14:30', endTime: '16:00' },
+    { startTime: '16:00', endTime: '17:30' },
+  ],
 };
 
 export const COURTS: Court[] = [
   { id: 'court-1', name: 'Quadra 1', surface: 'Saibro', active: true },
-  { id: 'court-2', name: 'Quadra 2', surface: 'Saibro', active: true },
-  { id: 'court-3', name: 'Quadra 3', surface: 'Rápida', active: true },
-  { id: 'court-4', name: 'Quadra 4', surface: 'Rápida', active: true },
+  { id: 'court-2', name: 'Quadra 2', surface: 'Saibro', active: false },
+  { id: 'court-3', name: 'Quadra 3', surface: 'Saibro', active: false },
 ];
 
 // 10 players for each of the 5 classes (50 players total)
@@ -112,8 +120,8 @@ export function generateInitialMatches(): Match[] {
       courtId: 'court-1',
       courtName: DEFAULT_COURT_CONFIG.courtName,
       date: dayPlus1,
-      startTime: '18:00',
-      endTime: '19:00',
+      startTime: '07:00',
+      endTime: '08:30',
       status: 'scheduled',
       createdAt: '2026-08-18T10:00:00Z'
     },
@@ -127,8 +135,8 @@ export function generateInitialMatches(): Match[] {
       courtId: 'court-1',
       courtName: DEFAULT_COURT_CONFIG.courtName,
       date: dayPlus2,
-      startTime: '19:00',
-      endTime: '20:00',
+      startTime: '08:30',
+      endTime: '10:00',
       status: 'scheduled',
       createdAt: '2026-08-19T14:30:00Z'
     },
@@ -142,8 +150,8 @@ export function generateInitialMatches(): Match[] {
       courtId: 'court-1',
       courtName: DEFAULT_COURT_CONFIG.courtName,
       date: dayPlus3,
-      startTime: '08:00',
-      endTime: '09:00',
+      startTime: '10:00',
+      endTime: '11:30',
       status: 'scheduled',
       createdAt: '2026-08-19T16:00:00Z'
     },

@@ -1,7 +1,7 @@
 import React from 'react';
-import { CalendarDays, Home, User } from 'lucide-react';
+import { CalendarDays, Home, ListChecks, User } from 'lucide-react';
 
-export type TabType = 'home' | 'schedule' | 'book' | 'players' | 'profile' | 'matches' | 'admin';
+export type TabType = 'home' | 'schedule' | 'games' | 'book' | 'players' | 'profile' | 'matches' | 'admin';
 
 interface BottomNavProps {
   activeTab: TabType;
@@ -25,6 +25,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
       <div className="qp-bottom-nav__inner max-w-md lg:max-w-6xl mx-auto qp-nav pointer-events-auto px-5 lg:px-14 py-2 flex items-center justify-between lg:justify-center lg:gap-24">
         {item('home', 'Início', <Home className="w-[19px] h-[19px]" />)}
         {item('schedule', 'Agenda', <CalendarDays className="w-[19px] h-[19px]" />)}
+        {item('games', 'Jogos', <ListChecks className="w-[19px] h-[19px]" />)}
         {item('profile', 'Perfil', <User className="w-[19px] h-[19px]" />)}
       </div>
     </nav>

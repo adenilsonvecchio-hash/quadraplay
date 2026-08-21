@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Player, Match, BlockedSlot, CourtConfig, TennisClass } from '../../types';
+import { Player, Match, BlockedSlot, CourtConfig, TennisClass, Court } from '../../types';
 import { storageService } from '../../services/storageService';
 import { formatFriendlyDate, getBrasiliaToday } from '../../utils/dateUtils';
 import {
@@ -36,6 +36,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [blockedSlots, setBlockedSlots] = useState<BlockedSlot[]>([]);
   const [courtConfig, setCourtConfig] = useState<CourtConfig>(storageService.getConfig());
+  const [courts, setCourts] = useState<Court[]>(storageService.getCourts(false));
+  const [configSaved, setConfigSaved] = useState(false);
 
   // Player Form Modal State
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
@@ -50,6 +52,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   // Block Modal State
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
   const [blockDate, setBlockDate] = useState(getBrasiliaToday());
+  const [blockCourtId, setBlockCourtId] = useState('court-1');
   const [blockStartTime, setBlockStartTime] = useState('08:00');
   const [blockEndTime, setBlockEndTime] = useState('12:00');
   const [blockAllDay, setBlockAllDay] = useState(false);
@@ -70,6 +73,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setMatches(storageService.getMatches());
     setBlockedSlots(storageService.getBlockedSlots());
     setCourtConfig(storageService.getConfig());
+    setCourts(storageService.getCourts(false));
   };
 
   useEffect(() => {
@@ -148,6 +152,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     if (!blockDate || !blockReason.trim()) return;
 
     storageService.addBlockedSlot({
+      courtId: blockCourtId || undefined,
       date: blockDate,
       startTime: blockAllDay ? undefined : blockStartTime,
       endTime: blockAllDay ? undefined : blockEndTime,
@@ -166,8 +171,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const handleSaveConfig = (e: React.FormEvent) => {
     e.preventDefault();
     storageService.updateConfig(courtConfig);
-    alert('Configurações da quadra atualizadas com sucesso!');
+    setConfigSaved(true);
+    window.setTimeout(() => setConfigSaved(false), 2500);
   };
+
+  const updateSlot = (index: number, field: 'startTime' | 'endTime', value: string) => {
+    const timeSlots = [...(courtConfig.timeSlots || [])];
+    timeSlots[index] = { ...timeSlots[index], [field]: value };
+    setCourtConfig({ ...courtConfig, timeSlots });
+  };
+
+  const addTimeSlot = () => setCourtConfig({
+    ...courtConfig,
+    timeSlots: [...(courtConfig.timeSlots || []), { startTime: '07:00', endTime: '08:30' }],
+  });
+
+  const removeTimeSlot = (index: number) => setCourtConfig({
+    ...courtConfig,
+    timeSlots: (courtConfig.timeSlots || []).filter((_, itemIndex) => itemIndex !== index),
+  });
 
   const filteredMatches = matches.filter((m) => {
     if (matchClassFilter === 'ALL') return true;
@@ -444,6 +466,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                       </span>
                     </div>
                     <p className="text-xs font-semibold text-amber-900 mt-1">{b.reason}</p>
+                    <p className="text-[10px] font-bold text-amber-700 mt-0.5">
+                      {b.courtId ? courts.find((court) => court.id === b.courtId)?.name : 'Todas as quadras'}
+                    </p>
                   </div>
 
                   <button
@@ -468,15 +493,51 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             Horários & Regras da Quadra
           </h3>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Nome da Quadra</label>
-            <input
-              id="input-config-court-name"
-              type="text"
-              value={courtConfig.courtName}
-              onChange={(e) => setCourtConfig({ ...courtConfig, courtName: e.target.value })}
-              className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900"
-            />
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-700">Quadras cadastradas</label>
+            {courts.map((court) => (
+              <div key={court.id} className="grid grid-cols-[1fr_92px_auto] gap-2 items-center rounded-2xl bg-slate-50 p-2.5 border border-slate-200">
+                <input
+                  value={court.name}
+                  onChange={(event) => storageService.updateCourt(court.id, { name: event.target.value })}
+                  className="min-w-0 text-xs font-bold p-2 rounded-xl border border-slate-200"
+                  aria-label={`Nome da ${court.name}`}
+                />
+                <select
+                  value={court.surface}
+                  onChange={(event) => storageService.updateCourt(court.id, { surface: event.target.value })}
+                  className="text-[11px] font-semibold p-2 rounded-xl border border-slate-200"
+                >
+                  <option>Saibro</option>
+                  <option>Rápida</option>
+                  <option>Grama</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => storageService.updateCourt(court.id, { active: !court.active })}
+                  className={`px-2.5 py-2 rounded-xl text-[10px] font-black ${court.active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}
+                >
+                  {court.active ? 'Liberada' : 'Bloqueada'}
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-700">Horários disponíveis</label>
+              <button type="button" onClick={addTimeSlot} className="text-[10px] font-black text-violet-700 flex items-center gap-1">
+                <Plus className="w-3.5 h-3.5" /> Adicionar horário
+              </button>
+            </div>
+            {(courtConfig.timeSlots || []).map((slot, index) => (
+              <div key={`${index}-${slot.startTime}`} className="grid grid-cols-[1fr_auto_1fr_auto] gap-2 items-center">
+                <input type="time" value={slot.startTime} onChange={(event) => updateSlot(index, 'startTime', event.target.value)} className="text-xs font-semibold p-2.5 rounded-xl border border-slate-200" />
+                <span className="text-xs text-slate-400">até</span>
+                <input type="time" value={slot.endTime} onChange={(event) => updateSlot(index, 'endTime', event.target.value)} className="text-xs font-semibold p-2.5 rounded-xl border border-slate-200" />
+                <button type="button" onClick={() => removeTimeSlot(index)} className="p-2 text-rose-600" aria-label="Excluir horário"><Trash2 className="w-4 h-4" /></button>
+              </div>
+            ))}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -537,6 +598,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           >
             Salvar Configurações da Quadra
           </button>
+          {configSaved && <p className="text-center text-xs font-black text-emerald-700">Configurações salvas com sucesso.</p>}
         </form>
       )}
 
@@ -674,6 +736,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             </p>
 
             <form onSubmit={handleSaveBlock} className="space-y-3">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">Quadra</label>
+                <select
+                  value={blockCourtId}
+                  onChange={(event) => setBlockCourtId(event.target.value)}
+                  className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200"
+                >
+                  <option value="">Todas as quadras</option>
+                  {courts.map((court) => <option key={court.id} value={court.id}>{court.name}</option>)}
+                </select>
+              </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Data</label>
                 <input

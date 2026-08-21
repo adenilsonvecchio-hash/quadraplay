@@ -10,9 +10,10 @@ import { CourtScheduleView } from './components/schedule/CourtScheduleView';
 import { PlayersView } from './components/players/PlayersView';
 import { ProfileView } from './components/profile/ProfileView';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { ScheduledGamesView } from './components/matches/ScheduledGamesView';
 
 function MainApp() {
-  const { currentUser } = useAuth();
+  const { currentUser, authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [preselectedOpponentId, setPreselectedOpponentId] = useState<string | undefined>();
   const [bookingSeed, setBookingSeed] = useState<{date?: string; startTime?: string; courtId?: string}>({});
@@ -23,6 +24,7 @@ function MainApp() {
     return () => window.removeEventListener('quadraplay:navigate-profile', openProfile);
   }, []);
 
+  if (authLoading) return <div className="min-h-screen grid place-items-center bg-[#eef1f8] text-[#6855df] font-black">Carregando QuadraPlay+...</div>;
   if (!currentUser) return <LoginView onSuccess={() => setActiveTab('home')} />;
 
   const startGeneralBooking = () => {
@@ -64,6 +66,7 @@ function MainApp() {
           )}
 
           {activeTab === 'matches' && <MyMatchesView onStartBooking={startGeneralBooking} />}
+          {activeTab === 'games' && <ScheduledGamesView />}
           {activeTab === 'schedule' && (
             <CourtScheduleView
               onScheduleSlot={(date, startTime, courtId) => {

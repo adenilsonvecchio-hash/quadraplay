@@ -55,7 +55,7 @@ create table if not exists public.configuracoes_agenda (
   grupo_id uuid primary key references public.grupos(id) on delete cascade,
   duracao_minutos integer not null default 90 check (duracao_minutos between 30 and 240),
   abre_as time not null default '07:00',
-  fecha_as time not null default '19:00',
+  fecha_as time not null default '17:30',
   dias_ativos smallint[] not null default array[0,1,2,3,4,5,6],
   antecedencia_maxima_dias integer not null default 14 check (antecedencia_maxima_dias between 1 and 365),
   atualizado_em timestamptz not null default now()
@@ -91,7 +91,9 @@ create table if not exists public.partidas (
   cancelado_em timestamptz,
   criado_em timestamptz not null default now(),
   check (jogador_1_id <> jogador_2_id),
-  check (hora_fim > hora_inicio)
+  check (hora_fim > hora_inicio),
+  check (hora_fim = hora_inicio + interval '90 minutes'),
+  check (hora_inicio in ('07:00','08:30','10:00','11:30','13:00','14:30','16:00'))
 );
 
 create unique index if not exists partidas_quadra_horario_ativo_uidx
@@ -130,6 +132,18 @@ begin
   if new.data = (now() at time zone 'America/Sao_Paulo')::date
      and new.hora_inicio <= (now() at time zone 'America/Sao_Paulo')::time then
     raise exception 'Este horário já transcorreu no dia de hoje.';
+  end if;
+
+  if new.hora_fim <> new.hora_inicio + interval '90 minutes'
+     or new.hora_inicio not in ('07:00','08:30','10:00','11:30','13:00','14:30','16:00') then
+    raise exception 'Horário inválido. Utilize um dos sete períodos oficiais de 1h30.';
+  end if;
+
+  if not exists (
+    select 1 from public.quadras q
+    where q.id = new.quadra_id and q.grupo_id = new.grupo_id and q.ativa
+  ) then
+    raise exception 'Esta quadra não está ativa para agendamentos.';
   end if;
 
   select classe into classe_1 from public.membros_grupo
@@ -245,4 +259,3 @@ grant execute on function public.admin_do_grupo(uuid) to authenticated;
 do $$ begin
   alter publication supabase_realtime add table public.partidas;
 exception when duplicate_object then null; end $$;
-

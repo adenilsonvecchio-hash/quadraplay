@@ -24,7 +24,7 @@ Projeto mobile de agendamento de jogos do Tangará Country Clube.
 
 ## Atualização da Agenda — modelo aprovado
 
-- Agenda com 4 quadras reais no modelo local (`court-1` a `court-4`).
+- Agenda do piloto com 3 quadras; somente a Quadra 1 permanece ativa inicialmente.
 - Horários oficiais de 1h30: 07:00–08:30, 08:30–10:00, 10:00–11:30, 11:30–13:00, 13:00–14:30, 14:30–16:00 e 16:00–17:30.
 - Fluxo de reserva reorganizado: Data → Quadra e horário → Adversário → Confirmar.
 - Clique em horário disponível na Agenda abre o fluxo já com data, quadra e horário selecionados.
@@ -34,7 +34,7 @@ Projeto mobile de agendamento de jogos do Tangará Country Clube.
 - Colisão de quadra e conflito de jogador são validados para reservas pendentes e confirmadas.
 - Datas e horários passados continuam bloqueados.
 
-> Nesta etapa os dados ainda estão no serviço local do projeto. A conexão definitiva com Supabase deve ser feita na etapa seguinte, mantendo as mesmas regras de negócio.
+> A agenda continua no serviço local durante a validação do login. A migração das partidas será feita na próxima etapa, mantendo as mesmas regras de negócio.
 
 ## Migração visual QuadraPlay — 2026-08-20
 
@@ -42,10 +42,10 @@ O projeto foi padronizado para o novo design aprovado: fundo branco, cartões su
 
 ### Auditoria técnica
 - Frontend: React 19 + TypeScript + Vite + Tailwind CSS 4.
-- Persistência atual: localStorage por `storageService.ts`.
-- Autenticação atual: simulação local por e-mail; ainda não usa Supabase Auth real.
-- Banco real: ainda não conectado ao runtime. Existe apenas um schema SQL de referência em `initialData.ts`.
-- Agenda: 4 quadras, blocos de horário, bloqueios, datas passadas e conflito de quadra já são validados localmente.
+- Persistência da agenda: localStorage por `storageService.ts`, temporariamente.
+- Autenticação: Supabase Auth por e-mail e senha quando as variáveis de ambiente estão configuradas.
+- Perfil e grupo: carregados das tabelas `perfis` e `membros_grupo` do Supabase.
+- Agenda: 3 quadras, blocos de horário, bloqueios, datas passadas e conflito de quadra já são validados localmente.
 - Partidas: fluxo pendente → aceita/recusada/cancelada já existe localmente.
 - Ranking: removido do produto. O QuadraPlay é somente agenda de jogos.
 
@@ -70,10 +70,29 @@ O projeto foi padronizado para o novo design aprovado: fundo branco, cartões su
 O arquivo `supabase/migrations/001_quadraplay_schema.sql` prepara o banco real com:
 
 - perfis, grupos, membros, classes A–E e aprovação de jogador;
-- 4 quadras configuráveis e bloqueios administrativos;
+- 3 quadras configuráveis no piloto e bloqueios administrativos;
 - partidas pendentes, aceitas, recusadas, canceladas ou concluídas;
 - bloqueio de data/horário passado, conflito de quadra e conflito de jogador;
 - RLS por grupo e permissões de jogador, administrador e proprietário;
 - Realtime na agenda.
 
-Próxima etapa: adicionar o cliente Supabase ao frontend e trocar gradualmente o `storageService`, mantendo as interfaces visuais existentes.
+## Conexão do frontend com Supabase — etapa 2
+
+1. Copie `.env.example` para `.env.local`.
+2. No painel Supabase, abra **Connect → Framework → React → Vite**.
+3. Preencha `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` no `.env.local`.
+4. Nunca publique a chave `service_role` no frontend.
+5. Execute `npm install` e `npm run dev`.
+
+Com as variáveis presentes, o aplicativo usa sessão persistente do Supabase, login por e-mail/senha e busca o perfil aprovado do grupo Nosso Tênis. Sem elas, o modo demonstrativo local continua disponível.
+
+Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o Supabase.
+
+## Gestão de agenda — versão 15
+
+- Nova tela **Jogos** para todos os membros visualizarem os próximos jogos do grupo, com data, horário, quadra, classe, jogadores e situação.
+- Painel administrativo com as três quadras do piloto e controle individual **Liberada/Bloqueada**.
+- Administrador pode editar o nome e o tipo de piso de cada quadra.
+- Cadastro e exclusão das faixas de horários disponíveis.
+- Bloqueio por data e horário para uma quadra específica ou para todas as quadras.
+- Configuração inicial: Quadra 1 liberada; Quadras 2 e 3 bloqueadas.

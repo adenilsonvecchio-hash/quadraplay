@@ -1,4 +1,4 @@
-import { Player, Match, BlockedSlot, CourtConfig, TennisClass, CourtSlot } from '../types';
+import { Player, Match, BlockedSlot, CourtConfig, TennisClass, CourtSlot, Court } from '../types';
 import { INITIAL_PLAYERS, generateInitialMatches, generateInitialBlockedSlots, DEFAULT_COURT_CONFIG, COURTS } from '../data/initialData';
 import { getBrasiliaToday, isSlotInPast, generateDaySlots, isBeforeDate } from '../utils/dateUtils';
 
@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   BLOCKED: 'quadraplay_blocked_v1',
   // v2 aplica a grade oficial: 07:00–17:30 em blocos fixos de 90 minutos.
   CONFIG: 'quadraplay_config_v2',
+  COURTS: 'quadraplay_courts_v1',
   CURRENT_USER_ID: 'quadraplay_current_user_id_v1',
 };
 
@@ -16,6 +17,7 @@ class StorageService {
   private matches: Match[] = [];
   private blockedSlots: BlockedSlot[] = [];
   private config: CourtConfig = DEFAULT_COURT_CONFIG;
+  private courts: Court[] = COURTS;
   private listeners: Set<() => void> = new Set();
 
   constructor() {
@@ -55,12 +57,17 @@ class StorageService {
         this.config = DEFAULT_COURT_CONFIG;
         this.saveConfig();
       }
+
+      const storedCourts = localStorage.getItem(STORAGE_KEYS.COURTS);
+      this.courts = storedCourts ? JSON.parse(storedCourts) : COURTS;
+      if (!storedCourts) this.saveCourts();
     } catch (e) {
       console.error('Failed to load from storage, using initial data', e);
       this.players = INITIAL_PLAYERS;
       this.matches = generateInitialMatches();
       this.blockedSlots = generateInitialBlockedSlots();
       this.config = DEFAULT_COURT_CONFIG;
+      this.courts = COURTS;
     }
   }
 
@@ -90,6 +97,11 @@ class StorageService {
 
   private saveConfig() {
     localStorage.setItem(STORAGE_KEYS.CONFIG, JSON.stringify(this.config));
+    this.notify();
+  }
+
+  private saveCourts() {
+    localStorage.setItem(STORAGE_KEYS.COURTS, JSON.stringify(this.courts));
     this.notify();
   }
 
@@ -196,12 +208,19 @@ class StorageService {
     return { upcoming, past, cancelled };
   }
 
-  public getCourts() {
-    return COURTS.filter((court) => court.active);
+  public getCourts(activeOnly = true): Court[] {
+    return this.courts.filter((court) => !activeOnly || court.active).map((court) => ({ ...court }));
+  }
+
+  public updateCourt(courtId: string, changes: Partial<Omit<Court, 'id'>>) {
+    this.courts = this.courts.map((court) => court.id === courtId ? { ...court, ...changes } : court);
+    this.saveCourts();
   }
 
   public getCourtScheduleForDate(date: string, courtId: string = 'court-1'): CourtSlot[] {
-    const baseSlots = generateDaySlots(this.config.openTime, this.config.closeTime, this.config.slotDurationMinutes);
+    const baseSlots = this.config.timeSlots?.length
+      ? this.config.timeSlots.map((slot) => ({ ...slot }))
+      : generateDaySlots(this.config.openTime, this.config.closeTime, this.config.slotDurationMinutes);
     const dateMatches = this.matches.filter((m) => m.date === date && m.courtId === courtId && (m.status === 'scheduled' || m.status === 'pending'));
     const dateBlocks = this.blockedSlots.filter((b) => b.date === date && (!b.courtId || b.courtId === courtId));
 
@@ -283,7 +302,7 @@ class StorageService {
 
     const player1 = this.getPlayerById(params.player1Id);
     const player2 = this.getPlayerById(params.player2Id);
-    const court = COURTS.find((c) => c.id === params.courtId && c.active);
+    const court = this.courts.find((c) => c.id === params.courtId && c.active);
 
     if (!court) {
       return { success: false, error: 'Quadra inválida ou indisponível.' };
@@ -443,10 +462,12 @@ class StorageService {
     this.matches = generateInitialMatches();
     this.blockedSlots = generateInitialBlockedSlots();
     this.config = DEFAULT_COURT_CONFIG;
+    this.courts = COURTS;
     this.savePlayers();
     this.saveMatches();
     this.saveBlocked();
     this.saveConfig();
+    this.saveCourts();
   }
 }
 

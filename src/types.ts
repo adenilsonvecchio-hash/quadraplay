@@ -68,4 +68,5 @@ export interface CourtConfig {
   closeTime: string; // "22:00"
   activeDays: number[]; // 0 (Sun) to 6 (Sat)
   maxAdvanceBookingDays: number;
+  timeSlots?: Array<{ startTime: string; endTime: string }>;
 }

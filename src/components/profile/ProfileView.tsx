@@ -1,242 +1,41 @@
 import React, { useState } from 'react';
+import { CheckCircle2, ChevronRight, Database, LogOut, RefreshCw, Shield, Sparkles, UserRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { storageService } from '../../services/storageService';
 import { SUPABASE_SQL_SCHEMA } from '../../data/initialData';
-import {
-  User,
-  Shield,
-  LogOut,
-  Sparkles,
-  Database,
-  CheckCircle2,
-  Copy,
-  ChevronRight,
-  Info,
-  RefreshCw,
-} from 'lucide-react';
 
-interface ProfileViewProps {
-  onOpenAdmin: () => void;
-}
+interface ProfileViewProps { onOpenAdmin: () => void; }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenAdmin }) => {
   const { currentUser, logout, switchUser, allPlayers, isAdmin } = useAuth();
-  const [showSqlModal, setShowSqlModal] = useState(false);
-  const [copiedSql, setCopiedSql] = useState(false);
-  const [showPlayerSwitcher, setShowPlayerSwitcher] = useState(false);
-
+  const [showPlayers, setShowPlayers] = useState(false);
+  const [showSql, setShowSql] = useState(false);
   if (!currentUser) return null;
 
-  const handleCopySql = () => {
-    navigator.clipboard.writeText(SUPABASE_SQL_SCHEMA);
-    setCopiedSql(true);
-    setTimeout(() => setCopiedSql(false), 2000);
-  };
+  const matches = storageService.getPlayerMatches(currentUser.id);
+  const total = matches.upcoming.length + matches.past.length;
 
-  const handleResetData = () => {
-    storageService.resetToDefaults();
-    window.location.reload();
-  };
+  return <div className="space-y-4 pb-8">
+    <section className="pt-1"><h2 className="text-2xl font-black tracking-tight">Perfil Esportivo</h2><p className="text-xs text-slate-500 mt-1">Seus dados e atividade no QuadraPlay.</p></section>
 
-  return (
-    <div className="space-y-4 pb-12">
-      {/* Header */}
-      <div>
-        <h2 className="text-xl font-black text-slate-900 tracking-tight">Perfil do Atleta</h2>
-        <p className="text-xs text-slate-500">
-          Suas informações no grupo Nosso Tênis
-        </p>
-      </div>
+    <section className="qp-card rounded-[28px] p-4">
+      <div className="flex items-center gap-3"><div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 text-white grid place-items-center text-xl font-black shadow-lg">{currentUser.name.charAt(0)}</div><div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h3 className="text-lg font-black truncate">{currentUser.name}</h3>{currentUser.isAdmin && <span className="text-[9px] font-black text-amber-700 bg-amber-50 px-2 py-1 rounded-full">ADMIN</span>}</div><p className="text-xs text-slate-500 truncate">{currentUser.email}</p><span className="inline-block mt-2 text-[10px] font-black text-violet-700 bg-violet-50 px-2.5 py-1 rounded-full">Classe {currentUser.tennisClass}</span></div></div>
+      <div className="grid grid-cols-3 gap-2 mt-4"><div className="qp-soft rounded-[17px] p-3 text-center"><p className="text-lg font-black">{total}</p><p className="text-[9px] text-slate-400 font-bold">Jogos</p></div><div className="qp-soft rounded-[17px] p-3 text-center"><p className="text-lg font-black">{matches.upcoming.length}</p><p className="text-[9px] text-slate-400 font-bold">Próximos</p></div><div className="qp-soft rounded-[17px] p-3 text-center"><p className="text-lg font-black">{matches.past.length}</p><p className="text-[9px] text-slate-400 font-bold">Realizados</p></div></div>
+    </section>
 
-      {/* Main Profile Card */}
-      <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs relative overflow-hidden">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-[#0F1E36] text-[#D4F63D] font-black text-xl flex items-center justify-center shadow-xs">
-            {currentUser.name.charAt(0)}
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-base font-black text-slate-900">{currentUser.name}</h3>
-              {currentUser.isAdmin && (
-                <span className="text-[10px] font-black bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full">
-                  Admin
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-500 mt-0.5">{currentUser.email}</p>
-            <p className="text-xs text-slate-500">{currentUser.phone}</p>
-          </div>
-        </div>
+    {isAdmin && <button onClick={onOpenAdmin} className="w-full qp-card rounded-[20px] p-4 flex items-center gap-3 text-left"><span className="w-10 h-10 rounded-[15px] bg-violet-100 text-violet-600 grid place-items-center"><Shield className="w-5 h-5"/></span><span className="flex-1"><span className="block text-sm font-black">Administração</span><span className="block text-[10px] text-slate-500">Gerenciar jogadores, horários e bloqueios</span></span><ChevronRight className="w-4 h-4 text-slate-400"/></button>}
 
-        {/* Class Badge & Restriction Note */}
-        <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-              Categoria Atual
-            </span>
-            <span className="text-sm font-black text-slate-900">
-              Classe {currentUser.tennisClass}
-            </span>
-          </div>
+    <section className="qp-card rounded-[24px] overflow-hidden">
+      <button onClick={()=>setShowPlayers(v=>!v)} className="w-full p-4 flex items-center gap-3 text-left"><span className="w-10 h-10 rounded-[15px] bg-violet-50 text-violet-600 grid place-items-center"><Sparkles className="w-4 h-4"/></span><span className="flex-1"><span className="block text-sm font-black">Alternar jogador</span><span className="block text-[10px] text-slate-500">Somente para testes desta versão</span></span><ChevronRight className={`w-4 h-4 text-slate-400 transition ${showPlayers?'rotate-90':''}`}/></button>
+      {showPlayers && <div className="p-3 pt-0 max-h-56 overflow-y-auto custom-scrollbar space-y-1.5">{allPlayers.map(player=><button key={player.id} onClick={()=>{switchUser(player.id);setShowPlayers(false)}} className={`w-full qp-soft rounded-[15px] p-2.5 flex items-center gap-2 text-left ${player.id===currentUser.id?'ring-2 ring-violet-200':''}`}><span className="w-8 h-8 rounded-full bg-violet-100 text-violet-700 grid place-items-center text-xs font-black">{player.tennisClass}</span><span className="flex-1 text-xs font-black truncate">{player.name}</span>{player.id===currentUser.id&&<CheckCircle2 className="w-4 h-4 text-violet-600"/>}</button>)}</div>}
+    </section>
 
-          <div className="text-right">
-            <span className="text-[11px] text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full font-medium inline-flex items-center gap-1">
-              <Info className="w-3 h-3 text-slate-400" />
-              <span>Classe gerida pelo Admin</span>
-            </span>
-          </div>
-        </div>
-      </div>
+    <section className="qp-card rounded-[24px] overflow-hidden">
+      <button onClick={()=>setShowSql(v=>!v)} className="w-full p-4 flex items-center gap-3 text-left"><span className="w-10 h-10 rounded-[15px] bg-emerald-50 text-emerald-600 grid place-items-center"><Database className="w-4 h-4"/></span><span className="flex-1"><span className="block text-sm font-black">Estrutura Supabase</span><span className="block text-[10px] text-slate-500">Schema de referência incluído no projeto</span></span><ChevronRight className={`w-4 h-4 text-slate-400 transition ${showSql?'rotate-90':''}`}/></button>
+      {showSql && <pre className="mx-3 mb-3 max-h-52 overflow-auto rounded-[16px] bg-[#0b1742] text-emerald-300 p-3 text-[9px] custom-scrollbar">{SUPABASE_SQL_SCHEMA}</pre>}
+    </section>
 
-      {/* Admin Panel Access Button if Admin */}
-      {isAdmin && (
-        <button
-          id="btn-profile-go-admin"
-          onClick={onOpenAdmin}
-          className="w-full py-3.5 px-4 bg-[#0F1E36] hover:bg-slate-800 text-white rounded-2xl font-bold text-xs flex items-center justify-between shadow-xs transition-colors"
-        >
-          <div className="flex items-center gap-2.5">
-            <Shield className="w-4 h-4 text-amber-400" />
-            <span>Acessar Painel de Administração</span>
-          </div>
-          <ChevronRight className="w-4 h-4 text-slate-400" />
-        </button>
-      )}
-
-      {/* Switch Player (Demo / Testing helper) */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-        <button
-          id="btn-profile-toggle-switcher"
-          onClick={() => setShowPlayerSwitcher(!showPlayerSwitcher)}
-          className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-[#0F1E36]" />
-            </div>
-            <div>
-              <p className="text-xs font-black text-slate-900">Alternar Atleta (Demonstração)</p>
-              <p className="text-[11px] text-slate-500">
-                Simule qualquer um dos 50 atletas das 5 classes
-              </p>
-            </div>
-          </div>
-          <ChevronRight
-            className={`w-4 h-4 text-slate-400 transition-transform ${
-              showPlayerSwitcher ? 'rotate-90' : ''
-            }`}
-          />
-        </button>
-
-        {showPlayerSwitcher && (
-          <div className="p-3 bg-slate-50 border-t border-slate-100 max-h-60 overflow-y-auto space-y-1">
-            {allPlayers.map((player) => (
-              <button
-                key={player.id}
-                id={`btn-switch-to-${player.id}`}
-                onClick={() => {
-                  switchUser(player.id);
-                  setShowPlayerSwitcher(false);
-                }}
-                className={`w-full p-2 rounded-xl text-left text-xs flex items-center justify-between transition-colors ${
-                  player.id === currentUser.id
-                    ? 'bg-[#0F1E36] text-white font-bold'
-                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/60'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#D4F63D] text-slate-950 font-black text-[10px] flex items-center justify-center">
-                    {player.tennisClass}
-                  </span>
-                  <span>{player.name}</span>
-                  {player.isAdmin && (
-                    <span className="text-[9px] bg-amber-400/20 text-amber-600 px-1 py-0.2 rounded font-bold">
-                      Admin
-                    </span>
-                  )}
-                </div>
-                {player.id === currentUser.id && (
-                  <CheckCircle2 className="w-4 h-4 text-[#D4F63D]" />
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Supabase Schema & Architecture view */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-        <button
-          id="btn-profile-view-supabase"
-          onClick={() => setShowSqlModal(!showSqlModal)}
-          className="w-full p-4 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-              <Database className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-xs font-black text-slate-900">Supabase & PostgreSQL</p>
-              <p className="text-[11px] text-slate-500">
-                Esquema SQL DDL, RLS e constraints de agendamento
-              </p>
-            </div>
-          </div>
-          <ChevronRight
-            className={`w-4 h-4 text-slate-400 transition-transform ${
-              showSqlModal ? 'rotate-90' : ''
-            }`}
-          />
-        </button>
-
-        {showSqlModal && (
-          <div className="p-4 bg-slate-900 text-slate-300 border-t border-slate-800 text-xs font-mono">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] text-slate-400">schema.sql (Supabase DDL & RLS)</span>
-              <button
-                id="btn-copy-supabase-sql"
-                onClick={handleCopySql}
-                className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-white font-sans text-xs flex items-center gap-1"
-              >
-                {copiedSql ? (
-                  <>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Copiado!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>Copiar SQL</span>
-                  </>
-                )}
-              </button>
-            </div>
-            <pre className="max-h-60 overflow-y-auto bg-slate-950 p-3 rounded-xl text-[11px] text-emerald-400 leading-relaxed custom-scrollbar">
-              {SUPABASE_SQL_SCHEMA}
-            </pre>
-          </div>
-        )}
-      </div>
-
-      {/* Reset Data to Initial Seed */}
-      <button
-        id="btn-reset-demo-data"
-        onClick={handleResetData}
-        className="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl font-semibold text-xs flex items-center justify-center gap-2 transition-colors"
-      >
-        <RefreshCw className="w-3.5 h-3.5" />
-        <span>Restaurar dados iniciais de fábrica</span>
-      </button>
-
-      {/* Logout */}
-      <button
-        id="btn-profile-logout"
-        onClick={logout}
-        className="w-full py-3.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-colors"
-      >
-        <LogOut className="w-4 h-4" />
-        <span>Sair da Conta</span>
-      </button>
-    </div>
-  );
+    <button onClick={()=>{storageService.resetToDefaults();window.location.reload();}} className="w-full qp-soft rounded-[18px] py-3 text-xs font-black text-slate-600 flex items-center justify-center gap-2"><RefreshCw className="w-4 h-4"/>Restaurar dados de demonstração</button>
+    <button onClick={logout} className="w-full rounded-[18px] py-3 bg-rose-50 border border-rose-100 text-xs font-black text-rose-700 flex items-center justify-center gap-2"><LogOut className="w-4 h-4"/>Sair da conta</button>
+  </div>;
 };

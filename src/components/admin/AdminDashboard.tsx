@@ -177,7 +177,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   return (
     <div className="space-y-4 pb-12">
       {/* Top Header */}
-      <div className="bg-[#0F1E36] text-white rounded-3xl p-5 border border-slate-800 shadow-sm">
+      <div className="bg-[#0b1742] text-white rounded-3xl p-5 border border-slate-800 shadow-sm">
         <div className="flex items-center justify-between">
           <button
             id="btn-admin-back"
@@ -207,7 +207,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('players')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'players'
-              ? 'bg-white text-[#0F1E36] shadow-xs'
+              ? 'bg-white text-[#0b1742] shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -218,7 +218,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('matches')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'matches'
-              ? 'bg-white text-[#0F1E36] shadow-xs'
+              ? 'bg-white text-[#0b1742] shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -229,7 +229,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('blocks')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'blocks'
-              ? 'bg-white text-[#0F1E36] shadow-xs'
+              ? 'bg-white text-[#0b1742] shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -240,7 +240,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('config')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'config'
-              ? 'bg-white text-[#0F1E36] shadow-xs'
+              ? 'bg-white text-[#0b1742] shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -258,7 +258,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <button
               id="btn-admin-add-player"
               onClick={handleOpenNewPlayer}
-              className="text-xs font-black bg-[#D4F63D] hover:bg-[#c6ea2f] text-slate-950 px-3 py-2 rounded-xl flex items-center gap-1 shadow-xs"
+              className="text-xs font-black bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Novo Jogador</span>
@@ -269,10 +269,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             {players.map((player) => (
               <div
                 key={player.id}
-                className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between"
+                className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#0F1E36] font-black text-sm flex items-center justify-center border border-slate-200">
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#0b1742] font-black text-sm flex items-center justify-center border border-slate-200">
                     {player.tennisClass}
                   </div>
                   <div>
@@ -328,7 +328,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 onClick={() => setMatchClassFilter(cls)}
                 className={`text-xs px-2.5 py-1 rounded-lg font-bold transition-colors ${
                   matchClassFilter === cls
-                    ? 'bg-[#0F1E36] text-white'
+                    ? 'bg-[#0b1742] text-white'
                     : 'bg-white text-slate-600 border border-slate-200'
                 }`}
               >
@@ -346,7 +346,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
               filteredMatches.map((m) => (
                 <div
                   key={m.id}
-                  className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs space-y-2"
+                  className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm space-y-2"
                 >
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5">
@@ -416,7 +416,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <button
               id="btn-admin-add-block"
               onClick={() => setIsBlockModalOpen(true)}
-              className="text-xs font-black bg-[#D4F63D] hover:bg-[#c6ea2f] text-slate-950 px-3 py-2 rounded-xl flex items-center gap-1 shadow-xs"
+              className="text-xs font-black bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Novo Bloqueio</span>
@@ -432,7 +432,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
               blockedSlots.map((b) => (
                 <div
                   key={b.id}
-                  className="bg-amber-50/60 border border-amber-200 p-3.5 rounded-2xl flex items-center justify-between shadow-xs"
+                  className="bg-amber-50/60 border border-amber-200 p-3.5 rounded-2xl flex items-center justify-between shadow-sm"
                 >
                   <div>
                     <div className="flex items-center gap-2">
@@ -463,7 +463,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
       {/* TAB 4: CONFIGURAÇÕES DA QUADRA */}
       {activeTab === 'config' && (
-        <form onSubmit={handleSaveConfig} className="bg-white p-5 rounded-3xl border border-slate-200 space-y-4 shadow-xs">
+        <form onSubmit={handleSaveConfig} className="bg-white p-5 rounded-3xl border border-slate-200 space-y-4 shadow-sm">
           <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">
             Horários & Regras da Quadra
           </h3>
@@ -533,7 +533,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           <button
             id="btn-save-court-config"
             type="submit"
-            className="w-full py-3 bg-[#0F1E36] hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+            className="w-full py-3 bg-[#0b1742] hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-sm transition-colors"
           >
             Salvar Configurações da Quadra
           </button>
@@ -613,7 +613,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                       onClick={() => setPlayerClass(cls)}
                       className={`py-2 rounded-xl text-xs font-black transition-all ${
                         playerClass === cls
-                          ? 'bg-[#0F1E36] text-white shadow-xs'
+                          ? 'bg-[#0b1742] text-white shadow-sm'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
@@ -647,7 +647,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 <button
                   id="btn-save-player-submit"
                   type="submit"
-                  className="flex-1 py-2.5 text-xs font-bold text-slate-950 bg-[#D4F63D] hover:bg-[#c6ea2f] rounded-xl shadow-xs"
+                  className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm"
                 >
                   Salvar
                 </button>

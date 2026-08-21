@@ -40,3 +40,57 @@ html, body {
     -webkit-backdrop-filter: blur(14px);
   }
 }
+
+:root {
+  color: #0b1742;
+  background: #eef1f8;
+  font-synthesis: none;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% -10%, #ffffff 0%, #f6f7fc 35%, #eef1f8 100%);
+}
+
+.qp-shell {
+  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,249,255,.98));
+  box-shadow: 0 24px 70px rgba(43, 48, 83, .14);
+}
+
+.qp-card {
+  background: rgba(255,255,255,.88);
+  border: 1px solid rgba(235,237,247,.95);
+  box-shadow: 0 9px 26px rgba(45,49,84,.08), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.qp-soft {
+  background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(247,247,253,.9));
+  border: 1px solid rgba(235,237,247,.95);
+  box-shadow: 0 8px 20px rgba(46,50,86,.08), inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+.qp-icon-btn {
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: rgba(255,255,255,.95);
+  border: 1px solid rgba(235,237,247,.95);
+  box-shadow: 0 8px 20px rgba(45,49,84,.11), inset 0 1px 0 rgba(255,255,255,.95);
+}
+
+.qp-nav {
+  border-radius: 26px;
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(232,234,244,.96);
+  box-shadow: 0 14px 34px rgba(45,49,84,.13), inset 0 1px 0 rgba(255,255,255,.98);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.qp-primary {
+  background: linear-gradient(100deg, #6f4cff 0%, #5428f3 100%);
+  color: white;
+  box-shadow: 0 10px 22px rgba(92, 53, 255, .25), inset 0 1px 0 rgba(255,255,255,.35);
+}

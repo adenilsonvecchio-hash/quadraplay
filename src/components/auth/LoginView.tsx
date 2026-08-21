@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { Lock, Mail, ChevronRight, Sparkles, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
-interface LoginViewProps {
-  onSuccess?: () => void;
-}
+interface LoginViewProps { onSuccess?: () => void; }
 
 export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
   const { loginWithEmail, allPlayers } = useAuth();
@@ -13,157 +11,45 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
   const [error, setError] = useState<string | null>(null);
   const [showDemoSelector, setShowDemoSelector] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) {
-      setError('Por favor, informe seu e-mail.');
-      return;
-    }
-
-    const res = loginWithEmail(email, password);
-    if (res.success) {
-      setError(null);
-      if (onSuccess) onSuccess();
-    } else {
-      setError(res.error || 'Credenciais inválidas.');
-    }
-  };
-
-  const handleSelectDemoPlayer = (playerEmail: string) => {
-    setEmail(playerEmail);
-    setPassword('senha123');
-    const res = loginWithEmail(playerEmail, 'senha123');
-    if (res.success && onSuccess) {
-      onSuccess();
-    }
+  const login = (userEmail: string, userPassword = password) => {
+    const res = loginWithEmail(userEmail, userPassword);
+    if (!res.success) return setError(res.error || 'Credenciais inválidas.');
+    setError(null);
+    onSuccess?.();
   };
 
   return (
-    <div className="min-h-screen bg-[#0F1E36] text-white flex flex-col justify-between px-5 py-8 max-w-md mx-auto">
-      {/* Top Header & Branding */}
-      <div className="pt-6 text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#D4F63D] text-slate-950 font-black text-2xl shadow-xl shadow-lime-950/40 mb-4 border-2 border-lime-300">
-          QP
-        </div>
-        <h1 className="text-2xl font-black tracking-tight text-white">QuadraPlay</h1>
-        <p className="text-xs font-semibold text-lime-400 mt-1 uppercase tracking-wider">
-          Nosso Tênis • Tangará Country Clube
-        </p>
-        <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto">
-          Agendamento oficial da quadra de saibro exclusiva para o grupo.
-        </p>
-      </div>
-
-      {/* Main Login Card */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl backdrop-blur-md my-6">
-        <h2 className="text-lg font-bold text-white mb-1">Acessar Conta</h2>
-        <p className="text-xs text-slate-400 mb-5">
-          Entre com seu e-mail cadastrado pelo clube.
-        </p>
-
-        {error && (
-          <div className="mb-4 p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium flex items-center gap-2">
-            <span>⚠️</span>
-            <span>{error}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">E-mail</label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                id="input-login-email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setError(null);
-                }}
-                placeholder="seu.nome@tangara.com"
-                className="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#D4F63D] focus:border-transparent transition-all"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1.5">Senha</label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                id="input-login-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#D4F63D] focus:border-transparent transition-all"
-              />
-            </div>
-          </div>
-
-          <button
-            id="btn-login-submit"
-            type="submit"
-            className="w-full py-3.5 px-4 bg-[#D4F63D] hover:bg-[#c6ea2f] text-slate-950 font-black text-sm rounded-xl shadow-lg shadow-lime-950/20 active:scale-98 transition-all flex items-center justify-center gap-2 mt-2"
-          >
-            <span>Entrar no QuadraPlay</span>
-            <ChevronRight className="w-4 h-4 stroke-[3]" />
-          </button>
-        </form>
-
-        {/* Demo Fast Access Toggle */}
-        <div className="mt-5 pt-4 border-t border-slate-800 text-center">
-          <button
-            id="btn-toggle-demo-accounts"
-            type="button"
-            onClick={() => setShowDemoSelector(!showDemoSelector)}
-            className="text-xs text-[#D4F63D] hover:underline font-semibold inline-flex items-center gap-1.5"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>{showDemoSelector ? 'Ocultar contas de demonstração' : 'Acessar com 1 clique (50 jogadores)'}</span>
-          </button>
+    <div className="min-h-screen bg-[#eef1f8] flex items-center justify-center px-4 py-7">
+      <div className="qp-shell w-full max-w-md rounded-[38px] border border-white p-5 sm:p-7">
+        <div className="text-center pt-3 pb-7">
+          <div className="text-[38px] leading-none select-none"><span className="font-black tracking-[-2px] text-[#0b1742]">Quadra</span><span className="font-black italic tracking-[-2.3px] text-[#5b37ff]">Play</span></div>
+          <p className="text-sm font-bold text-slate-500 mt-3">Agende, desafie e jogue.</p>
         </div>
 
-        {showDemoSelector && (
-          <div className="mt-4 max-h-56 overflow-y-auto space-y-1.5 pr-1 text-left custom-scrollbar">
-            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Selecione um jogador teste:
-            </p>
-            {allPlayers.map((player) => (
-              <button
-                key={player.id}
-                id={`btn-demo-player-${player.id}`}
-                type="button"
-                onClick={() => handleSelectDemoPlayer(player.email)}
-                className="w-full p-2 rounded-lg bg-slate-800/70 hover:bg-slate-700/80 border border-slate-700/60 flex items-center justify-between text-xs transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-[#D4F63D] text-slate-950 font-black text-[10px] flex items-center justify-center">
-                    {player.tennisClass}
-                  </span>
-                  <span className="font-semibold text-slate-200">{player.name}</span>
-                  {player.isAdmin && (
-                    <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-bold">
-                      Admin
-                    </span>
-                  )}
-                </div>
-                <span className="text-[11px] text-slate-400">{player.email.split('@')[0]}</span>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+        <section className="qp-card rounded-[30px] p-5">
+          <h2 className="text-xl font-black text-[#0b1742]">Entrar</h2>
+          <p className="text-xs text-slate-500 mt-1 mb-5">Acesse sua conta para ver agenda, partidas e adversários.</p>
 
-      {/* Footer Info */}
-      <div className="text-center text-slate-500 text-[11px] space-y-1">
-        <p className="flex items-center justify-center gap-1">
-          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Quadra única • 5 Classes (A, B, C, D, E) • 50 Atletas</span>
-        </p>
-        <p>Tangará Country Clube — Nosso Tênis</p>
+          {error && <div className="mb-4 p-3 rounded-[16px] bg-rose-50 border border-rose-100 text-rose-700 text-xs font-bold">{error}</div>}
+
+          <form onSubmit={(e) => { e.preventDefault(); if (!email.trim()) return setError('Informe seu e-mail.'); login(email); }} className="space-y-3">
+            <label className="block">
+              <span className="text-[11px] font-black text-slate-500 ml-1">E-mail</span>
+              <div className="relative mt-1.5"><Mail className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" /><input type="email" value={email} onChange={e => { setEmail(e.target.value); setError(null); }} placeholder="seu@email.com" className="w-full qp-soft rounded-[18px] pl-11 pr-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-violet-200" /></div>
+            </label>
+            <label className="block">
+              <span className="text-[11px] font-black text-slate-500 ml-1">Senha</span>
+              <div className="relative mt-1.5"><Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" /><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="w-full qp-soft rounded-[18px] pl-11 pr-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-violet-200" /></div>
+            </label>
+            <button type="submit" className="qp-primary w-full rounded-[18px] py-3.5 font-black text-sm flex items-center justify-center gap-1.5">Entrar no QuadraPlay <ChevronRight className="w-4 h-4" /></button>
+          </form>
+
+          <button type="button" onClick={() => setShowDemoSelector(v => !v)} className="w-full mt-4 pt-4 border-t border-slate-100 text-xs font-bold text-violet-600 flex items-center justify-center gap-1.5"><Sparkles className="w-3.5 h-3.5" />{showDemoSelector ? 'Ocultar jogadores de demonstração' : 'Entrar com jogador de demonstração'}</button>
+
+          {showDemoSelector && <div className="mt-3 max-h-52 overflow-y-auto custom-scrollbar space-y-1.5">{allPlayers.map(player => <button key={player.id} onClick={() => login(player.email, 'senha123')} className="w-full qp-soft rounded-[15px] px-3 py-2.5 flex items-center gap-2 text-left"><span className="w-8 h-8 rounded-full bg-violet-100 text-violet-700 grid place-items-center text-xs font-black">{player.tennisClass}</span><span className="flex-1 min-w-0 text-xs font-black truncate">{player.name}</span>{player.isAdmin && <span className="text-[9px] font-black text-amber-700 bg-amber-50 px-1.5 py-1 rounded-lg">ADMIN</span>}</button>)}</div>}
+        </section>
+
+        <div className="mt-5 text-center text-[10px] text-slate-400"><p className="flex items-center justify-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />Nosso Tênis • Tangará Country Clube</p></div>
       </div>
     </div>
   );

@@ -1,95 +1,53 @@
 import React from 'react';
-import { Home, Calendar, Plus, Users, User } from 'lucide-react';
+import { CalendarDays, Home, Trophy, User } from 'lucide-react';
 
-export type TabType = 'home' | 'schedule' | 'book' | 'players' | 'profile' | 'matches' | 'admin';
+export type TabType = 'home' | 'schedule' | 'book' | 'players' | 'ranking' | 'profile' | 'matches' | 'admin';
 
 interface BottomNavProps {
   activeTab: TabType;
   onChangeTab: (tab: TabType) => void;
 }
 
+const TennisMark = () => (
+  <svg viewBox="0 0 56 56" className="w-9 h-9" aria-hidden="true">
+    <circle cx="28" cy="28" r="23" fill="none" stroke="currentColor" strokeWidth="2.2" opacity=".28" />
+    <path d="M18 8c8 8 8 32 0 40M38 8c-8 8-8 32 0 40" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+  </svg>
+);
+
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) => {
+  const item = (tab: TabType, label: string, icon: React.ReactNode) => (
+    <button
+      type="button"
+      onClick={() => onChangeTab(tab)}
+      className={`flex flex-col items-center justify-center w-[58px] h-[54px] rounded-2xl transition-all ${activeTab === tab ? 'text-[#5636ff]' : 'text-[#0b1742]'}`}
+    >
+      <span className={`grid place-items-center w-8 h-8 rounded-xl ${activeTab === tab ? 'bg-violet-100 shadow-[0_5px_14px_rgba(91,55,255,.16)]' : ''}`}>{icon}</span>
+      <span className="text-[10px] font-bold mt-0.5">{label}</span>
+    </button>
+  );
+
   return (
-    <nav className="fixed bottom-3 left-0 right-0 z-40 px-4 pointer-events-none">
-      <div className="max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-white/80 shadow-[0_12px_36px_rgba(11,27,56,0.14)] rounded-[28px] px-3 py-2 flex items-center justify-between pointer-events-auto">
-        {/* Início */}
-        <button
-          id="nav-tab-home"
-          onClick={() => onChangeTab('home')}
-          className={`flex flex-col items-center justify-center w-12 py-1 transition-all rounded-2xl ${
-            activeTab === 'home'
-              ? 'text-[#0B1B38] font-black scale-105'
-              : 'text-slate-400 hover:text-slate-700 font-semibold'
-          }`}
-        >
-          <div className={`p-1 rounded-xl transition-colors ${activeTab === 'home' ? 'bg-[#1E78E6]/10 text-[#1E78E6]' : ''}`}>
-            <Home className={`w-5 h-5 ${activeTab === 'home' ? 'stroke-[2.5]' : 'stroke-2'}`} />
-          </div>
-          <span className="text-[10px] mt-0.5 tracking-tight">Início</span>
-        </button>
+    <nav className="fixed bottom-2 left-0 right-0 z-50 px-3 pointer-events-none">
+      <div className="max-w-md mx-auto qp-nav pointer-events-auto px-2 py-2 flex items-center justify-between">
+        {item('home', 'Início', <Home className="w-[19px] h-[19px]" />)}
+        {item('schedule', 'Agenda', <CalendarDays className="w-[19px] h-[19px]" />)}
 
-        {/* Agenda */}
-        <button
-          id="nav-tab-schedule"
-          onClick={() => onChangeTab('schedule')}
-          className={`flex flex-col items-center justify-center w-12 py-1 transition-all rounded-2xl ${
-            activeTab === 'schedule'
-              ? 'text-[#0B1B38] font-black scale-105'
-              : 'text-slate-400 hover:text-slate-700 font-semibold'
-          }`}
-        >
-          <div className={`p-1 rounded-xl transition-colors ${activeTab === 'schedule' ? 'bg-[#1E78E6]/10 text-[#1E78E6]' : ''}`}>
-            <Calendar className={`w-5 h-5 ${activeTab === 'schedule' ? 'stroke-[2.5]' : 'stroke-2'}`} />
-          </div>
-          <span className="text-[10px] mt-0.5 tracking-tight">Agenda</span>
-        </button>
-
-        {/* Central Prominent Button: Agendar (Modern Dark Squircle with Tennis Ball Lime Glow) */}
-        <div className="flex flex-col items-center -mt-6">
+        <div className="relative w-[72px] h-[54px] flex justify-center">
           <button
-            id="nav-tab-book-center"
+            type="button"
             onClick={() => onChangeTab('book')}
-            className="w-14 h-14 rounded-2xl bg-[#0B1B38] text-[#D4F63D] flex items-center justify-center shadow-[0_8px_20px_rgba(11,27,56,0.35)] border-4 border-[#EDF4FC] active:scale-95 transition-all hover:bg-[#12284C] group"
-            aria-label="Agendar jogo"
+            className="absolute -top-7 w-[66px] h-[66px] rounded-full bg-gradient-to-br from-[#765cff] via-[#5d39ff] to-[#4224dc] text-white grid place-items-center border-[5px] border-[#f8f9ff] shadow-[0_10px_28px_rgba(88,51,255,.42),inset_0_2px_0_rgba(255,255,255,.55)] active:scale-95 transition-transform"
+            aria-label="Jogar"
           >
-            <Plus className="w-6 h-6 stroke-[3] group-hover:rotate-90 transition-transform duration-300" />
+            <TennisMark />
           </button>
-          <span className="text-[10px] font-black text-[#0B1B38] mt-0.5">Agendar</span>
+          <span className="absolute top-[39px] text-[10px] font-black text-[#4e2cff]">JOGAR</span>
         </div>
 
-        {/* Jogadores */}
-        <button
-          id="nav-tab-players"
-          onClick={() => onChangeTab('players')}
-          className={`flex flex-col items-center justify-center w-12 py-1 transition-all rounded-2xl ${
-            activeTab === 'players'
-              ? 'text-[#0B1B38] font-black scale-105'
-              : 'text-slate-400 hover:text-slate-700 font-semibold'
-          }`}
-        >
-          <div className={`p-1 rounded-xl transition-colors ${activeTab === 'players' ? 'bg-[#1E78E6]/10 text-[#1E78E6]' : ''}`}>
-            <Users className={`w-5 h-5 ${activeTab === 'players' ? 'stroke-[2.5]' : 'stroke-2'}`} />
-          </div>
-          <span className="text-[10px] mt-0.5 tracking-tight">Atletas</span>
-        </button>
-
-        {/* Perfil */}
-        <button
-          id="nav-tab-profile"
-          onClick={() => onChangeTab('profile')}
-          className={`flex flex-col items-center justify-center w-12 py-1 transition-all rounded-2xl ${
-            activeTab === 'profile'
-              ? 'text-[#0B1B38] font-black scale-105'
-              : 'text-slate-400 hover:text-slate-700 font-semibold'
-          }`}
-        >
-          <div className={`p-1 rounded-xl transition-colors ${activeTab === 'profile' ? 'bg-[#1E78E6]/10 text-[#1E78E6]' : ''}`}>
-            <User className={`w-5 h-5 ${activeTab === 'profile' ? 'stroke-[2.5]' : 'stroke-2'}`} />
-          </div>
-          <span className="text-[10px] mt-0.5 tracking-tight">Perfil</span>
-        </button>
+        {item('ranking', 'Ranking', <Trophy className="w-[19px] h-[19px]" />)}
+        {item('profile', 'Perfil', <User className="w-[19px] h-[19px]" />)}
       </div>
     </nav>
   );
 };
-

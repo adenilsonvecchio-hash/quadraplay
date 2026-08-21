@@ -32,3 +32,19 @@ View your app in AI Studio: https://ai.studio/apps/1a1283ef-3137-44f6-af77-d0020
 - Datas e horários passados continuam bloqueados.
 
 > Nesta etapa os dados ainda estão no serviço local do projeto. A conexão definitiva com Supabase deve ser feita na etapa seguinte, mantendo as mesmas regras de negócio.
+
+## Migração visual QuadraPlay — 2026-08-20
+
+O projeto foi padronizado para o novo design aprovado: fundo branco, cartões suaves, sombras discretas, roxo/violeta como cor principal, cabeçalho unificado e navegação inferior com botão central JOGAR.
+
+### Auditoria técnica
+- Frontend: React 19 + TypeScript + Vite + Tailwind CSS 4.
+- Persistência atual: localStorage por `storageService.ts`.
+- Autenticação atual: simulação local por e-mail; ainda não usa Supabase Auth real.
+- Banco real: ainda não conectado ao runtime. Existe apenas um schema SQL de referência em `initialData.ts`.
+- Agenda: 4 quadras, blocos de horário, bloqueios, datas passadas e conflito de quadra já são validados localmente.
+- Partidas: fluxo pendente → aceita/recusada/cancelada já existe localmente.
+- Ranking: tela adicionada com participação por quantidade de jogos, sem pontuação automática por vitória.
+
+### Próxima etapa recomendada
+Substituir `storageService` por um repositório Supabase mantendo as mesmas interfaces do frontend, implementar Auth real, tabelas, RLS, RPC/constraints e Realtime sem alterar o design aprovado.

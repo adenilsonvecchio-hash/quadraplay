@@ -1,7 +1,8 @@
 import React from 'react';
-import { Bell, CalendarDays, CalendarPlus, ChevronRight, MapPin, Users } from 'lucide-react';
+import { CalendarDays, CalendarPlus, ChevronRight, MapPin, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../common/BrandLogo';
+import { NotificationsBell } from '../common/NotificationsBell';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -33,7 +34,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
             </div>
           </div>
           <div className="qp-clean-home__title">Início</div>
-          <button type="button" className="qp-clean-home__bell" aria-label="Notificações em breve"><Bell size={18} /></button>
+          <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
       </header>
 

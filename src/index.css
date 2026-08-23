@@ -153,6 +153,27 @@ body {
 .qp-club-mark { width:104px; height:38px; border:0; box-shadow:none; background:#fff; }
 .qp-clean-home__bell { width:34px; height:34px; color:#1d2041; background:#f7f7fb; border-color:#eceef4; border-radius:12px; }
 .qp-clean-home__bell span { background:#6955e3; border-color:#fff; }
+
+.qp-notification-count { position:absolute; right:-4px; top:-5px; min-width:19px; height:19px; padding:0 5px; display:grid; place-items:center; border-radius:999px; border:2px solid #f8f9ff; background:#ef4444 !important; color:#fff; font-size:10px; line-height:1; font-weight:900; }
+.qp-clean-home__bell .qp-notification-count { right:-6px; top:-6px; border-color:#fff; }
+.qp-notification-layer { position:fixed; inset:0; z-index:100; display:flex; align-items:flex-start; justify-content:center; padding:76px 14px 86px; background:rgba(11,23,66,.22); backdrop-filter:blur(3px); }
+.qp-notification-panel { width:min(390px,100%); max-height:min(580px,calc(100vh - 170px)); overflow:hidden; border:1px solid rgba(255,255,255,.95); border-radius:26px; background:#fff; box-shadow:0 24px 70px rgba(30,35,80,.25); }
+.qp-notification-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 18px 14px; border-bottom:1px solid #eef0f6; }
+.qp-notification-heading div { display:flex; flex-direction:column; }
+.qp-notification-heading strong { color:#101b3d; font-size:17px; font-weight:900; }
+.qp-notification-heading small { color:#8b91a7; font-size:11px; font-weight:700; }
+.qp-notification-heading button { width:36px; height:36px; display:grid; place-items:center; border-radius:12px; color:#69708a; background:#f3f4f8; }
+.qp-notification-list { max-height:calc(min(580px,100vh - 170px) - 70px); overflow-y:auto; padding:8px; }
+.qp-notification-item { width:100%; display:flex; align-items:center; gap:12px; padding:11px; border-radius:17px; text-align:left; transition:background .18s ease; }
+.qp-notification-item:hover { background:#f6f5ff; }
+.qp-notification-item>span:last-child { min-width:0; display:flex; flex-direction:column; }
+.qp-notification-item strong { color:#1c2748; font-size:13px; font-weight:900; }
+.qp-notification-item small { overflow:hidden; color:#777e95; font-size:11px; font-weight:700; text-overflow:ellipsis; white-space:nowrap; }
+.qp-notification-icon { flex:0 0 auto; width:38px; height:38px; display:grid; place-items:center; border-radius:13px; }
+.qp-notification-icon.is-pending { color:#8a6100; background:#fff3bf; }
+.qp-notification-icon.is-confirmed { color:#147a56; background:#dff8ee; }
+.qp-notification-icon.is-cancelled { color:#b33b4b; background:#ffe6ea; }
+.qp-notification-empty { padding:34px 18px; color:#8b91a7; text-align:center; font-size:12px; font-weight:800; }
 .qp-clean-home__panel { height:calc(100% - 104px); padding:18px 18px 18px; border-radius:0; background:#f3f4f9; box-shadow:none; }
 .qp-clean-home__intro { margin:0 2px 20px; }
 .qp-clean-home__brand { margin:0 0 14px; }

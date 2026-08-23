@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { Bell, CalendarDays, Home, ListChecks, Menu, ShieldCheck, User, X } from 'lucide-react';
+import { CalendarDays, Home, ListChecks, Menu, ShieldCheck, User, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from './BrandLogo';
+import { NotificationsBell } from './NotificationsBell';
+import { TabType } from './BottomNav';
 
 interface HeaderProps {
   onOpenAdmin?: () => void;
   activeTab: string;
-  onNavigate?: (tab: 'home' | 'schedule' | 'games' | 'profile' | 'admin') => void;
+  onNavigate?: (tab: TabType) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNavigate }) => {
   const { isAdmin } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = (tab: 'home' | 'schedule' | 'games' | 'profile' | 'admin') => {
+  const navigate = (tab: TabType) => {
     onNavigate?.(tab);
     setMenuOpen(false);
   };
@@ -31,16 +33,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
 
         <BrandLogo compact className="justify-self-center" />
 
-        <div className="relative">
-          <button
-            type="button"
-            onClick={undefined}
-            className="qp-icon-btn w-12 h-12"
-            aria-label="Notificações em breve"
-          >
-            <Bell className="w-5 h-5" />
-          </button>
-        </div>
+        <div className="relative"><NotificationsBell onOpenMatches={() => navigate('matches')} /></div>
       </div>
       {menuOpen && (
         <nav className="absolute left-4 top-[74px] z-50 w-[min(320px,calc(100vw-32px))] rounded-[24px] border border-white bg-white/95 p-2 shadow-[0_18px_48px_rgba(40,45,90,0.18)] backdrop-blur-xl">

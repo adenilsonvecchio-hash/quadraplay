@@ -41,6 +41,9 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenAdmin }) => {
             completed: matches.past.length,
           });
         }
+      } catch (error) {
+        console.warn('Não foi possível carregar as estatísticas do perfil.', error);
+        setStats({ total: 0, upcoming: 0, completed: 0 });
       } finally {
         setStatsLoading(false);
       }

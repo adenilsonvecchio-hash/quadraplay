@@ -52,7 +52,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant = 
 
   const notifications = useMemo(() => matches
     .filter((match) => match.status === 'pending' || match.status === 'scheduled' || match.status === 'cancelled')
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
     .slice(0, 8), [matches]);
 
   const pendingCount = matches.filter((match) => match.status === 'pending' && match.player2Id === currentUser?.id).length;

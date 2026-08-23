@@ -83,7 +83,7 @@ export const ScheduledGamesView: React.FC = () => {
             // perfil como compatibilidade para identificar o convidado.
             const incoming = match.status === 'pending' && !!currentUser && (
               match.player2Id === currentUser.id
-              || match.player2Name.trim().toLocaleLowerCase('pt-BR') === currentUser.name.trim().toLocaleLowerCase('pt-BR')
+              || (match.player2Name || '').trim().toLocaleLowerCase('pt-BR') === (currentUser.name || '').trim().toLocaleLowerCase('pt-BR')
             );
             return <article key={match.id} className="qp-glass rounded-[24px] p-4 border border-white">
               <div className="flex items-start justify-between gap-3">

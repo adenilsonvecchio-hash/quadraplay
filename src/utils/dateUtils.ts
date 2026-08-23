@@ -11,8 +11,13 @@ export function getBrasiliaToday(): string {
     month: '2-digit',
     day: '2-digit'
   };
-  const formatter = new Intl.DateTimeFormat('en-CA', options); // en-CA gives YYYY-MM-DD
-  return formatter.format(now);
+  const formatter = new Intl.DateTimeFormat('en-CA', options);
+  const parts = formatter.formatToParts(now);
+  const year = parts.find((part) => part.type === 'year')?.value;
+  const month = parts.find((part) => part.type === 'month')?.value;
+  const day = parts.find((part) => part.type === 'day')?.value;
+  if (year && month && day) return `${year}-${month}-${day}`;
+  return now.toISOString().slice(0, 10);
 }
 
 /**

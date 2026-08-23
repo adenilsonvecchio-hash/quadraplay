@@ -59,7 +59,8 @@ class StorageService {
       }
 
       const storedCourts = localStorage.getItem(STORAGE_KEYS.COURTS);
-      this.courts = storedCourts ? JSON.parse(storedCourts) : COURTS;
+      const parsedCourts = storedCourts ? JSON.parse(storedCourts) : COURTS;
+      this.courts = Array.isArray(parsedCourts) ? parsedCourts : COURTS;
       if (!storedCourts) this.saveCourts();
     } catch (e) {
       console.error('Failed to load from storage, using initial data', e);
@@ -209,7 +210,8 @@ class StorageService {
   }
 
   public getCourts(activeOnly = true): Court[] {
-    return this.courts.filter((court) => !activeOnly || court.active).map((court) => ({ ...court }));
+    const courts = Array.isArray(this.courts) ? this.courts : COURTS;
+    return courts.filter((court) => !activeOnly || court.active).map((court) => ({ ...court }));
   }
 
   public updateCourt(courtId: string, changes: Partial<Omit<Court, 'id'>>) {

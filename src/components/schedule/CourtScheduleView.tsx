@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { CourtSlot } from '../../types';
+import { Court, CourtSlot } from '../../types';
 import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { addDays, formatFriendlyDate, getBrasiliaToday } from '../../utils/dateUtils';
@@ -26,7 +26,9 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedCourtId, setSelectedCourtId] = useState('court-1');
   const [slots, setSlots] = useState<CourtSlot[]>([]);
-  const [courts, setCourts] = useState(() => storageService.getCourts(false));
+  // Não consulta o armazenamento antigo durante a renderização. No modo
+  // Supabase, as quadras reais serão carregadas logo após a página abrir.
+  const [courts, setCourts] = useState<Court[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
 
@@ -36,7 +38,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
     try {
       if (usingSupabase && groupId) {
         const nextCourts = await supabaseAgendaService.getCourts(groupId);
-        setCourts(nextCourts);
+        setCourts(Array.isArray(nextCourts) ? nextCourts : []);
         const availableCourt = nextCourts.find((court) => court.id === selectedCourtId && court.active) || nextCourts.find((court) => court.active);
         if (!availableCourt) {
           setSlots([]);
@@ -49,7 +51,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
         setSlots(await supabaseAgendaService.getSchedule(groupId, selectedDate, availableCourt.id));
       } else {
         const nextCourts = storageService.getCourts(false);
-        setCourts(nextCourts);
+        setCourts(Array.isArray(nextCourts) ? nextCourts : []);
         setSlots(storageService.getCourtScheduleForDate(selectedDate, selectedCourtId));
       }
     } catch {
@@ -127,7 +129,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
           <span className="text-[10px] font-bold text-slate-400">Selecione uma quadra</span>
         </div>
         <div className="grid grid-cols-3 gap-2">
-          {courts.map((court) => {
+          {(Array.isArray(courts) ? courts : []).map((court) => {
             const active = selectedCourtId === court.id;
             return (
               <button
@@ -162,7 +164,7 @@ export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onSchedule
 
           <section className="qp-glass rounded-[26px] p-2 space-y-1.5">
             {loading && <div className="p-6 text-center text-xs font-bold text-slate-500">Carregando agenda...</div>}
-            {slots.map((slot) => {
+            {(Array.isArray(slots) ? slots : []).map((slot) => {
               const isMyMatch = !!currentUser && !!slot.match && (slot.match.player1Id === currentUser.id || slot.match.player2Id === currentUser.id);
               const isPending = slot.match?.status === 'pending';
 

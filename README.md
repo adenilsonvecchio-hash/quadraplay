@@ -202,3 +202,9 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Adicionada uma quadra de tênis vetorial e transparente ao fundo da área principal da tela inicial.
 - A marca-d'água fica mais visível no espaço vazio do desktop e mais suave no celular.
 - Textos, botões e cartões permanecem acima da imagem, com leitura e cliques preservados.
+
+## Restauração de Meus jogos — pacote versão 30
+
+- A organização de Próximos, Histórico e Cancelados foi blindada contra registros antigos ou incompletos.
+- Campos ausentes de partidas recebem valores seguros sem derrubar a página.
+- O modal interno de cancelamento permanece conectado às partidas reais do Supabase.

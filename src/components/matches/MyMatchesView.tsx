@@ -9,11 +9,25 @@ import { ConfirmModal } from '../common/ConfirmModal';
 
 interface MyMatchesViewProps { onStartBooking: () => void; }
 type SubTab = 'upcoming' | 'past' | 'cancelled';
+type MatchBuckets = { upcoming: Match[]; past: Match[]; cancelled: Match[] };
+
+const emptyBuckets = (): MatchBuckets => ({ upcoming: [], past: [], cancelled: [] });
+
+const normalizeBuckets = (value: Partial<MatchBuckets> | null | undefined): MatchBuckets => ({
+  upcoming: Array.isArray(value?.upcoming) ? value.upcoming.filter(Boolean) : [],
+  past: Array.isArray(value?.past) ? value.past.filter(Boolean) : [],
+  cancelled: Array.isArray(value?.cancelled) ? value.cancelled.filter(Boolean) : [],
+});
+
+const safeDateLabel = (date: unknown) => {
+  if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return 'Data não informada';
+  try { return formatFriendlyDate(date); } catch { return date.split('-').reverse().join('/'); }
+};
 
 export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) => {
   const { currentUser, usingSupabase, groupId } = useAuth();
   const [active, setActive] = useState<SubTab>('upcoming');
-  const [data, setData] = useState<{upcoming: Match[]; past: Match[]; cancelled: Match[]}>({upcoming:[],past:[],cancelled:[]});
+  const [data, setData] = useState<MatchBuckets>(emptyBuckets);
   const [cancelling, setCancelling] = useState<Match | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState('');
@@ -23,11 +37,11 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
     if (!currentUser) return;
     try {
       const allMatches = usingSupabase && groupId ? await supabaseAgendaService.getMatches(groupId) : null;
-      if (!allMatches) setData(storageService.getPlayerMatches(currentUser.id));
+      if (!allMatches) setData(normalizeBuckets(storageService.getPlayerMatches(currentUser.id)));
       else {
         const today = getBrasiliaToday();
-        const result = { upcoming: [] as Match[], past: [] as Match[], cancelled: [] as Match[] };
-        allMatches.filter((match) => match.player1Id === currentUser.id || match.player2Id === currentUser.id).forEach((match) => {
+        const result = emptyBuckets();
+        (Array.isArray(allMatches) ? allMatches : []).filter((match): match is Match => !!match && (match.player1Id === currentUser.id || match.player2Id === currentUser.id)).forEach((match) => {
           if (match.status === 'cancelled') result.cancelled.push(match);
           else if (match.status === 'completed' || match.date < today || (match.date === today && isSlotInPast(match.date, match.startTime))) result.past.push(match);
           else result.upcoming.push(match);
@@ -35,10 +49,11 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
         result.upcoming.sort((a, b) => `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`));
         result.past.sort((a, b) => `${b.date} ${b.startTime}`.localeCompare(`${a.date} ${a.startTime}`));
         result.cancelled.sort((a, b) => `${b.date} ${b.startTime}`.localeCompare(`${a.date} ${a.startTime}`));
-        setData(result);
+        setData(normalizeBuckets(result));
       }
       setActionError('');
     } catch {
+      setData(emptyBuckets());
       setActionError('Não foi possível carregar seus jogos do banco.');
     } finally {
       setLoading(false);
@@ -51,7 +66,7 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
   }, [currentUser, usingSupabase, groupId]);
   if (!currentUser) return null;
 
-  const list = data[active];
+  const list = Array.isArray(data?.[active]) ? data[active] : [];
   const respond = async (match: Match, accept: boolean) => {
     setBusyMatchId(match.id); setActionError('');
     try {
@@ -96,19 +111,19 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
       {loading && <div className="qp-card rounded-[28px] p-8 text-center text-sm font-bold text-slate-500">Carregando seus jogos...</div>}
       {!loading && list.length === 0 && <div className="qp-card rounded-[28px] p-8 text-center"><CalendarDays className="w-8 h-8 text-violet-400 mx-auto"/><h3 className="font-black mt-3">Nenhum jogo nesta seção</h3><p className="text-xs text-slate-500 mt-1">Quando houver movimentações, elas aparecerão aqui.</p></div>}
 
-      {list.map(match => {
-        const opponent = match.player1Id === currentUser.id ? match.player2Name : match.player1Name;
+      {list.filter(Boolean).map(match => {
+        const opponent = String(match.player1Id === currentUser.id ? match.player2Name || 'Adversário' : match.player1Name || 'Adversário');
         const incoming = match.status === 'pending' && match.player2Id === currentUser.id;
         const tone = match.status === 'pending' ? 'orange' : match.status === 'cancelled' ? 'rose' : 'emerald';
         return <article key={match.id} className="qp-card rounded-[26px] p-4">
           <div className="flex items-center justify-between gap-3">
             <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${tone==='orange'?'bg-orange-50 text-orange-700':tone==='rose'?'bg-rose-50 text-rose-700':'bg-emerald-50 text-emerald-700'}`}>{match.status==='pending'?'Aguardando confirmação':match.status==='cancelled'?'Cancelado':active==='past'?'Realizado':'Confirmado'}</span>
-            <span className="text-[10px] font-black text-violet-700 bg-violet-50 px-2 py-1 rounded-full">Classe {match.tennisClass}</span>
+            <span className="text-[10px] font-black text-violet-700 bg-violet-50 px-2 py-1 rounded-full">Classe {String(match.tennisClass || '—')}</span>
           </div>
 
           <div className="mt-4 flex gap-3">
             <div className="w-14 h-14 rounded-[18px] bg-violet-50 text-violet-700 grid place-items-center shrink-0"><CalendarDays className="w-5 h-5"/></div>
-            <div className="min-w-0 flex-1"><p className="text-xs text-slate-500 font-bold">{formatFriendlyDate(match.date)}</p><h3 className="text-base font-black mt-1 truncate">vs {opponent}</h3><div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[11px] text-slate-500"><span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.5"/>{match.startTime} - {match.endTime}</span><span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/>{match.courtName}</span></div></div>
+            <div className="min-w-0 flex-1"><p className="text-xs text-slate-500 font-bold">{safeDateLabel(match.date)}</p><h3 className="text-base font-black mt-1 truncate">vs {opponent}</h3><div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[11px] text-slate-500"><span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.5"/>{String(match.startTime || '--:--')} - {String(match.endTime || '--:--')}</span><span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/>{String(match.courtName || 'Quadra')}</span></div></div>
           </div>
 
           {active==='upcoming' && <div className="mt-4 pt-3 border-t border-slate-100 flex gap-2">
@@ -118,6 +133,6 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
       })}
     </div>
 
-    <ConfirmModal isOpen={!!cancelling} title="Cancelar agendamento?" description={cancelling ? `Cancelar o jogo com ${cancelling.player1Id===currentUser.id?cancelling.player2Name:cancelling.player1Name} em ${formatFriendlyDate(cancelling.date)}?` : ''} confirmLabel="Cancelar jogo" cancelLabel="Manter jogo" isDestructive showReasonInput onConfirm={(reason)=>void confirmCancellation(reason)} onClose={()=>setCancelling(null)} />
+    <ConfirmModal isOpen={!!cancelling} title="Cancelar agendamento?" description={cancelling ? `Cancelar o jogo com ${String(cancelling.player1Id===currentUser.id?cancelling.player2Name || 'Adversário':cancelling.player1Name || 'Adversário')} em ${safeDateLabel(cancelling.date)}?` : ''} confirmLabel="Cancelar jogo" cancelLabel="Manter jogo" isDestructive showReasonInput onConfirm={(reason)=>void confirmCancellation(reason)} onClose={()=>setCancelling(null)} />
   </div>;
 };

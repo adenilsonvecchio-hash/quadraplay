@@ -98,7 +98,7 @@ function MainApp() {
           )}
           {activeTab === 'players' && <PlayersView onChallengePlayer={startBookingWithOpponent} />}
           {activeTab === 'profile' && <PageGuard name="Perfil" onBack={() => navigate('home')}><ProfileView onOpenAdmin={() => navigate('admin')} /></PageGuard>}
-          {activeTab === 'admin' && <AdminDashboard onBack={() => navigate('home')} />}
+          {activeTab === 'admin' && <PageGuard name="Painel administrativo" onBack={() => navigate('home')}><AdminDashboard onBack={() => navigate('home')} /></PageGuard>}
         </main>
 
         <BottomNav activeTab={activeTab} onChangeTab={navigate} />

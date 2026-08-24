@@ -58,8 +58,12 @@ const hydrateMatches = async (rows: any[] | null | undefined): Promise<Match[]> 
       : Promise.resolve({ data: [], error: null }),
   ]);
 
-  if (profilesResult.error) throw profilesResult.error;
-  if (courtsResult.error) throw courtsResult.error;
+  // Nomes e quadras enriquecem o cartão, mas não podem impedir a partida de
+  // aparecer. Em bases antigas, uma política RLS mais restrita pode bloquear
+  // uma destas consultas auxiliares mesmo quando a leitura de `partidas` está
+  // autorizada.
+  if (profilesResult.error) console.warn('Nomes dos jogadores indisponíveis.', profilesResult.error);
+  if (courtsResult.error) console.warn('Nomes das quadras indisponíveis.', courtsResult.error);
 
   const playerNames = new Map<string, string>((profilesResult.data || []).map((profile: any) => [profile.id, profile.nome]));
   const courtNames = new Map<string, string>((courtsResult.data || []).map((court: any) => [court.id, court.nome]));
@@ -67,6 +71,39 @@ const hydrateMatches = async (rows: any[] | null | undefined): Promise<Match[]> 
 };
 
 export const supabaseAgendaService = {
+  async getGroupPlayers(groupId: string): Promise<Player[]> {
+    if (!supabase) return [];
+    const { data: members, error: membersError } = await supabase
+      .from('membros_grupo')
+      .select('usuario_id, classe, perfil')
+      .eq('grupo_id', groupId)
+      .eq('aprovado', true);
+    if (membersError) throw membersError;
+    if (!members?.length) return [];
+
+    const playerIds = members.map((member) => member.usuario_id);
+    const { data: profiles, error: profilesError } = await supabase
+      .from('perfis')
+      .select('id, nome, email, telefone, avatar_url, criado_em')
+      .in('id', playerIds);
+    if (profilesError) throw profilesError;
+
+    const profilesById = new Map<string, any>((profiles || []).map((profile: any) => [profile.id, profile]));
+    return members.map((member: any) => {
+      const profile = profilesById.get(member.usuario_id);
+      return {
+        id: member.usuario_id,
+        name: profile?.nome?.trim() || 'Jogador sem nome',
+        email: profile?.email || '',
+        phone: profile?.telefone || undefined,
+        avatarUrl: profile?.avatar_url || undefined,
+        tennisClass: (member.classe || 'A') as TennisClass,
+        isAdmin: member.perfil === 'ADMINISTRADOR' || member.perfil === 'PROPRIETARIO',
+        createdAt: profile?.criado_em || new Date().toISOString(),
+      };
+    }).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  },
+
   async getPlayersByClass(groupId: string, tennisClass: TennisClass, currentUserId: string): Promise<Player[]> {
     if (!supabase) return [];
     // Carrega primeiro os membros e depois os perfis. Esta forma não depende
@@ -212,6 +249,19 @@ export const supabaseAgendaService = {
   async getMatches(groupId: string): Promise<Match[]> {
     if (!supabase) return [];
     const { data, error } = await supabase.from('partidas').select(matchSelect).eq('grupo_id', groupId).order('data').order('hora_inicio');
+    if (error) throw error;
+    return hydrateMatches(data);
+  },
+
+  async getMatchesForUser(groupId: string, userId: string): Promise<Match[]> {
+    if (!supabase) return [];
+    const { data, error } = await supabase
+      .from('partidas')
+      .select(matchSelect)
+      .eq('grupo_id', groupId)
+      .or(`jogador_1_id.eq.${userId},jogador_2_id.eq.${userId}`)
+      .order('data')
+      .order('hora_inicio');
     if (error) throw error;
     return hydrateMatches(data);
   },

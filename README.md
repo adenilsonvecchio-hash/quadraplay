@@ -208,3 +208,18 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - A organização de Próximos, Histórico e Cancelados foi blindada contra registros antigos ou incompletos.
 - Campos ausentes de partidas recebem valores seguros sem derrubar a página.
 - O modal interno de cancelamento permanece conectado às partidas reais do Supabase.
+
+## Reconstrução de Meus jogos e Administração — pacote versão 31
+
+- **Meus jogos** foi reconstruído com carregamento isolado, listas normalizadas e assinatura em tempo real protegida.
+- O Painel administrativo não acessa mais configurações antigas do navegador durante a abertura.
+- Jogadores aprovados, partidas, quadras, bloqueios e configurações administrativas são carregados do Supabase.
+- O Painel administrativo passa a ter proteção visual contra qualquer falha inesperada.
+
+## Leitura resiliente do banco — pacote versão 32
+
+- **Meus jogos** consulta diretamente as partidas em que o usuário autenticado é jogador 1 ou jogador 2.
+- Falhas auxiliares ao buscar nomes de jogadores ou quadras não escondem mais as partidas.
+- O Perfil usa a mesma consulta individual para manter seus contadores consistentes.
+- A Administração carrega jogadores, partidas, bloqueios, configurações e quadras de forma independente.
+- Se uma seção do Supabase falhar, as demais continuam visíveis e o painel informa o problema sem ficar em branco.

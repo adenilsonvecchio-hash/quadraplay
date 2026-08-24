@@ -28,6 +28,18 @@ interface AdminDashboardProps {
 
 type AdminTab = 'players' | 'matches' | 'blocks' | 'config';
 
+const safeInitialConfig: CourtConfig = {
+  courtName: 'Quadra 1',
+  clubName: 'Tangará Country Clube',
+  groupName: 'Nosso Tênis',
+  slotDurationMinutes: 90,
+  openTime: '07:00',
+  closeTime: '17:30',
+  activeDays: [0, 1, 2, 3, 4, 5, 6],
+  maxAdvanceBookingDays: 30,
+  timeSlots: [],
+};
+
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const { currentUser, usingSupabase, groupId } = useAuth();
   const [activeTab, setActiveTab] = useState<AdminTab>('players');
@@ -36,10 +48,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [blockedSlots, setBlockedSlots] = useState<BlockedSlot[]>([]);
-  const [courtConfig, setCourtConfig] = useState<CourtConfig>(storageService.getConfig());
-  const [courts, setCourts] = useState<Court[]>(storageService.getCourts(false));
+  const [courtConfig, setCourtConfig] = useState<CourtConfig>(safeInitialConfig);
+  const [courts, setCourts] = useState<Court[]>([]);
   const [configSaved, setConfigSaved] = useState(false);
   const [adminError, setAdminError] = useState('');
+  const [adminLoading, setAdminLoading] = useState(true);
 
   // Player Form Modal State
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
@@ -71,22 +84,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const [matchClassFilter, setMatchClassFilter] = useState<TennisClass | 'ALL'>('ALL');
 
   const loadAll = async () => {
+    setAdminLoading(true);
     try {
       setAdminError('');
-      setPlayers(storageService.getPlayers());
       if (usingSupabase && groupId) {
-        const [nextMatches, nextBlocks, nextConfig, nextCourts] = await Promise.all([
-          supabaseAgendaService.getMatches(groupId), supabaseAgendaService.getBlockedSlots(groupId),
-          supabaseAgendaService.getConfig(groupId), supabaseAgendaService.getCourts(groupId),
+        const results = await Promise.allSettled([
+          supabaseAgendaService.getGroupPlayers(groupId), supabaseAgendaService.getMatches(groupId),
+          supabaseAgendaService.getBlockedSlots(groupId), supabaseAgendaService.getConfig(groupId),
+          supabaseAgendaService.getCourts(groupId),
         ]);
-        setMatches(nextMatches); setBlockedSlots(nextBlocks); setCourts(nextCourts);
-        if (nextConfig) setCourtConfig(nextConfig);
+        const [playersResult, matchesResult, blocksResult, configResult, courtsResult] = results;
+
+        if (playersResult.status === 'fulfilled') setPlayers(Array.isArray(playersResult.value) ? playersResult.value : []);
+        if (matchesResult.status === 'fulfilled') setMatches(Array.isArray(matchesResult.value) ? matchesResult.value : []);
+        if (blocksResult.status === 'fulfilled') setBlockedSlots(Array.isArray(blocksResult.value) ? blocksResult.value : []);
+        if (courtsResult.status === 'fulfilled') setCourts(Array.isArray(courtsResult.value) ? courtsResult.value : []);
+        if (configResult.status === 'fulfilled' && configResult.value) setCourtConfig({ ...safeInitialConfig, ...configResult.value });
+
+        const failedSections = results.filter((result) => result.status === 'rejected').length;
+        if (failedSections) setAdminError(`${failedSections} seção(ões) não puderam ser carregadas. As demais continuam disponíveis.`);
       } else {
+        setPlayers(storageService.getPlayers());
         setMatches(storageService.getMatches()); setBlockedSlots(storageService.getBlockedSlots());
         setCourtConfig(storageService.getConfig()); setCourts(storageService.getCourts(false));
       }
     } catch {
       setAdminError('Não foi possível carregar as configurações administrativas do banco.');
+    } finally {
+      setAdminLoading(false);
     }
   };
 
@@ -224,7 +249,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     timeSlots: (courtConfig.timeSlots || []).filter((_, itemIndex) => itemIndex !== index),
   });
 
-  const filteredMatches = matches.filter((m) => {
+  const filteredMatches = (Array.isArray(matches) ? matches : []).filter((m) => {
     if (matchClassFilter === 'ALL') return true;
     return m.tennisClass === matchClassFilter;
   });
@@ -258,6 +283,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       {adminError && (
         <div className="rounded-2xl bg-rose-50 border border-rose-100 p-3 text-xs font-bold text-rose-700">
           {adminError}
+        </div>
+      )}
+
+      {adminLoading && (
+        <div className="rounded-2xl bg-violet-50 border border-violet-100 p-3 text-xs font-bold text-violet-700">
+          Carregando dados administrativos...
         </div>
       )}
 

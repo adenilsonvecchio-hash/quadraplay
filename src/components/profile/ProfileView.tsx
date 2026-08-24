@@ -19,9 +19,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenAdmin }) => {
       try {
         if (usingSupabase && groupId) {
           const today = getBrasiliaToday();
-          const playerMatches = (await supabaseAgendaService.getMatches(groupId)).filter(
-            (match) => match.player1Id === currentUser.id || match.player2Id === currentUser.id,
-          );
+          const playerMatches = await supabaseAgendaService.getMatchesForUser(groupId, currentUser.id);
           const activeMatches = playerMatches.filter((match) => match.status !== 'cancelled');
           const completed = activeMatches.filter((match) =>
             match.status === 'completed'

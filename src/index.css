@@ -174,8 +174,9 @@ body {
 .qp-notification-icon.is-confirmed { color:#147a56; background:#dff8ee; }
 .qp-notification-icon.is-cancelled { color:#b33b4b; background:#ffe6ea; }
 .qp-notification-empty { padding:34px 18px; color:#8b91a7; text-align:center; font-size:12px; font-weight:800; }
-.qp-clean-home__panel { height:calc(100% - 104px); padding:18px 18px 18px; border-radius:0; background:#f3f4f9; box-shadow:none; pointer-events:auto; }
-.qp-clean-home__intro { margin:0 2px 20px; }
+.qp-clean-home__panel { height:calc(100% - 104px); padding:18px 18px 18px; border-radius:0; background:#f3f4f9; box-shadow:none; pointer-events:auto; isolation:isolate; }
+.qp-clean-home__panel::before { content:''; position:absolute; z-index:-1; top:2%; right:-10%; width:92%; height:64%; background:url('/tennis-court-watermark.svg') center/contain no-repeat; opacity:.11; pointer-events:none; }
+.qp-clean-home__intro { position:relative; z-index:1; margin:0 2px 20px; }
 .qp-clean-home__brand { margin:0 0 14px; }
 .qp-clean-home__brand .qp-brand-logo__quadra { font-size:14px; }
 .qp-clean-home__brand .qp-brand-logo__play { font-size:24px; }
@@ -251,6 +252,14 @@ body {
   .qp-clean-home__panel {
     height: calc(100% - 110px);
     padding: 42px 48px 34px;
+  }
+
+  .qp-clean-home__panel::before {
+    top: 0;
+    right: 2%;
+    width: 62%;
+    height: 72%;
+    opacity: .17;
   }
 
   .qp-clean-home__intro {

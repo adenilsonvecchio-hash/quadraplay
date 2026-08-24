@@ -63,6 +63,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const [playerClass, setPlayerClass] = useState<TennisClass>('A');
   const [playerIsAdmin, setPlayerIsAdmin] = useState(false);
   const [playerError, setPlayerError] = useState<string | null>(null);
+  const [playerSaving, setPlayerSaving] = useState(false);
 
   // Block Modal State
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
@@ -79,6 +80,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   // Deletion Modal
   const [deletingPlayer, setDeletingPlayer] = useState<Player | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteSaving, setDeleteSaving] = useState(false);
 
   // Filter state for matches
   const [matchClassFilter, setMatchClassFilter] = useState<TennisClass | 'ALL'>('ALL');
@@ -144,33 +146,64 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setIsPlayerModalOpen(true);
   };
 
-  const handleSavePlayer = (e: React.FormEvent) => {
+  const handleSavePlayer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!playerName.trim() || !playerEmail.trim()) {
       setPlayerError('Nome e E-mail são obrigatórios.');
       return;
     }
 
-    storageService.savePlayer({
-      id: editingPlayer?.id,
-      name: playerName.trim(),
-      email: playerEmail.trim(),
-      phone: playerPhone.trim(),
-      tennisClass: playerClass,
-      isAdmin: playerIsAdmin,
-    });
-
-    setIsPlayerModalOpen(false);
+    setPlayerSaving(true);
+    setPlayerError(null);
+    try {
+      const payload = {
+        name: playerName.trim(),
+        email: playerEmail.trim(),
+        phone: playerPhone.trim() || undefined,
+        tennisClass: playerClass,
+        isAdmin: playerIsAdmin,
+      };
+      if (usingSupabase && groupId) {
+        if (editingPlayer) await supabaseAgendaService.updateGroupPlayer(groupId, editingPlayer.id, payload);
+        else await supabaseAgendaService.addGroupPlayer(groupId, payload);
+      } else {
+        storageService.savePlayer({ id: editingPlayer?.id, ...payload });
+      }
+      setIsPlayerModalOpen(false);
+      await loadAll();
+    } catch (saveError) {
+      const message = saveError instanceof Error ? saveError.message : 'Não foi possível salvar o jogador.';
+      setPlayerError(message.includes('admin_adicionar_jogador') || message.includes('admin_atualizar_jogador')
+        ? 'Execute a migração 003 no Supabase antes de gerenciar jogadores.'
+        : message);
+    } finally {
+      setPlayerSaving(false);
+    }
   };
 
-  const handleConfirmDeletePlayer = () => {
+  const handleConfirmDeletePlayer = async () => {
     if (!deletingPlayer) return;
-    const res = storageService.deletePlayer(deletingPlayer.id);
-    if (!res.success) {
-      setDeleteError(res.message || 'Não foi possível excluir.');
-    } else {
+    if (deletingPlayer.id === currentUser?.id) {
+      setDeleteError('Você não pode remover sua própria conta administrativa.');
+      return;
+    }
+    setDeleteSaving(true);
+    try {
+      if (usingSupabase && groupId) await supabaseAgendaService.removeGroupPlayer(groupId, deletingPlayer.id);
+      else {
+        const result = storageService.deletePlayer(deletingPlayer.id);
+        if (!result.success) throw new Error(result.message || 'Não foi possível excluir.');
+      }
       setDeletingPlayer(null);
       setDeleteError(null);
+      await loadAll();
+    } catch (removeError) {
+      const message = removeError instanceof Error ? removeError.message : 'Não foi possível excluir.';
+      setDeleteError(message.includes('admin_remover_jogador')
+        ? 'Execute a migração 003 no Supabase antes de excluir jogadores.'
+        : message);
+    } finally {
+      setDeleteSaving(false);
     }
   };
 
@@ -345,7 +378,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500">
-              Total de 50 atletas (10 por classe)
+              {players.length} de 50 atletas cadastrados
             </span>
             <button
               id="btn-admin-add-player"
@@ -688,7 +721,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
               {editingPlayer ? 'Editar Atleta' : 'Novo Atleta'}
             </h3>
             <p className="text-xs text-slate-500 mb-4">
-              Defina os dados e a categoria de classe do jogador.
+              {editingPlayer
+                ? 'Atualize os dados e a classe do jogador no grupo.'
+                : 'Informe o e-mail de uma conta que já existe no Supabase.'}
             </p>
 
             {playerError && (
@@ -717,10 +752,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                   id="input-player-email"
                   type="email"
                   required
+                  disabled={!!editingPlayer && usingSupabase}
                   value={playerEmail}
                   onChange={(e) => setPlayerEmail(e.target.value)}
                   placeholder="nome@tangara.com"
-                  className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900"
+                  className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 disabled:bg-slate-100 disabled:text-slate-400"
                 />
               </div>
 
@@ -780,9 +816,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 <button
                   id="btn-save-player-submit"
                   type="submit"
-                  className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm"
+                  disabled={playerSaving}
+                  className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm disabled:opacity-60"
                 >
-                  Salvar
+                  {playerSaving ? 'Salvando...' : 'Salvar'}
                 </button>
               </div>
             </form>
@@ -925,7 +962,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             ? `Deseja realmente remover o jogador ${deletingPlayer.name} da Classe ${deletingPlayer.tennisClass}? Esta ação não pode ser desfeita.`
             : ''
         }
-        confirmLabel="Excluir Jogador"
+        confirmLabel={deleteSaving ? 'Excluindo...' : 'Excluir Jogador'}
         cancelLabel="Cancelar"
         isDestructive={true}
         onConfirm={handleConfirmDeletePlayer}

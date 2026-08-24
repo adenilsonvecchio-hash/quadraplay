@@ -106,6 +106,41 @@ export const supabaseAgendaService = {
     }).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
   },
 
+  async addGroupPlayer(groupId: string, player: Pick<Player, 'name' | 'email' | 'phone' | 'tennisClass' | 'isAdmin'>): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { error } = await supabase.rpc('admin_adicionar_jogador', {
+      p_grupo_id: groupId,
+      p_nome: player.name,
+      p_email: player.email,
+      p_telefone: player.phone || null,
+      p_classe: player.tennisClass,
+      p_perfil: player.isAdmin ? 'ADMINISTRADOR' : 'JOGADOR',
+    });
+    if (error) throw error;
+  },
+
+  async updateGroupPlayer(groupId: string, playerId: string, player: Pick<Player, 'name' | 'phone' | 'tennisClass' | 'isAdmin'>): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { error } = await supabase.rpc('admin_atualizar_jogador', {
+      p_grupo_id: groupId,
+      p_usuario_id: playerId,
+      p_nome: player.name,
+      p_telefone: player.phone || null,
+      p_classe: player.tennisClass,
+      p_perfil: player.isAdmin ? 'ADMINISTRADOR' : 'JOGADOR',
+    });
+    if (error) throw error;
+  },
+
+  async removeGroupPlayer(groupId: string, playerId: string): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { error } = await supabase.rpc('admin_remover_jogador', {
+      p_grupo_id: groupId,
+      p_usuario_id: playerId,
+    });
+    if (error) throw error;
+  },
+
   async getPlayersByClass(groupId: string, tennisClass: TennisClass, currentUserId: string): Promise<Player[]> {
     if (!supabase) return [];
     // Carrega primeiro os membros e depois os perfis. Esta forma não depende

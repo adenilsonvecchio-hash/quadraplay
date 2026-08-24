@@ -243,3 +243,11 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - A marca `v35` aparece ao lado da logomarca nas páginas internas e no topo da tela inicial.
 - A identificação permite confirmar visualmente que a publicação nova substituiu o pacote antigo.
 - Mantidas integralmente as correções de isolamento das telas e dos canais Realtime da versão 34.
+
+## Gestão real de jogadores — pacote versão 36
+
+- Novo jogador adiciona ao grupo uma conta já existente no Supabase pelo e-mail.
+- Editar atualiza nome, telefone, classe e permissão administrativa.
+- Excluir remove somente a participação no grupo, preservando a conta de autenticação.
+- O administrador não pode remover a própria conta nem retirar a própria permissão.
+- A migração `003_gestao_jogadores_admin.sql` instala as funções protegidas necessárias.

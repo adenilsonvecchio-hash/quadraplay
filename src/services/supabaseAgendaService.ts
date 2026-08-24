@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { generateDaySlots, isSlotInPast } from '../utils/dateUtils';
 
 const shortTime = (value: string | null | undefined) => (value || '').slice(0, 5);
+const safeString = (value: unknown, fallback = '') => typeof value === 'string' && value.trim() ? value : fallback;
 
 const statusMap: Record<string, Match['status']> = {
   PENDENTE: 'pending',
@@ -17,19 +18,19 @@ const mapMatch = (
   playerNames: Map<string, string> = new Map(),
   courtNames: Map<string, string> = new Map(),
 ): Match => ({
-  id: row.id,
-  player1Id: row.jogador_1_id,
+  id: safeString(row?.id, `${safeString(row?.data, 'partida')}-${shortTime(row?.hora_inicio)}`),
+  player1Id: safeString(row?.jogador_1_id),
   player1Name: playerNames.get(row.jogador_1_id) || row.jogador_1?.nome || 'Jogador 1',
-  player2Id: row.jogador_2_id,
+  player2Id: safeString(row?.jogador_2_id),
   player2Name: playerNames.get(row.jogador_2_id) || row.jogador_2?.nome || 'Jogador 2',
-  tennisClass: row.classe as TennisClass,
-  courtId: row.quadra_id,
+  tennisClass: (['A', 'B', 'C', 'D', 'E'].includes(row?.classe) ? row.classe : 'A') as TennisClass,
+  courtId: safeString(row?.quadra_id),
   courtName: courtNames.get(row.quadra_id) || row.quadra?.nome || 'Quadra',
-  date: row.data,
+  date: safeString(row?.data),
   startTime: shortTime(row.hora_inicio),
   endTime: shortTime(row.hora_fim),
   status: statusMap[row.status] || 'pending',
-  createdAt: row.criado_em,
+  createdAt: safeString(row?.criado_em),
   cancelledAt: row.cancelado_em || undefined,
   cancelReason: row.motivo_cancelamento || undefined,
 });

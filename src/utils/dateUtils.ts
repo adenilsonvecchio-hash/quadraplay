@@ -39,10 +39,11 @@ export function getBrasiliaCurrentTime(): string {
  * Formats a YYYY-MM-DD date into a friendly Brazilian format
  * e.g., "Sábado, 22 de Ago" or "22 de Agosto de 2026"
  */
-export function formatFriendlyDate(dateStr: string, includeDayOfWeek: boolean = true): string {
-  if (!dateStr) return '';
+export function formatFriendlyDate(dateStr: string | null | undefined, includeDayOfWeek: boolean = true): string {
+  if (typeof dateStr !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return 'Data não informada';
   const [year, month, day] = dateStr.split('-').map(Number);
   const date = new Date(year, month - 1, day);
+  if (Number.isNaN(date.getTime())) return 'Data não informada';
 
   const dayOfWeek = date.toLocaleDateString('pt-BR', { weekday: 'long' });
   const dayOfWeekCapitalized = dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1);

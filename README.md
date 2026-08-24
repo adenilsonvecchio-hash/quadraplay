@@ -223,3 +223,10 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - O Perfil usa a mesma consulta individual para manter seus contadores consistentes.
 - A Administração carrega jogadores, partidas, bloqueios, configurações e quadras de forma independente.
 - Se uma seção do Supabase falhar, as demais continuam visíveis e o painel informa o problema sem ficar em branco.
+
+## Navegação interna restaurada — pacote versão 33
+
+- Agenda, Jogos agendados, Perfil e Administração possuem proteções de erro independentes.
+- Uma falha isolada não é mais carregada para as outras páginas ao trocar de aba.
+- Dados antigos ou incompletos de perfil, partida e data recebem valores seguros durante a leitura.
+- O painel administrativo volta a ser montado normalmente depois de navegar pelo Perfil.

@@ -52,12 +52,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenAdmin }) => {
   }, [currentUser, usingSupabase, groupId]);
 
   if (!currentUser) return null;
+  const displayName = typeof currentUser.name === 'string' && currentUser.name.trim() ? currentUser.name.trim() : 'Jogador';
+  const displayEmail = typeof currentUser.email === 'string' ? currentUser.email : '';
 
   return <div className="space-y-4 pb-8">
     <section className="pt-1"><h2 className="text-2xl font-black tracking-tight">Perfil Esportivo</h2><p className="text-xs text-slate-500 mt-1">Seus dados e atividade no QuadraPlay.</p></section>
 
     <section className="qp-card rounded-[28px] p-4">
-      <div className="flex items-center gap-3"><div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 text-white grid place-items-center text-xl font-black shadow-lg">{currentUser.name.charAt(0)}</div><div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h3 className="text-lg font-black truncate">{currentUser.name}</h3>{currentUser.isAdmin && <span className="text-[9px] font-black text-amber-700 bg-amber-50 px-2 py-1 rounded-full">ADMIN</span>}</div><p className="text-xs text-slate-500 truncate">{currentUser.email}</p><span className="inline-block mt-2 text-[10px] font-black text-violet-700 bg-violet-50 px-2.5 py-1 rounded-full">Classe {currentUser.tennisClass}</span></div></div>
+      <div className="flex items-center gap-3"><div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-violet-700 text-white grid place-items-center text-xl font-black shadow-lg">{displayName.charAt(0).toUpperCase()}</div><div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h3 className="text-lg font-black truncate">{displayName}</h3>{currentUser.isAdmin && <span className="text-[9px] font-black text-amber-700 bg-amber-50 px-2 py-1 rounded-full">ADMIN</span>}</div><p className="text-xs text-slate-500 truncate">{displayEmail}</p><span className="inline-block mt-2 text-[10px] font-black text-violet-700 bg-violet-50 px-2.5 py-1 rounded-full">Classe {currentUser.tennisClass || 'A'}</span></div></div>
       <div className="grid grid-cols-3 gap-2 mt-4"><div className="qp-soft rounded-[17px] p-3 text-center"><p className="text-lg font-black">{statsLoading ? '—' : stats.total}</p><p className="text-[9px] text-slate-400 font-bold">Jogos</p></div><div className="qp-soft rounded-[17px] p-3 text-center"><p className="text-lg font-black">{statsLoading ? '—' : stats.upcoming}</p><p className="text-[9px] text-slate-400 font-bold">Próximos</p></div><div className="qp-soft rounded-[17px] p-3 text-center"><p className="text-lg font-black">{statsLoading ? '—' : stats.completed}</p><p className="text-[9px] text-slate-400 font-bold">Realizados</p></div></div>
     </section>
 

@@ -38,16 +38,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setGroupId(null);
       return false;
     }
+    const safeName = typeof profile.nome === 'string' && profile.nome.trim()
+      ? profile.nome.trim()
+      : (typeof profile.email === 'string' && profile.email.includes('@') ? profile.email.split('@')[0] : 'Jogador');
+    const safeEmail = typeof profile.email === 'string' ? profile.email : '';
+    const safeClass = ['A', 'B', 'C', 'D', 'E'].includes(membership.classe) ? membership.classe : 'A';
+
     setGroupId(membership.grupo_id);
     setCurrentUser({
       id: profile.id,
-      name: profile.nome,
-      email: profile.email,
+      name: safeName,
+      email: safeEmail,
       phone: profile.telefone || undefined,
       avatarUrl: profile.avatar_url || undefined,
-      tennisClass: membership.classe || 'A',
+      tennisClass: safeClass,
       isAdmin: membership.perfil === 'ADMINISTRADOR' || membership.perfil === 'PROPRIETARIO',
-      createdAt: profile.criado_em,
+      createdAt: profile.criado_em || new Date().toISOString(),
     });
     return true;
   };

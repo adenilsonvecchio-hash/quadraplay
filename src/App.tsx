@@ -85,10 +85,10 @@ function MainApp() {
             />
           )}
 
-          {activeTab === 'matches' && <PageGuard name="Meus jogos" onBack={() => navigate('home')}><MyMatchesView onStartBooking={startGeneralBooking} /></PageGuard>}
-          {activeTab === 'games' && <PageGuard name="Jogos agendados" onBack={() => navigate('home')}><ScheduledGamesView /></PageGuard>}
+          {activeTab === 'matches' && <PageGuard key="matches" name="Meus jogos" onBack={() => navigate('home')}><MyMatchesView onStartBooking={startGeneralBooking} /></PageGuard>}
+          {activeTab === 'games' && <PageGuard key="games" name="Jogos agendados" onBack={() => navigate('home')}><ScheduledGamesView /></PageGuard>}
           {activeTab === 'schedule' && (
-            <PageGuard name="Agenda" onBack={() => navigate('home')}><CourtScheduleView
+            <PageGuard key="schedule" name="Agenda" onBack={() => navigate('home')}><CourtScheduleView
               onScheduleSlot={(date, startTime, courtId) => {
                 setPreselectedOpponentId(undefined);
                 setBookingSeed({ date, startTime: startTime || undefined, courtId });
@@ -97,8 +97,8 @@ function MainApp() {
             /></PageGuard>
           )}
           {activeTab === 'players' && <PlayersView onChallengePlayer={startBookingWithOpponent} />}
-          {activeTab === 'profile' && <PageGuard name="Perfil" onBack={() => navigate('home')}><ProfileView onOpenAdmin={() => navigate('admin')} /></PageGuard>}
-          {activeTab === 'admin' && <PageGuard name="Painel administrativo" onBack={() => navigate('home')}><AdminDashboard onBack={() => navigate('home')} /></PageGuard>}
+          {activeTab === 'profile' && <PageGuard key="profile" name="Perfil" onBack={() => navigate('home')}><ProfileView onOpenAdmin={() => navigate('admin')} /></PageGuard>}
+          {activeTab === 'admin' && <PageGuard key="admin" name="Painel administrativo" onBack={() => navigate('home')}><AdminDashboard onBack={() => navigate('home')} /></PageGuard>}
         </main>
 
         <BottomNav activeTab={activeTab} onChangeTab={navigate} />

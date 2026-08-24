@@ -13,7 +13,9 @@ interface HomeViewProps {
 
 export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers }) => {
   const { currentUser } = useAuth();
-  const firstName = currentUser?.name.split(' ')[0] || 'Jogador';
+  const firstName = typeof currentUser?.name === 'string' && currentUser.name.trim()
+    ? currentUser.name.trim().split(/\s+/)[0]
+    : 'Jogador';
   const actions = [
     { label: 'Agendar', helper: 'Escolha a quadra e o horário', icon: CalendarPlus, image: undefined, onClick: onStartBooking, tone: 'featured' },
     { label: 'Agenda', helper: 'Horários livres', icon: CalendarDays, image: undefined, onClick: onViewSchedule, tone: 'blue' },

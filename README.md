@@ -190,3 +190,9 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Partidas, perfis dos dois jogadores e quadras são carregados em consultas separadas e combinados no aplicativo.
 - Agenda, Jogos agendados, Meus jogos, Perfil, Administração e notificações passam a compartilhar a leitura compatível.
 - A criação de uma nova reserva também devolve corretamente os nomes do adversário e da quadra.
+
+## Proteção contra convites vencidos — pacote versão 28
+
+- Jogos pendentes ou confirmados cujo horário já começou deixam de aparecer em **Jogos agendados**.
+- Convites vencidos não exibem mais os botões **Aceitar** e **Recusar**.
+- O histórico do jogador continua preservado em **Meus jogos**.

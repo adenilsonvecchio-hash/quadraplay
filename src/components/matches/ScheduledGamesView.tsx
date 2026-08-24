@@ -4,7 +4,7 @@ import { Match } from '../../types';
 import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { useAuth } from '../../context/AuthContext';
-import { formatFriendlyDate, getBrasiliaToday } from '../../utils/dateUtils';
+import { formatFriendlyDate, getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
 
 export const ScheduledGamesView: React.FC = () => {
   const { currentUser, usingSupabase, groupId } = useAuth();
@@ -32,7 +32,11 @@ export const ScheduledGamesView: React.FC = () => {
   const upcoming = useMemo(() => {
     const today = getBrasiliaToday();
     return matches
-      .filter((match) => (match.status === 'scheduled' || match.status === 'pending') && match.date >= today)
+      .filter((match) =>
+        (match.status === 'scheduled' || match.status === 'pending')
+        && match.date >= today
+        && !isSlotInPast(match.date, match.startTime),
+      )
       .sort((a, b) => `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`));
   }, [matches]);
 

@@ -4,6 +4,7 @@ import { generateDaySlots, isSlotInPast } from '../utils/dateUtils';
 
 const shortTime = (value: string | null | undefined) => (value || '').slice(0, 5);
 const safeString = (value: unknown, fallback = '') => typeof value === 'string' && value.trim() ? value : fallback;
+let realtimeChannelSequence = 0;
 
 const statusMap: Record<string, Match['status']> = {
   PENDENTE: 'pending',
@@ -360,11 +361,25 @@ export const supabaseAgendaService = {
 
   subscribeToMatches(groupId: string, onChange: () => void) {
     if (!supabase) return () => undefined;
-    const channel = supabase.channel(`agenda-${groupId}`).on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: 'partidas', filter: `grupo_id=eq.${groupId}` },
-      onChange,
-    ).subscribe();
-    return () => { void supabase.removeChannel(channel); };
+    // O sino e a página aberta ficam montados ao mesmo tempo. Cada consumidor
+    // precisa de um tópico próprio; reutilizar `agenda-${groupId}` fazia o
+    // Realtime lançar erro de inscrição duplicada e derrubava todas as telas
+    // internas dentro do PageGuard.
+    realtimeChannelSequence += 1;
+    const channelName = `agenda-${groupId}-${Date.now()}-${realtimeChannelSequence}`;
+    try {
+      const channel = supabase.channel(channelName).on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'partidas', filter: `grupo_id=eq.${groupId}` },
+        () => {
+          try { onChange(); }
+          catch (callbackError) { console.warn('Falha ao atualizar dados em tempo real.', callbackError); }
+        },
+      ).subscribe();
+      return () => { void supabase.removeChannel(channel); };
+    } catch (subscriptionError) {
+      console.warn('Atualização em tempo real indisponível nesta tela.', subscriptionError);
+      return () => undefined;
+    }
   },
 };

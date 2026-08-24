@@ -27,7 +27,7 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant = 
     setLoading(true);
     try {
       const result = usingSupabase
-        ? await supabaseAgendaService.getMatches(groupId)
+        ? await supabaseAgendaService.getMatchesForUser(groupId, currentUser.id)
         : storageService.getMatches();
       setMatches(result.filter((match) => match.player1Id === currentUser.id || match.player2Id === currentUser.id));
     } catch (error) {

@@ -107,14 +107,17 @@ function MainApp() {
   );
 }
 
-class PageGuard extends React.Component<{ name: string; onBack: () => void; children: React.ReactNode }, { failed: boolean }> {
+class PageGuard extends React.Component<{ name: string; onBack: () => void; children: React.ReactNode }, { failed: boolean; detail: string }> {
   declare readonly props: { name: string; onBack: () => void; children: React.ReactNode };
-  state = { failed: false };
-  static getDerivedStateFromError() { return { failed: true }; }
+  state = { failed: false, detail: '' };
+  static getDerivedStateFromError(error: unknown) {
+    const detail = error instanceof Error ? error.message : String(error || 'Erro desconhecido');
+    return { failed: true, detail };
+  }
   componentDidCatch(error: unknown) { console.error(`Falha ao abrir ${this.props.name}`, error); }
   render() {
     if (!this.state.failed) return this.props.children;
-    return <div className="qp-card rounded-[26px] p-6 mt-3 text-center"><h2 className="text-lg font-black text-[#101b3d]">Não foi possível abrir {this.props.name}</h2><p className="mt-2 text-xs text-slate-500">Os dados desta página apresentaram um erro. A tela inicial continua protegida.</p><button type="button" onClick={this.props.onBack} className="qp-primary rounded-2xl px-5 py-3 mt-5 text-xs font-black">Voltar ao início</button></div>;
+    return <div className="qp-card rounded-[26px] p-6 mt-3 text-center"><h2 className="text-lg font-black text-[#101b3d]">Não foi possível abrir {this.props.name}</h2><p className="mt-2 text-xs text-slate-500">Os dados desta página apresentaram um erro. A tela inicial continua protegida.</p><p className="mt-3 text-[10px] text-rose-600 break-words">Detalhe: {this.state.detail}</p><button type="button" onClick={this.props.onBack} className="qp-primary rounded-2xl px-5 py-3 mt-5 text-xs font-black">Voltar ao início</button></div>;
   }
 }
 

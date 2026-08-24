@@ -230,3 +230,16 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Uma falha isolada não é mais carregada para as outras páginas ao trocar de aba.
 - Dados antigos ou incompletos de perfil, partida e data recebem valores seguros durante a leitura.
 - O painel administrativo volta a ser montado normalmente depois de navegar pelo Perfil.
+
+## Correção das telas internas — pacote versão 34
+
+- O sino e cada página usam canais Realtime exclusivos no Supabase.
+- Eliminado o conflito de inscrição duplicada que derrubava Agenda, Jogos agendados, Perfil e Administração.
+- Falhas do Realtime passam a ser isoladas e não interrompem a renderização das telas.
+- O sino consulta somente as partidas do usuário autenticado.
+
+## Identificação de publicação — pacote versão 35
+
+- A marca `v35` aparece ao lado da logomarca nas páginas internas e no topo da tela inicial.
+- A identificação permite confirmar visualmente que a publicação nova substituiu o pacote antigo.
+- Mantidas integralmente as correções de isolamento das telas e dos canais Realtime da versão 34.

@@ -31,7 +31,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
           {menuOpen ? <X className="w-6 h-6 stroke-[2.2]" /> : <Menu className="w-6 h-6 stroke-[2.2]" />}
         </button>
 
-        <BrandLogo compact className="justify-self-center" />
+        <div className="justify-self-center flex items-center gap-2">
+          <BrandLogo compact />
+          <span className="rounded-full bg-violet-100 px-2 py-1 text-[9px] font-black text-violet-700">v35</span>
+        </div>
 
         <div className="relative"><NotificationsBell onOpenMatches={() => navigate('matches')} /></div>
       </div>

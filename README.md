@@ -183,3 +183,10 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Bloqueios de dia inteiro ou de uma faixa de horário podem ser aplicados a uma quadra ou a todas.
 - A migração `002_horarios_administraveis.sql` cria os horários por grupo e atualiza as validações das reservas.
 - O banco impede reserva fora dos horários cadastrados, em quadra bloqueada, sobre outro jogo ou com jogador ocupado.
+
+## Correção conjunta das páginas de dados — pacote versão 27
+
+- A leitura das partidas não depende mais dos nomes internos das relações geradas pelo Supabase.
+- Partidas, perfis dos dois jogadores e quadras são carregados em consultas separadas e combinados no aplicativo.
+- Agenda, Jogos agendados, Meus jogos, Perfil, Administração e notificações passam a compartilhar a leitura compatível.
+- A criação de uma nova reserva também devolve corretamente os nomes do adversário e da quadra.

@@ -12,15 +12,19 @@ const statusMap: Record<string, Match['status']> = {
   RECUSADA: 'cancelled',
 };
 
-const mapMatch = (row: any): Match => ({
+const mapMatch = (
+  row: any,
+  playerNames: Map<string, string> = new Map(),
+  courtNames: Map<string, string> = new Map(),
+): Match => ({
   id: row.id,
   player1Id: row.jogador_1_id,
-  player1Name: row.jogador_1?.nome || 'Jogador 1',
+  player1Name: playerNames.get(row.jogador_1_id) || row.jogador_1?.nome || 'Jogador 1',
   player2Id: row.jogador_2_id,
-  player2Name: row.jogador_2?.nome || 'Jogador 2',
+  player2Name: playerNames.get(row.jogador_2_id) || row.jogador_2?.nome || 'Jogador 2',
   tennisClass: row.classe as TennisClass,
   courtId: row.quadra_id,
-  courtName: row.quadra?.nome || 'Quadra',
+  courtName: courtNames.get(row.quadra_id) || row.quadra?.nome || 'Quadra',
   date: row.data,
   startTime: shortTime(row.hora_inicio),
   endTime: shortTime(row.hora_fim),
@@ -30,13 +34,37 @@ const mapMatch = (row: any): Match => ({
   cancelReason: row.motivo_cancelamento || undefined,
 });
 
+// Consulta apenas as colunas da partida. Os nomes de jogadores e quadras são
+// carregados separadamente para não depender dos nomes internos das relações
+// que o PostgREST gera para cada banco Supabase.
 const matchSelect = `
   id, grupo_id, quadra_id, jogador_1_id, jogador_2_id, classe, data,
-  hora_inicio, hora_fim, status, criado_em, cancelado_em, motivo_cancelamento,
-  quadra:quadras!partidas_quadra_id_fkey(nome),
-  jogador_1:perfis!partidas_jogador_1_id_fkey(nome),
-  jogador_2:perfis!partidas_jogador_2_id_fkey(nome)
+  hora_inicio, hora_fim, status, criado_em, cancelado_em, motivo_cancelamento
 `;
+
+const hydrateMatches = async (rows: any[] | null | undefined): Promise<Match[]> => {
+  if (!rows?.length) return [];
+  if (!supabase) return rows.map((row) => mapMatch(row));
+
+  const playerIds = [...new Set(rows.flatMap((row) => [row.jogador_1_id, row.jogador_2_id]).filter(Boolean))];
+  const courtIds = [...new Set(rows.map((row) => row.quadra_id).filter(Boolean))];
+
+  const [profilesResult, courtsResult] = await Promise.all([
+    playerIds.length
+      ? supabase.from('perfis').select('id, nome').in('id', playerIds)
+      : Promise.resolve({ data: [], error: null }),
+    courtIds.length
+      ? supabase.from('quadras').select('id, nome').in('id', courtIds)
+      : Promise.resolve({ data: [], error: null }),
+  ]);
+
+  if (profilesResult.error) throw profilesResult.error;
+  if (courtsResult.error) throw courtsResult.error;
+
+  const playerNames = new Map<string, string>((profilesResult.data || []).map((profile: any) => [profile.id, profile.nome]));
+  const courtNames = new Map<string, string>((courtsResult.data || []).map((court: any) => [court.id, court.nome]));
+  return rows.map((row) => mapMatch(row, playerNames, courtNames));
+};
 
 export const supabaseAgendaService = {
   async getPlayersByClass(groupId: string, tennisClass: TennisClass, currentUserId: string): Promise<Player[]> {
@@ -185,7 +213,7 @@ export const supabaseAgendaService = {
     if (!supabase) return [];
     const { data, error } = await supabase.from('partidas').select(matchSelect).eq('grupo_id', groupId).order('data').order('hora_inicio');
     if (error) throw error;
-    return (data || []).map(mapMatch);
+    return hydrateMatches(data);
   },
 
   async createMatch(params: {
@@ -211,7 +239,8 @@ export const supabaseAgendaService = {
       status: 'PENDENTE',
     }).select(matchSelect).single();
     if (error) throw error;
-    return mapMatch(data);
+    const [createdMatch] = await hydrateMatches([data]);
+    return createdMatch;
   },
 
   async respondToMatch(matchId: string, playerId: string, accept: boolean): Promise<void> {
@@ -262,7 +291,7 @@ export const supabaseAgendaService = {
     ]);
     if (matchesResult.error) throw matchesResult.error;
     if (blocksResult.error) throw blocksResult.error;
-    const matches = (matchesResult.data || []).map(mapMatch);
+    const matches = await hydrateMatches(matchesResult.data);
     const blocks = (blocksResult.data || []).filter((block) => !block.quadra_id || block.quadra_id === courtId);
     const slots = config?.timeSlots?.length
       ? config.timeSlots

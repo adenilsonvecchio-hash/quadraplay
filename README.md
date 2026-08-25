@@ -257,3 +257,9 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Adicionado o indicador **Cancelados** ao Perfil Esportivo.
 - Partidas canceladas continuam fora dos totais de jogos válidos, próximos e realizados.
 - O contador funciona tanto com Supabase quanto no modo local.
+
+## Motivo e responsável pelo cancelamento — pacote versão 38
+
+- A Agenda administrativa carrega o nome de quem cancelou a partida.
+- O motivo informado pelo jogador ou administrador é exibido no histórico.
+- Removido o texto incompleto `(por )` quando o responsável não estiver disponível.

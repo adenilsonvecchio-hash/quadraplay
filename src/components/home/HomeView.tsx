@@ -35,7 +35,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
               <img src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis ATT Tour" />
             </div>
           </div>
-          <div className="qp-clean-home__title flex items-center gap-2">Início <span className="rounded-full bg-white/15 px-2 py-1 text-[9px] font-black">v37</span></div>
+          <div className="qp-clean-home__title flex items-center gap-2">Início <span className="rounded-full bg-white/15 px-2 py-1 text-[9px] font-black">v38</span></div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
       </header>

@@ -521,7 +521,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
                   {m.cancelReason && (
                     <p className="text-[11px] text-rose-600 italic pt-1 border-t border-slate-100">
-                      Motivo: {m.cancelReason} (por {m.cancelledBy})
+                      Motivo: {m.cancelReason}{m.cancelledBy ? ` • por ${m.cancelledBy}` : ''}
                     </p>
                   )}
                 </div>

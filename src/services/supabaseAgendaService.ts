@@ -33,6 +33,7 @@ const mapMatch = (
   status: statusMap[row.status] || 'pending',
   createdAt: safeString(row?.criado_em),
   cancelledAt: row.cancelado_em || undefined,
+  cancelledBy: playerNames.get(row.cancelado_por) || undefined,
   cancelReason: row.motivo_cancelamento || undefined,
 });
 
@@ -41,14 +42,14 @@ const mapMatch = (
 // que o PostgREST gera para cada banco Supabase.
 const matchSelect = `
   id, grupo_id, quadra_id, jogador_1_id, jogador_2_id, classe, data,
-  hora_inicio, hora_fim, status, criado_em, cancelado_em, motivo_cancelamento
+  hora_inicio, hora_fim, status, criado_em, cancelado_por, cancelado_em, motivo_cancelamento
 `;
 
 const hydrateMatches = async (rows: any[] | null | undefined): Promise<Match[]> => {
   if (!rows?.length) return [];
   if (!supabase) return rows.map((row) => mapMatch(row));
 
-  const playerIds = [...new Set(rows.flatMap((row) => [row.jogador_1_id, row.jogador_2_id]).filter(Boolean))];
+  const playerIds = [...new Set(rows.flatMap((row) => [row.jogador_1_id, row.jogador_2_id, row.cancelado_por]).filter(Boolean))];
   const courtIds = [...new Set(rows.map((row) => row.quadra_id).filter(Boolean))];
 
   const [profilesResult, courtsResult] = await Promise.all([

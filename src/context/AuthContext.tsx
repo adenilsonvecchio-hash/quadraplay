@@ -9,7 +9,11 @@ interface AuthContextType {
   authLoading: boolean;
   usingSupabase: boolean;
   groupId: string | null;
+  passwordRecoveryMode: boolean;
   loginWithEmail: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
+  requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
+  updatePassword: (password: string) => Promise<{ success: boolean; error?: string }>;
+  finishPasswordRecovery: () => Promise<void>;
   switchUser: (playerId: string) => void;
   logout: () => Promise<void>;
   allPlayers: Player[];
@@ -23,6 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [allPlayers, setAllPlayers] = useState<Player[]>([]);
   const [authLoading, setAuthLoading] = useState(true);
   const [groupId, setGroupId] = useState<string | null>(null);
+  const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
 
   const loadSupabaseUser = async (userId: string) => {
     if (!supabase) {
@@ -86,7 +91,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (data.session?.user) await loadSupabaseUser(data.session.user.id);
         setAuthLoading(false);
       });
-      const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY') setPasswordRecoveryMode(true);
         if (session?.user) void loadSupabaseUser(session.user.id);
         else {
           setCurrentUser(null);
@@ -122,6 +128,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true };
   };
 
+  const requestPasswordReset = async (email: string) => {
+    if (!supabase) return { success: false, error: 'Recuperação de senha indisponível.' };
+    const redirectTo = `${window.location.origin}${window.location.pathname}`;
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo });
+    if (error) return { success: false, error: 'Não foi possível enviar o link. Aguarde e tente novamente.' };
+    return { success: true };
+  };
+
+  const updatePassword = async (password: string) => {
+    if (!supabase) return { success: false, error: 'Recuperação de senha indisponível.' };
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) return { success: false, error: 'Não foi possível atualizar a senha. Solicite um novo link.' };
+    await supabase.auth.signOut();
+    setCurrentUser(null);
+    setGroupId(null);
+    return { success: true };
+  };
+
+  const finishPasswordRecovery = async () => {
+    if (supabase) await supabase.auth.signOut();
+    setCurrentUser(null);
+    setGroupId(null);
+    setPasswordRecoveryMode(false);
+  };
+
   const switchUser = (playerId: string) => {
     const player = storageService.getPlayerById(playerId);
     if (player) {
@@ -145,7 +176,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         authLoading,
         usingSupabase: isSupabaseConfigured,
         groupId,
+        passwordRecoveryMode,
         loginWithEmail,
+        requestPasswordReset,
+        updatePassword,
+        finishPasswordRecovery,
         switchUser,
         logout,
         allPlayers,

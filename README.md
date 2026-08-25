@@ -269,3 +269,10 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Convites com data ou horário já encerrados não aparecem como novas notificações.
 - O contador vermelho considera somente convites pendentes e ainda válidos.
 - Confirmações futuras e cancelamentos continuam visíveis no painel do sino.
+
+## Recuperação de senha — pacote versão 40
+
+- A tela de entrada possui a opção **Esqueci minha senha**.
+- O Supabase envia um link seguro para o e-mail informado.
+- O link abre uma tela própria do QuadraPlay para cadastrar e confirmar a nova senha.
+- Após a alteração, o jogador retorna ao login e entra com a nova senha.

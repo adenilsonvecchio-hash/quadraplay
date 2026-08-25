@@ -6,12 +6,14 @@ import { BrandLogo } from '../common/BrandLogo';
 interface LoginViewProps { onSuccess?: () => void; }
 
 export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
-  const { loginWithEmail, allPlayers, usingSupabase } = useAuth();
+  const { loginWithEmail, requestPasswordReset, allPlayers, usingSupabase } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [showDemoSelector, setShowDemoSelector] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const login = async (userEmail: string, userPassword = password) => {
     setSubmitting(true);
@@ -20,6 +22,17 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
     if (!res.success) return setError(res.error || 'Credenciais inválidas.');
     setError(null);
     onSuccess?.();
+  };
+
+  const sendResetLink = async () => {
+    if (!email.trim()) return setError('Informe seu e-mail para recuperar a senha.');
+    setResetting(true);
+    setError(null);
+    setResetSent(false);
+    const result = await requestPasswordReset(email);
+    setResetting(false);
+    if (!result.success) return setError(result.error || 'Não foi possível enviar o link.');
+    setResetSent(true);
   };
 
   return (
@@ -35,6 +48,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
           <p className="text-xs text-slate-500 mt-1 mb-5">Acesse sua conta para ver agenda, partidas e adversários.</p>
 
           {error && <div className="mb-4 p-3 rounded-[16px] bg-rose-50 border border-rose-100 text-rose-700 text-xs font-bold">{error}</div>}
+          {resetSent && <div className="mb-4 p-3 rounded-[16px] bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold">Link enviado. Verifique sua caixa de entrada e o spam.</div>}
 
           <form onSubmit={(e) => { e.preventDefault(); if (!email.trim()) return setError('Informe seu e-mail.'); void login(email); }} className="space-y-3">
             <label className="block">
@@ -45,6 +59,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
               <span className="text-[11px] font-black text-slate-500 ml-1">Senha</span>
               <div className="relative mt-1.5"><Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" /><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" className="w-full qp-soft rounded-[18px] pl-11 pr-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-violet-200" /></div>
             </label>
+            {usingSupabase && <button type="button" disabled={resetting} onClick={() => void sendResetLink()} className="w-full text-right pr-1 text-[11px] font-black text-violet-600 hover:text-violet-700 disabled:opacity-50">{resetting ? 'Enviando link...' : 'Esqueci minha senha'}</button>}
             <button type="submit" disabled={submitting} className="qp-primary w-full rounded-[18px] py-3.5 font-black text-sm flex items-center justify-center gap-1.5 disabled:opacity-60">{submitting ? 'Entrando...' : 'Entrar no QuadraPlay'} <ChevronRight className="w-4 h-4" /></button>
           </form>
 

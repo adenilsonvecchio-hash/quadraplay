@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/common/Header';
 import { BottomNav, TabType } from './components/common/BottomNav';
 import { LoginView } from './components/auth/LoginView';
+import { PasswordResetView } from './components/auth/PasswordResetView';
 import { HomeView } from './components/home/HomeView';
 import { BookingWizard } from './components/booking/BookingWizard';
 import { MyMatchesView } from './components/matches/MyMatchesView';
@@ -13,7 +14,7 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { ScheduledGamesView } from './components/matches/ScheduledGamesView';
 
 function MainApp() {
-  const { currentUser, authLoading } = useAuth();
+  const { currentUser, authLoading, passwordRecoveryMode } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [preselectedOpponentId, setPreselectedOpponentId] = useState<string | undefined>();
   const [bookingSeed, setBookingSeed] = useState<{date?: string; startTime?: string; courtId?: string}>({});
@@ -45,6 +46,7 @@ function MainApp() {
   }, []);
 
   if (authLoading) return <div className="min-h-screen grid place-items-center bg-[#eef1f8] text-[#6855df] font-black">Carregando QuadraPlay+...</div>;
+  if (passwordRecoveryMode) return <PasswordResetView />;
   if (!currentUser) return <LoginView onSuccess={() => setActiveTab('home')} />;
 
   const startGeneralBooking = () => {

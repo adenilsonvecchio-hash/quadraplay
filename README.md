@@ -263,3 +263,9 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - A Agenda administrativa carrega o nome de quem cancelou a partida.
 - O motivo informado pelo jogador ou administrador é exibido no histórico.
 - Removido o texto incompleto `(por )` quando o responsável não estiver disponível.
+
+## Convites vencidos fora das notificações — pacote versão 39
+
+- Convites com data ou horário já encerrados não aparecem como novas notificações.
+- O contador vermelho considera somente convites pendentes e ainda válidos.
+- Confirmações futuras e cancelamentos continuam visíveis no painel do sino.

@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { storageService } from '../../services/storageService';
 import { Match } from '../../types';
+import { getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
 
 interface NotificationsBellProps {
   variant?: 'light' | 'dark';
@@ -51,12 +52,22 @@ export const NotificationsBell: React.FC<NotificationsBellProps> = ({ variant = 
     }
   }, [groupId, load, usingSupabase]);
 
-  const notifications = useMemo(() => matches
-    .filter((match) => match.status === 'pending' || match.status === 'scheduled' || match.status === 'cancelled')
-    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
-    .slice(0, 8), [matches]);
+  const isExpired = useCallback((match: Match) => {
+    const today = getBrasiliaToday();
+    return match.date < today || (match.date === today && isSlotInPast(match.date, match.startTime));
+  }, []);
 
-  const pendingCount = matches.filter((match) => match.status === 'pending' && match.player2Id === currentUser?.id).length;
+  const notifications = useMemo(() => matches
+    .filter((match) => match.status === 'cancelled'
+      || ((match.status === 'pending' || match.status === 'scheduled') && !isExpired(match)))
+    .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+    .slice(0, 8), [isExpired, matches]);
+
+  const pendingCount = matches.filter((match) =>
+    match.status === 'pending'
+    && match.player2Id === currentUser?.id
+    && !isExpired(match),
+  ).length;
 
   const selectNotification = () => {
     setOpen(false);

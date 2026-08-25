@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
 
         <div className="justify-self-center flex items-center gap-2">
           <BrandLogo compact />
-          <span className="rounded-full bg-violet-100 px-2 py-1 text-[9px] font-black text-violet-700">v40</span>
+          <span className="rounded-full bg-violet-100 px-2 py-1 text-[9px] font-black text-violet-700">v41</span>
         </div>
 
         <div className="relative"><NotificationsBell onOpenMatches={() => navigate('matches')} /></div>

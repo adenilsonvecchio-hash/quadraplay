@@ -276,3 +276,10 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - O Supabase envia um link seguro para o e-mail informado.
 - O link abre uma tela própria do QuadraPlay para cadastrar e confirmar a nova senha.
 - Após a alteração, o jogador retorna ao login e entra com a nova senha.
+
+## Primeiro acesso por convite — pacote versão 41
+
+- O QuadraPlay identifica o link de convite antes que o Supabase remova seus parâmetros da URL.
+- O convidado abre uma tela própria para criar e confirmar sua primeira senha.
+- O fluxo de convite permanece separado da recuperação de senha e mostra textos adequados para cada caso.
+- A etapa de criação da senha continua ativa mesmo se o convidado atualizar a página acidentalmente.

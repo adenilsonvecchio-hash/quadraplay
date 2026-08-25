@@ -1,7 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Player } from '../types';
 import { storageService } from '../services/storageService';
-import { isSupabaseConfigured, supabase } from '../lib/supabase';
+import {
+  initialPasswordSetupMode,
+  isSupabaseConfigured,
+  PasswordSetupMode,
+  savePasswordSetupMode,
+  supabase,
+} from '../lib/supabase';
 
 interface AuthContextType {
   currentUser: Player | null;
@@ -9,7 +15,7 @@ interface AuthContextType {
   authLoading: boolean;
   usingSupabase: boolean;
   groupId: string | null;
-  passwordRecoveryMode: boolean;
+  passwordSetupMode: PasswordSetupMode;
   loginWithEmail: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
   requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
   updatePassword: (password: string) => Promise<{ success: boolean; error?: string }>;
@@ -27,7 +33,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [allPlayers, setAllPlayers] = useState<Player[]>([]);
   const [authLoading, setAuthLoading] = useState(true);
   const [groupId, setGroupId] = useState<string | null>(null);
-  const [passwordRecoveryMode, setPasswordRecoveryMode] = useState(false);
+  const [passwordSetupMode, setPasswordSetupMode] = useState<PasswordSetupMode>(initialPasswordSetupMode);
+  const passwordSetupModeRef = useRef<PasswordSetupMode>(initialPasswordSetupMode);
+
+  const activatePasswordSetup = (mode: Exclude<PasswordSetupMode, null>) => {
+    passwordSetupModeRef.current = mode;
+    savePasswordSetupMode(mode);
+    setPasswordSetupMode(mode);
+  };
+
+  const clearPasswordSetup = () => {
+    passwordSetupModeRef.current = null;
+    savePasswordSetupMode(null);
+    setPasswordSetupMode(null);
+  };
 
   const loadSupabaseUser = async (userId: string) => {
     if (!supabase) {
@@ -88,12 +107,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     if (supabase) {
       supabase.auth.getSession().then(async ({ data }) => {
-        if (data.session?.user) await loadSupabaseUser(data.session.user.id);
+        if (data.session?.user && !passwordSetupModeRef.current) await loadSupabaseUser(data.session.user.id);
         setAuthLoading(false);
       });
       const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'PASSWORD_RECOVERY') setPasswordRecoveryMode(true);
-        if (session?.user) void loadSupabaseUser(session.user.id);
+        if (event === 'PASSWORD_RECOVERY') activatePasswordSetup('recovery');
+        if (session?.user && !passwordSetupModeRef.current) void loadSupabaseUser(session.user.id);
         else {
           setCurrentUser(null);
           setGroupId(null);
@@ -150,7 +169,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (supabase) await supabase.auth.signOut();
     setCurrentUser(null);
     setGroupId(null);
-    setPasswordRecoveryMode(false);
+    clearPasswordSetup();
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
   };
 
   const switchUser = (playerId: string) => {
@@ -176,7 +196,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         authLoading,
         usingSupabase: isSupabaseConfigured,
         groupId,
-        passwordRecoveryMode,
+        passwordSetupMode,
         loginWithEmail,
         requestPasswordReset,
         updatePassword,

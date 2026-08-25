@@ -14,7 +14,7 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { ScheduledGamesView } from './components/matches/ScheduledGamesView';
 
 function MainApp() {
-  const { currentUser, authLoading, passwordRecoveryMode } = useAuth();
+  const { currentUser, authLoading, passwordSetupMode } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [preselectedOpponentId, setPreselectedOpponentId] = useState<string | undefined>();
   const [bookingSeed, setBookingSeed] = useState<{date?: string; startTime?: string; courtId?: string}>({});
@@ -46,7 +46,7 @@ function MainApp() {
   }, []);
 
   if (authLoading) return <div className="min-h-screen grid place-items-center bg-[#eef1f8] text-[#6855df] font-black">Carregando QuadraPlay+...</div>;
-  if (passwordRecoveryMode) return <PasswordResetView />;
+  if (passwordSetupMode) return <PasswordResetView mode={passwordSetupMode} />;
   if (!currentUser) return <LoginView onSuccess={() => setActiveTab('home')} />;
 
   const startGeneralBooking = () => {

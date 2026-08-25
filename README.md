@@ -251,3 +251,9 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - Excluir remove somente a participação no grupo, preservando a conta de autenticação.
 - O administrador não pode remover a própria conta nem retirar a própria permissão.
 - A migração `003_gestao_jogadores_admin.sql` instala as funções protegidas necessárias.
+
+## Contador de cancelamentos no Perfil — pacote versão 37
+
+- Adicionado o indicador **Cancelados** ao Perfil Esportivo.
+- Partidas canceladas continuam fora dos totais de jogos válidos, próximos e realizados.
+- O contador funciona tanto com Supabase quanto no modo local.

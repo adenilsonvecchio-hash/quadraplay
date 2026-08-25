@@ -6,6 +6,12 @@ const shortTime = (value: string | null | undefined) => (value || '').slice(0, 5
 const safeString = (value: unknown, fallback = '') => typeof value === 'string' && value.trim() ? value : fallback;
 let realtimeChannelSequence = 0;
 
+export interface PlayerInviteResult {
+  status: 'invited' | 'linked';
+  message: string;
+  userId: string;
+}
+
 const statusMap: Record<string, Match['status']> = {
   PENDENTE: 'pending',
   ACEITA: 'scheduled',
@@ -107,17 +113,36 @@ export const supabaseAgendaService = {
     }).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
   },
 
-  async addGroupPlayer(groupId: string, player: Pick<Player, 'name' | 'email' | 'phone' | 'tennisClass' | 'isAdmin'>): Promise<void> {
+  async addGroupPlayer(groupId: string, player: Pick<Player, 'name' | 'email' | 'phone' | 'tennisClass' | 'isAdmin'>): Promise<PlayerInviteResult> {
     if (!supabase) throw new Error('Supabase não configurado.');
-    const { error } = await supabase.rpc('admin_adicionar_jogador', {
-      p_grupo_id: groupId,
-      p_nome: player.name,
-      p_email: player.email,
-      p_telefone: player.phone || null,
-      p_classe: player.tennisClass,
-      p_perfil: player.isAdmin ? 'ADMINISTRADOR' : 'JOGADOR',
+    const { data, error } = await supabase.functions.invoke<PlayerInviteResult>('admin-invite-player', {
+      body: {
+        groupId,
+        name: player.name,
+        email: player.email,
+        phone: player.phone || null,
+        tennisClass: player.tennisClass,
+        isAdmin: player.isAdmin,
+      },
     });
-    if (error) throw error;
+    if (error) {
+      let serverMessage = typeof (data as { error?: unknown } | null)?.error === 'string'
+        ? (data as unknown as { error: string }).error
+        : '';
+      const response = (error as { context?: Response }).context;
+      if (!serverMessage && response) {
+        try {
+          const responseBody = await response.clone().json() as { error?: unknown; message?: unknown };
+          if (typeof responseBody.error === 'string') serverMessage = responseBody.error;
+          else if (typeof responseBody.message === 'string') serverMessage = responseBody.message;
+        } catch {
+          // Mantém a mensagem original do SDK quando a resposta não contém JSON.
+        }
+      }
+      throw new Error(serverMessage || error.message || 'Não foi possível convidar o jogador.');
+    }
+    if (!data?.userId) throw new Error('O servidor não confirmou a criação do jogador.');
+    return data;
   },
 
   async updateGroupPlayer(groupId: string, playerId: string, player: Pick<Player, 'name' | 'phone' | 'tennisClass' | 'isAdmin'>): Promise<void> {

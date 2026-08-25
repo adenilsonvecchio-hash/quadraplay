@@ -63,6 +63,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const [playerClass, setPlayerClass] = useState<TennisClass>('A');
   const [playerIsAdmin, setPlayerIsAdmin] = useState(false);
   const [playerError, setPlayerError] = useState<string | null>(null);
+  const [playerSuccess, setPlayerSuccess] = useState<string | null>(null);
   const [playerSaving, setPlayerSaving] = useState(false);
 
   // Block Modal State
@@ -132,6 +133,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setPlayerClass('A');
     setPlayerIsAdmin(false);
     setPlayerError(null);
+    setPlayerSuccess(null);
     setIsPlayerModalOpen(true);
   };
 
@@ -143,6 +145,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setPlayerClass(p.tennisClass);
     setPlayerIsAdmin(p.isAdmin);
     setPlayerError(null);
+    setPlayerSuccess(null);
     setIsPlayerModalOpen(true);
   };
 
@@ -165,15 +168,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       };
       if (usingSupabase && groupId) {
         if (editingPlayer) await supabaseAgendaService.updateGroupPlayer(groupId, editingPlayer.id, payload);
-        else await supabaseAgendaService.addGroupPlayer(groupId, payload);
+        else {
+          const result = await supabaseAgendaService.addGroupPlayer(groupId, payload);
+          setPlayerSuccess(result.status === 'invited'
+            ? `Convite enviado para ${payload.email}. O jogador já foi aprovado no grupo.`
+            : `A conta ${payload.email} já existia e foi vinculada ao grupo.`);
+        }
       } else {
         storageService.savePlayer({ id: editingPlayer?.id, ...payload });
+        if (!editingPlayer) setPlayerSuccess('Jogador cadastrado com sucesso.');
       }
       setIsPlayerModalOpen(false);
       await loadAll();
     } catch (saveError) {
       const message = saveError instanceof Error ? saveError.message : 'Não foi possível salvar o jogador.';
-      setPlayerError(message.includes('admin_adicionar_jogador') || message.includes('admin_atualizar_jogador')
+      const edgeFunctionUnavailable = !editingPlayer && (
+        message.includes('admin-invite-player')
+        || message.includes('Failed to send a request')
+        || message.includes('Failed to fetch')
+        || message.includes('FunctionsFetchError')
+        || message.includes('FunctionsHttpError')
+        || message.includes('Edge Function returned')
+        || message.includes('Function not found')
+        || message.includes('NOT_FOUND')
+      );
+      setPlayerError(edgeFunctionUnavailable
+        ? 'Publique a função admin-invite-player no Supabase antes de convidar jogadores.'
+        : message.includes('admin_adicionar_jogador') || message.includes('admin_atualizar_jogador')
         ? 'Execute a migração 003 no Supabase antes de gerenciar jogadores.'
         : message);
     } finally {
@@ -376,6 +397,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       {/* TAB 1: JOGADORES */}
       {activeTab === 'players' && (
         <div className="space-y-3">
+          {playerSuccess && (
+            <div className="flex items-start justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-bold text-emerald-800">
+              <span>{playerSuccess}</span>
+              <button type="button" onClick={() => setPlayerSuccess(null)} className="shrink-0 text-emerald-600 hover:text-emerald-900" aria-label="Fechar confirmação">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500">
               {players.length} de 50 atletas cadastrados
@@ -723,7 +752,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <p className="text-xs text-slate-500 mb-4">
               {editingPlayer
                 ? 'Atualize os dados e a classe do jogador no grupo.'
-                : 'Informe o e-mail de uma conta que já existe no Supabase.'}
+                : 'Informe os dados. O QuadraPlay criará a conta, aprovará o jogador no grupo e enviará o convite por e-mail.'}
             </p>
 
             {playerError && (
@@ -819,7 +848,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                   disabled={playerSaving}
                   className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm disabled:opacity-60"
                 >
-                  {playerSaving ? 'Salvando...' : 'Salvar'}
+                  {playerSaving
+                    ? (editingPlayer ? 'Salvando...' : 'Enviando convite...')
+                    : (editingPlayer ? 'Salvar' : 'Convidar e salvar')}
                 </button>
               </div>
             </form>

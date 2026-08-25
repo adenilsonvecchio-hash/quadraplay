@@ -283,3 +283,23 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 - O convidado abre uma tela própria para criar e confirmar sua primeira senha.
 - O fluxo de convite permanece separado da recuperação de senha e mostra textos adequados para cada caso.
 - A etapa de criação da senha continua ativa mesmo se o convidado atualizar a página acidentalmente.
+
+## Convite e aprovação em uma única etapa — pacote versão 42
+
+- O botão **Novo Jogador** do painel administrativo cria a conta no Supabase, vincula o atleta ao grupo e envia o convite por e-mail.
+- Se a conta já existir, ela é apenas vinculada ao grupo, sem duplicação e sem novo convite.
+- A operação é executada pela Edge Function protegida `admin-invite-player`; a chave administrativa nunca é enviada ao navegador.
+- O administrador recebe uma confirmação diferente para convite enviado ou conta existente vinculada.
+
+### Publicação obrigatória da função da versão 42
+
+Na pasta extraída do projeto, entre na conta do Supabase e publique a função:
+
+```bash
+npx supabase login
+npx supabase functions deploy admin-invite-player --project-ref vewnjcjkowpiyebzfzyv
+```
+
+O Supabase fornece automaticamente `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` à função. O endereço padrão dos convites é `https://quadraplay.centercalculos.com.br`. Opcionalmente, ele pode ser substituído por um secret chamado `QUADRAPLAY_SITE_URL`.
+
+Depois da publicação, abra **Supabase → Edge Functions** e confirme que `admin-invite-player` aparece como ativa. Em seguida, publique normalmente a versão 42 na Vercel. Sem esta função, o botão **Convidar e salvar** exibirá uma orientação de configuração e não criará contas incompletas.

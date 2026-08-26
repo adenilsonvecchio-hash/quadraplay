@@ -26,14 +26,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
     <section className="qp-clean-home" aria-label="Início do QuadraPlay">
       <header className="qp-clean-home__header">
         <div className="qp-clean-home__topline">
-          <div className="qp-header-brands">
-            <div className="qp-club-mark" aria-label="Tangará Country Clube">
-              <img src="./tangara-logo-oficial.png" alt="Tangará" />
-            </div>
-            <div className="qp-group-mark" aria-label="Grupo Nosso Tênis">
-              <img src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis ATT Tour" />
-            </div>
-          </div>
+<div className="qp-header-brands" aria-hidden="true" />
           <div className="qp-clean-home__title"><span className="qp-header-wordmark"><span>Quadra</span><strong>Play</strong><b>+</b></span></div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
@@ -45,6 +38,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
             <h1>Olá, {firstName}</h1>
             <p>Organize seu próximo jogo</p>
             <div className="qp-clean-home__club"><MapPin size={12} /> Tangará Country Clube</div>
+          </div>
+          <div className="qp-intro-brands" aria-label="Tangará Country Clube e Nosso Tênis">
+            <img className="qp-intro-tangara" src="./tangara-logo-oficial.png" alt="Tangará" />
+            <img className="qp-intro-nosso-tenis" src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis ATT Tour" />
           </div>
         </div>
         <div className="qp-action-grid">

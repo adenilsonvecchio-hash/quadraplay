@@ -337,3 +337,9 @@ body {
   .qp-header-wordmark > strong, .qp-global-header-brand .qp-brand-logo__play { font-size:30px; }
   .qp-header-wordmark > b, .qp-global-header-brand .qp-brand-logo__plus { font-size:27px; }
 }
+
+/* v46 — marcas do clube reposicionadas para o lado direito da saudação */
+.qp-clean-home__intro { display:flex; align-items:center; justify-content:space-between; gap:14px; }
+.qp-intro-brands { flex:0 0 auto; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; min-width:82px; }
+.qp-intro-tangara { width:76px; max-height:28px; object-fit:contain; }
+.qp-intro-nosso-tenis { width:46px; height:46px; object-fit:contain; }

@@ -1,0 +1,34 @@
+import React from 'react';
+import { CalendarDays, Home, ListChecks, User } from 'lucide-react';
+
+export type TabType = 'home' | 'schedule' | 'games' | 'book' | 'players' | 'profile' | 'matches' | 'admin';
+
+interface BottomNavProps {
+  activeTab: TabType;
+  onChangeTab: (tab: TabType) => void;
+}
+
+export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) => {
+  const item = (tab: TabType, label: string, icon: React.ReactNode) => (
+    <button
+      type="button"
+      onClick={() => onChangeTab(tab)}
+      aria-label={`Abrir ${label}`}
+      className={`qp-bottom-nav__button flex flex-col items-center justify-center min-w-[72px] h-[62px] rounded-2xl transition-all ${activeTab === tab ? 'text-[#6855df]' : 'text-[#a7abba]'}`}
+    >
+      <span className={`grid place-items-center w-9 h-9 rounded-full ${activeTab === tab ? 'bg-[#eeeaff]' : ''}`}>{icon}</span>
+      <span className="max-w-[76px] text-center text-[9px] sm:text-[10px] font-bold leading-tight mt-0.5">{label}</span>
+    </button>
+  );
+
+  return (
+    <nav className="qp-bottom-nav fixed bottom-0 left-0 right-0 z-50" aria-label="Navegação principal">
+      <div className="qp-bottom-nav__inner max-w-md lg:max-w-6xl mx-auto qp-nav px-5 lg:px-14 py-2 flex items-center justify-between lg:justify-center lg:gap-24">
+        {item('home', 'Início', <Home className="w-[19px] h-[19px]" />)}
+        {item('schedule', 'Agenda', <CalendarDays className="w-[19px] h-[19px]" />)}
+        {item('games', 'Jogos agendados', <ListChecks className="w-[19px] h-[19px]" />)}
+        {item('profile', 'Perfil', <User className="w-[19px] h-[19px]" />)}
+      </div>
+    </nav>
+  );
+};

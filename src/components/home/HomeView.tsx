@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarDays, CalendarPlus, ChevronRight, MapPin, Users } from 'lucide-react';
+import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, MapPin, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from '../common/BrandLogo';
 import { NotificationsBell } from '../common/NotificationsBell';
@@ -18,8 +18,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
     : 'Jogador';
   const actions = [
     { label: 'Agendar', helper: 'Escolha a quadra e o horário', icon: CalendarPlus, image: undefined, onClick: onStartBooking, tone: 'featured' },
-    { label: 'Agenda', helper: 'Horários livres', icon: CalendarDays, image: undefined, onClick: onViewSchedule, tone: 'blue' },
-    { label: 'Meus jogos', helper: 'Convites e reservas', icon: undefined, image: './tennis-ball-realistic.png', onClick: onViewAllMatches, tone: 'amber' },
+    { label: 'Horários livres', helper: 'Veja a grade disponível', icon: CalendarDays, image: undefined, onClick: onViewSchedule, tone: 'blue' },
+    { label: 'Meus jogos', helper: 'Convites e reservas', icon: ListChecks, image: undefined, onClick: onViewAllMatches, tone: 'amber' },
     { label: 'Jogadores', helper: 'Sua classe', icon: Users, image: undefined, onClick: onViewPlayers, tone: 'green' },
   ] as const;
 
@@ -35,7 +35,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
               <img src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis ATT Tour" />
             </div>
           </div>
-          <div className="qp-clean-home__title flex items-center gap-2">Início <span className="rounded-full bg-white/15 px-2 py-1 text-[9px] font-black">v42</span></div>
+          <div className="qp-clean-home__title flex items-center gap-2">Início <span className="rounded-full bg-white/15 px-2 py-1 text-[9px] font-black">v43</span></div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
       </header>

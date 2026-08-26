@@ -25,7 +25,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
     <nav className="qp-bottom-nav fixed bottom-0 left-0 right-0 z-50" aria-label="Navegação principal">
       <div className="qp-bottom-nav__inner max-w-md lg:max-w-6xl mx-auto qp-nav px-5 lg:px-14 py-2 flex items-center justify-between lg:justify-center lg:gap-24">
         {item('home', 'Início', <Home className="w-[19px] h-[19px]" />)}
-        {item('schedule', 'Agenda', <CalendarDays className="w-[19px] h-[19px]" />)}
+        {item('schedule', 'Horários livres', <CalendarDays className="w-[19px] h-[19px]" />)}
         {item('games', 'Jogos agendados', <ListChecks className="w-[19px] h-[19px]" />)}
         {item('profile', 'Perfil', <User className="w-[19px] h-[19px]" />)}
       </div>

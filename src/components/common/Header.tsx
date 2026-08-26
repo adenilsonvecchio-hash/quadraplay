@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
 
         <div className="justify-self-center flex items-center gap-2">
           <BrandLogo compact />
-          <span className="rounded-full bg-violet-100 px-2 py-1 text-[9px] font-black text-violet-700">v42</span>
+          <span className="rounded-full bg-violet-100 px-2 py-1 text-[9px] font-black text-violet-700">v43</span>
         </div>
 
         <div className="relative"><NotificationsBell onOpenMatches={() => navigate('matches')} /></div>
@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
         <nav className="absolute left-4 top-[74px] z-50 w-[min(320px,calc(100vw-32px))] rounded-[24px] border border-white bg-white/95 p-2 shadow-[0_18px_48px_rgba(40,45,90,0.18)] backdrop-blur-xl">
           {[
             { tab: 'home' as const, label: 'Início', icon: Home },
-            { tab: 'schedule' as const, label: 'Agenda', icon: CalendarDays },
+            { tab: 'schedule' as const, label: 'Horários livres', icon: CalendarDays },
             { tab: 'games' as const, label: 'Jogos agendados', icon: ListChecks },
             { tab: 'profile' as const, label: 'Perfil', icon: User },
           ].map(({ tab, label, icon: Icon }) => (

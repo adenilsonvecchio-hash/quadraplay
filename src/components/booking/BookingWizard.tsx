@@ -103,6 +103,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
     setSelectedOpponent(player); setErrorMsg(null); setStep(4);
   };
   const confirm = async () => {
+    if (saving) return;
     if (!selectedSlot || !selectedOpponent || !selectedCourt) return setErrorMsg('Complete todas as etapas do agendamento.');
     setSaving(true); setErrorMsg(null);
     try {
@@ -120,7 +121,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
         if (!result.success) throw new Error(result.error || 'Não foi possível criar a reserva.');
       }
       setSuccess(true);
-      window.setTimeout(onSuccess, 1200);
+      window.setTimeout(onSuccess, 1800);
     } catch (error: any) {
       const message = String(error?.message || '');
       if (message.includes('duplicate') || message.includes('partidas_quadra_horario')) setErrorMsg('Este horário acabou de ser reservado por outro jogador. Escolha outro período.');
@@ -137,8 +138,8 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
   if (success) {
     return <div className="qp-glass rounded-[30px] p-8 text-center mt-3">
       <div className="w-16 h-16 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center"><CheckCircle2 className="w-9 h-9" /></div>
-      <h2 className="mt-4 text-xl font-black text-[#101b3d]">Reserva enviada!</h2>
-      <p className="text-sm text-slate-500 mt-1">{selectedOpponent?.name} receberá o convite para confirmar a partida.</p>
+      <h2 className="mt-4 text-xl font-black text-[#101b3d]">Convite enviado!</h2>
+      <p className="text-sm text-slate-500 mt-1">{selectedOpponent?.name} receberá o convite. O horário ficará reservado enquanto você aguarda a resposta.</p>
     </div>;
   }
 

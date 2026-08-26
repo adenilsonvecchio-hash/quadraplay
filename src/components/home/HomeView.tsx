@@ -1,7 +1,6 @@
 import React from 'react';
 import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, MapPin, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { BrandLogo } from '../common/BrandLogo';
 import { NotificationsBell } from '../common/NotificationsBell';
 
 interface HomeViewProps {
@@ -35,7 +34,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
               <img src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis ATT Tour" />
             </div>
           </div>
-          <div className="qp-clean-home__title flex items-center gap-2">Início <span className="rounded-full bg-white/15 px-2 py-1 text-[9px] font-black">v43</span></div>
+          <div className="qp-clean-home__title"><span className="qp-header-wordmark"><span>Quadra</span><strong>Play</strong><b>+</b></span></div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
       </header>
@@ -43,7 +42,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
       <div className="qp-clean-home__panel">
         <div className="qp-clean-home__intro">
           <div>
-            <BrandLogo className="qp-clean-home__brand" />
             <h1>Olá, {firstName}</h1>
             <p>Organize seu próximo jogo</p>
             <div className="qp-clean-home__club"><MapPin size={12} /> Tangará Country Clube</div>

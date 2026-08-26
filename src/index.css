@@ -322,3 +322,18 @@ body {
     border-radius: 24px 24px 0 0;
   }
 }
+
+/* Cabeçalho padronizado v45: marca QuadraPlay+ grande em todas as páginas */
+.qp-header-wordmark { display:inline-flex; align-items:baseline; white-space:nowrap; letter-spacing:-1.6px; line-height:1; }
+.qp-header-wordmark > span { color:#0f1e36; font-size:21px; font-weight:800; letter-spacing:-1px; }
+.qp-header-wordmark > strong { color:#6c4cf5; font-size:34px; font-weight:900; letter-spacing:-2.2px; }
+.qp-header-wordmark > b { color:#f59e0b; font-size:31px; font-weight:900; margin-left:2px; }
+.qp-clean-home__title { display:flex; align-items:center; justify-content:center; }
+.qp-global-header-brand .qp-brand-logo__quadra { font-size:21px; font-weight:800; }
+.qp-global-header-brand .qp-brand-logo__play { font-size:34px; }
+.qp-global-header-brand .qp-brand-logo__plus { font-size:31px; }
+@media (max-width: 380px) {
+  .qp-header-wordmark > span, .qp-global-header-brand .qp-brand-logo__quadra { font-size:18px; }
+  .qp-header-wordmark > strong, .qp-global-header-brand .qp-brand-logo__play { font-size:30px; }
+  .qp-header-wordmark > b, .qp-global-header-brand .qp-brand-logo__plus { font-size:27px; }
+}

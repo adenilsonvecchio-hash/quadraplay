@@ -127,16 +127,20 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
         {!loading && visibleMatches.map((match) => {
           const opponent = match.player1Id === currentUser.id ? match.player2Name : match.player1Name;
           const incoming = match.status === 'pending' && match.player2Id === currentUser.id;
+          const outgoing = match.status === 'pending' && match.player1Id === currentUser.id;
+          const statusLabel = incoming ? 'Convite recebido' : outgoing ? 'Aguardando adversário' : match.status === 'cancelled' ? (match.cancelReason === 'Convite recusado pelo adversário' ? 'Convite recusado' : 'Cancelado') : activeTab === 'past' ? 'Realizado' : 'Confirmado';
           return (
             <article key={safeText(match.id, `${match.date}-${match.startTime}`)} className="qp-card rounded-[26px] p-4">
               <div className="flex items-center justify-between gap-3">
-                <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${match.status === 'pending' ? 'bg-orange-50 text-orange-700' : match.status === 'cancelled' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'}`}>{match.status === 'pending' ? 'Aguardando confirmação' : match.status === 'cancelled' ? 'Cancelado' : activeTab === 'past' ? 'Realizado' : 'Confirmado'}</span>
+                <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${match.status === 'pending' ? 'bg-orange-50 text-orange-700' : match.status === 'cancelled' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'}`}>{statusLabel}</span>
                 <span className="text-[10px] font-black text-violet-700 bg-violet-50 px-2 py-1 rounded-full">Classe {safeText(match.tennisClass, '—')}</span>
               </div>
               <div className="mt-4 flex gap-3">
                 <div className="w-14 h-14 rounded-[18px] bg-violet-50 text-violet-700 grid place-items-center shrink-0"><CalendarDays className="w-5 h-5"/></div>
                 <div className="min-w-0 flex-1"><p className="text-xs text-slate-500 font-bold">{safeDate(match.date)}</p><h3 className="text-base font-black mt-1 truncate">vs {safeText(opponent, 'Adversário')}</h3><div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[11px] text-slate-500"><span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.5"/>{safeText(match.startTime, '--:--')} - {safeText(match.endTime, '--:--')}</span><span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/>{safeText(match.courtName, 'Quadra')}</span></div></div>
               </div>
+              {outgoing && <div className="mt-3 rounded-[15px] bg-orange-50 px-3 py-2 text-[11px] font-bold text-orange-700">O horário está reservado provisoriamente. A partida será confirmada quando o adversário aceitar.</div>}
+              {incoming && <div className="mt-3 rounded-[15px] bg-violet-50 px-3 py-2 text-[11px] font-bold text-violet-700">Você recebeu este convite. Aceite para confirmar a partida ou recuse para liberar o horário.</div>}
               {activeTab === 'upcoming' && <div className="mt-4 pt-3 border-t border-slate-100 flex gap-2">
                 {incoming ? <><button type="button" disabled={busyId === match.id} onClick={() => void respond(match, false)} className="flex-1 qp-soft rounded-[15px] py-2.5 text-xs font-black text-rose-600 disabled:opacity-50">Recusar</button><button type="button" disabled={busyId === match.id} onClick={() => void respond(match, true)} className="flex-1 rounded-[15px] py-2.5 text-xs font-black bg-emerald-500 text-white flex items-center justify-center gap-1 disabled:opacity-50"><CheckCircle2 className="w-4 h-4"/>{busyId === match.id ? 'Salvando...' : 'Aceitar'}</button></> : <button type="button" disabled={busyId === match.id} onClick={() => setCancelling(match)} className="w-full qp-soft rounded-[15px] py-2.5 text-xs font-black text-rose-600 flex items-center justify-center gap-1 disabled:opacity-50"><XCircle className="w-4 h-4"/>Cancelar partida</button>}
               </div>}

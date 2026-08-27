@@ -27,6 +27,12 @@ const findAuthUserByEmail = async (adminClient: ReturnType<typeof createClient>,
   throw new Error('Não foi possível concluir a busca da conta informada.');
 };
 
+const generateTemporaryPassword = () => {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#';
+  const bytes = crypto.getRandomValues(new Uint8Array(12));
+  return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join('');
+};
+
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (request.method !== 'POST') return json({ error: 'Método não permitido.' }, 405);
@@ -68,17 +74,20 @@ Deno.serve(async (request) => {
     }
 
     let user = await findAuthUserByEmail(adminClient, email);
-    let status: 'invited' | 'linked' = 'linked';
+    let status: 'created' | 'linked' = 'linked';
+    let temporaryPassword: string | undefined;
 
     if (!user) {
-      const redirectTo = Deno.env.get('QUADRAPLAY_SITE_URL') || 'https://quadraplay.centercalculos.com.br';
-      const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(email, {
-        redirectTo,
-        data: { nome: name },
+      temporaryPassword = generateTemporaryPassword();
+      const { data: createData, error: createError } = await adminClient.auth.admin.createUser({
+        email,
+        password: temporaryPassword,
+        email_confirm: true,
+        user_metadata: { nome: name },
       });
-      if (inviteError) throw inviteError;
-      user = inviteData.user;
-      status = 'invited';
+      if (createError) throw createError;
+      user = createData.user;
+      status = 'created';
     }
 
     const { error: profileError } = await adminClient.from('perfis').upsert({
@@ -86,6 +95,7 @@ Deno.serve(async (request) => {
       nome: name,
       email,
       telefone: phone,
+      precisa_trocar_senha: status === 'created',
     }, { onConflict: 'id' });
     if (profileError) throw profileError;
 
@@ -101,7 +111,8 @@ Deno.serve(async (request) => {
     return json({
       status,
       userId: user.id,
-      message: status === 'invited' ? 'Convite enviado e jogador aprovado.' : 'Conta existente vinculada ao grupo.',
+      temporaryPassword,
+      message: status === 'created' ? 'Conta criada sem envio de e-mail.' : 'Conta existente vinculada ao grupo.',
     });
   } catch (error) {
     console.error('admin-invite-player:', error);

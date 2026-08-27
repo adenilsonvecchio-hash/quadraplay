@@ -26,6 +26,7 @@ interface AuthContextType {
   allPlayers: Player[];
   refreshAuth: () => void;
   updateAvatar: (file: File | null) => Promise<{ success: boolean; error?: string }>;
+  completeFirstAccess: (password: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -56,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
     const [{ data: profile }, { data: membership }] = await Promise.all([
-      supabase.from('perfis').select('id, nome, email, telefone, avatar_url, criado_em').eq('id', userId).maybeSingle(),
+      supabase.from('perfis').select('id, nome, email, telefone, avatar_url, precisa_trocar_senha, criado_em').eq('id', userId).maybeSingle(),
       supabase.from('membros_grupo').select('grupo_id, classe, perfil, aprovado').eq('usuario_id', userId).eq('aprovado', true).maybeSingle(),
     ]);
     if (!profile || !membership) {
@@ -77,6 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email: safeEmail,
       phone: profile.telefone || undefined,
       avatarUrl: profile.avatar_url || undefined,
+      mustChangePassword: profile.precisa_trocar_senha === true,
       tennisClass: safeClass,
       isAdmin: membership.perfil === 'ADMINISTRADOR' || membership.perfil === 'PROPRIETARIO',
       createdAt: profile.criado_em || new Date().toISOString(),
@@ -233,6 +235,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true };
   };
 
+  const completeFirstAccess = async (password: string) => {
+    if (!supabase || !currentUser) return { success: false, error: 'Sessão não encontrada.' };
+    const { error: passwordError } = await supabase.auth.updateUser({ password });
+    if (passwordError) return { success: false, error: 'Não foi possível criar a nova senha.' };
+    const { error: profileError } = await supabase.from('perfis').update({ precisa_trocar_senha: false }).eq('id', currentUser.id);
+    if (profileError) return { success: false, error: 'A senha mudou, mas não foi possível concluir o primeiro acesso.' };
+    await loadSupabaseUser(currentUser.id);
+    return { success: true };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -251,6 +263,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         allPlayers,
         refreshAuth,
         updateAvatar,
+        completeFirstAccess,
       }}
     >
       {children}

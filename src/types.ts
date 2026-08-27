@@ -8,6 +8,7 @@ export interface Player {
   tennisClass: TennisClass;
   isAdmin: boolean;
   avatarUrl?: string;
+  mustChangePassword?: boolean;
   createdAt: string;
 }
 

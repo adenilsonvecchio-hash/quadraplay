@@ -19,6 +19,7 @@ import {
   Settings,
   ArrowLeft,
   X,
+  Copy,
 } from 'lucide-react';
 import { ConfirmModal } from '../common/ConfirmModal';
 
@@ -65,6 +66,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const [playerError, setPlayerError] = useState<string | null>(null);
   const [playerSuccess, setPlayerSuccess] = useState<string | null>(null);
   const [playerSaving, setPlayerSaving] = useState(false);
+  const [accessCredentials, setAccessCredentials] = useState<{ email: string; password: string } | null>(null);
 
   // Block Modal State
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
@@ -134,6 +136,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setPlayerIsAdmin(false);
     setPlayerError(null);
     setPlayerSuccess(null);
+    setAccessCredentials(null);
     setIsPlayerModalOpen(true);
   };
 
@@ -146,6 +149,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setPlayerIsAdmin(p.isAdmin);
     setPlayerError(null);
     setPlayerSuccess(null);
+    setAccessCredentials(null);
     setIsPlayerModalOpen(true);
   };
 
@@ -170,15 +174,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         if (editingPlayer) await supabaseAgendaService.updateGroupPlayer(groupId, editingPlayer.id, payload);
         else {
           const result = await supabaseAgendaService.addGroupPlayer(groupId, payload);
-          setPlayerSuccess(result.status === 'invited'
-            ? `Convite enviado para ${payload.email}. O jogador já foi aprovado no grupo.`
-            : `A conta ${payload.email} já existia e foi vinculada ao grupo.`);
+          if (result.status === 'created' && result.temporaryPassword) {
+            setAccessCredentials({ email: payload.email, password: result.temporaryPassword });
+            setPlayerSuccess('Conta criada e aprovada sem envio de e-mail. Copie os dados de acesso.');
+          } else setPlayerSuccess(`A conta ${payload.email} já existia e foi vinculada ao grupo.`);
         }
       } else {
         storageService.savePlayer({ id: editingPlayer?.id, ...payload });
         if (!editingPlayer) setPlayerSuccess('Jogador cadastrado com sucesso.');
       }
-      setIsPlayerModalOpen(false);
+      if (editingPlayer || !usingSupabase) setIsPlayerModalOpen(false);
       await loadAll();
     } catch (saveError) {
       const message = saveError instanceof Error ? saveError.message : 'Não foi possível salvar o jogador.';
@@ -752,7 +757,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <p className="text-xs text-slate-500 mb-4">
               {editingPlayer
                 ? 'Atualize os dados e a classe do jogador no grupo.'
-                : 'Informe os dados. O QuadraPlay criará a conta, aprovará o jogador no grupo e enviará o convite por e-mail.'}
+                : 'Informe os dados. O QuadraPlay criará e aprovará a conta sem enviar e-mail.'}
             </p>
 
             {playerError && (
@@ -761,7 +766,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
               </div>
             )}
 
-            <form onSubmit={handleSavePlayer} className="space-y-3">
+            {accessCredentials && <div className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+              <p className="text-xs font-black text-emerald-800">Acesso provisório criado</p>
+              <p className="mt-2 text-[11px] text-emerald-700">E-mail</p><p className="text-sm font-black break-all">{accessCredentials.email}</p>
+              <p className="mt-2 text-[11px] text-emerald-700">Senha provisória</p><p className="text-lg font-black tracking-wider">{accessCredentials.password}</p>
+              <button type="button" onClick={() => void navigator.clipboard.writeText(`QuadraPlay\nAcesso: ${accessCredentials.email}\nSenha provisória: ${accessCredentials.password}`)} className="mt-3 w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-black text-white flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" />Copiar para enviar no WhatsApp</button>
+              <p className="mt-2 text-[10px] font-bold text-emerald-700">O jogador deverá criar uma senha pessoal no primeiro acesso.</p>
+            </div>}
+
+            {!accessCredentials && <form onSubmit={handleSavePlayer} className="space-y-3">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Nome Completo</label>
                 <input
@@ -849,11 +862,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                   className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm disabled:opacity-60"
                 >
                   {playerSaving
-                    ? (editingPlayer ? 'Salvando...' : 'Enviando convite...')
+                    ? (editingPlayer ? 'Salvando...' : 'Criando acesso...')
                     : (editingPlayer ? 'Salvar' : 'Convidar e salvar')}
                 </button>
               </div>
-            </form>
+            </form>}
           </div>
         </div>
       )}

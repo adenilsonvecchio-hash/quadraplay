@@ -4,6 +4,7 @@ import { Header } from './components/common/Header';
 import { BottomNav, TabType } from './components/common/BottomNav';
 import { LoginView } from './components/auth/LoginView';
 import { PasswordResetView } from './components/auth/PasswordResetView';
+import { FirstAccessPasswordView } from './components/auth/FirstAccessPasswordView';
 import { HomeView } from './components/home/HomeView';
 import { BookingWizard } from './components/booking/BookingWizard';
 import { MyMatchesView } from './components/matches/MyMatchesView';
@@ -48,6 +49,7 @@ function MainApp() {
   if (authLoading) return <div className="min-h-screen grid place-items-center bg-[#eef1f8] text-[#6855df] font-black">Carregando QuadraPlay+...</div>;
   if (passwordSetupMode) return <PasswordResetView mode={passwordSetupMode} />;
   if (!currentUser) return <LoginView onSuccess={() => setActiveTab('home')} />;
+  if (currentUser.mustChangePassword) return <FirstAccessPasswordView />;
 
   const startGeneralBooking = () => {
     setPreselectedOpponentId(undefined);

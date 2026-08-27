@@ -286,7 +286,7 @@ Próxima etapa: migrar a leitura e a gravação da agenda e das partidas para o 
 
 ## Convite e aprovação em uma única etapa — pacote versão 42
 
-- O botão **Novo Jogador** do painel administrativo cria a conta no Supabase, vincula o atleta ao grupo e envia o convite por e-mail.
+- O botão **Novo Jogador** cria e confirma a conta no Supabase sem enviar e-mail, exibe uma senha provisória ao administrador e exige que o atleta crie uma senha pessoal no primeiro acesso.
 - Se a conta já existir, ela é apenas vinculada ao grupo, sem duplicação e sem novo convite.
 - A operação é executada pela Edge Function protegida `admin-invite-player`; a chave administrativa nunca é enviada ao navegador.
 - O administrador recebe uma confirmação diferente para convite enviado ou conta existente vinculada.

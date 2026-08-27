@@ -7,9 +7,10 @@ const safeString = (value: unknown, fallback = '') => typeof value === 'string' 
 let realtimeChannelSequence = 0;
 
 export interface PlayerInviteResult {
-  status: 'invited' | 'linked';
+  status: 'created' | 'linked';
   message: string;
   userId: string;
+  temporaryPassword?: string;
 }
 
 const statusMap: Record<string, Match['status']> = {

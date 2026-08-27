@@ -83,6 +83,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAdmin: membership.perfil === 'ADMINISTRADOR' || membership.perfil === 'PROPRIETARIO',
       createdAt: profile.criado_em || new Date().toISOString(),
     });
+    try {
+      setAllPlayers(await supabaseAgendaService.getGroupPlayers(membership.grupo_id));
+    } catch (error) {
+      console.warn('Não foi possível carregar os jogadores do grupo.', error);
+      setAllPlayers([]);
+    }
     return true;
   };
 

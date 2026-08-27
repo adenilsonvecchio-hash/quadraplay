@@ -212,7 +212,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
   const copyAccessCredentials = async () => {
     if (!accessCredentials) return;
-    const message = `QuadraPlay\nAcesso: ${accessCredentials.email}\nSenha provisória: ${accessCredentials.password}\nNo primeiro acesso, crie sua senha pessoal.`;
+    const message = `QuadraPlay\nAcesse: https://quadraplay.centercalculos.com.br\n\nAcesso: ${accessCredentials.email}\nSenha provisória: ${accessCredentials.password}\n\nNo primeiro acesso, crie sua senha pessoal.`;
     let copied = false;
     try {
       if (navigator.clipboard && window.isSecureContext) {

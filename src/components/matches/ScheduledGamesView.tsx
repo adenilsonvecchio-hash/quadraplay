@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, CheckCircle2, Clock3, MapPin, Users, XCircle } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Clock3, MapPin, XCircle } from 'lucide-react';
 import { Match } from '../../types';
 import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { useAuth } from '../../context/AuthContext';
 import { formatFriendlyDate, getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
+import { PlayerAvatar } from '../common/PlayerAvatar';
 
 export const ScheduledGamesView: React.FC = () => {
-  const { currentUser, usingSupabase, groupId } = useAuth();
+  const { currentUser, allPlayers, usingSupabase, groupId } = useAuth();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -83,6 +84,8 @@ export const ScheduledGamesView: React.FC = () => {
       ) : (
         <div className="grid gap-3 lg:grid-cols-2">
           {upcoming.map((match) => {
+            const player1 = allPlayers.find((player) => player.id === match.player1Id);
+            const player2 = allPlayers.find((player) => player.id === match.player2Id);
             // Em bancos migrados, usa o ID como regra principal e o nome do
             // perfil como compatibilidade para identificar o convidado.
             const incoming = match.status === 'pending' && !!currentUser && (
@@ -103,8 +106,11 @@ export const ScheduledGamesView: React.FC = () => {
                 </span>
               </div>
               <div className="mt-4 rounded-[18px] bg-white/65 p-3">
-                <div className="flex items-center gap-2 text-sm font-black text-slate-800">
-                  <Users className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center gap-3 text-sm font-black text-slate-800">
+                  <div className="flex shrink-0 -space-x-2" aria-label="Fotos dos jogadores">
+                    <PlayerAvatar name={match.player1Name} avatarUrl={player1?.avatarUrl} className="w-10 h-10 text-[10px] ring-2 ring-white" />
+                    <PlayerAvatar name={match.player2Name} avatarUrl={player2?.avatarUrl} className="w-10 h-10 text-[10px] ring-2 ring-white" />
+                  </div>
                   <span className="truncate">{match.player1Name} × {match.player2Name}</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-[11px] font-bold text-slate-500">

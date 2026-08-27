@@ -149,7 +149,7 @@ body {
 .qp-header-brands { display:block; width:104px; position:relative; }
 .qp-group-mark { position:absolute; left:35px; top:37px; z-index:5; width:38px; height:38px; display:grid; place-items:center; overflow:hidden; border-radius:50%; background:#fff; border:2px solid #fff; box-shadow:0 3px 10px rgba(19,45,74,.13); }
 .qp-group-mark img { width:100%; height:100%; object-fit:contain; display:block; }
-.qp-clean-home__title { position:absolute; left:50%; transform:translateX(-50%); font-size:13px; font-weight:900; }
+.qp-clean-home__title { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-size:13px; font-weight:900; }
 .qp-club-mark { width:104px; height:38px; border:0; box-shadow:none; background:#fff; }
 .qp-clean-home__bell { width:34px; height:34px; color:#1d2041; background:#f7f7fb; border-color:#eceef4; border-radius:12px; }
 .qp-clean-home__bell span { background:#6955e3; border-color:#fff; }

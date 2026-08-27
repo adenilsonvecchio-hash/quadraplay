@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { Lock, Plus, Search, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { TennisClass } from '../../types';
-import { storageService } from '../../services/storageService';
+import { PlayerAvatar } from '../common/PlayerAvatar';
 
 interface PlayersViewProps { onChallengePlayer: (opponentId: string) => void; }
 
 export const PlayersView: React.FC<PlayersViewProps> = ({ onChallengePlayer }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, allPlayers } = useAuth();
   const [selectedClass, setSelectedClass] = useState<TennisClass>(currentUser?.tennisClass || 'B');
   const [search, setSearch] = useState('');
-  const players = storageService.getPlayersByClass(selectedClass).filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+  const players = allPlayers.filter(p => p.tennisClass === selectedClass && p.name.toLowerCase().includes(search.toLowerCase()));
   const isUserClass = currentUser?.tennisClass === selectedClass;
 
   return <div className="space-y-4 pb-8">
@@ -28,7 +28,7 @@ export const PlayersView: React.FC<PlayersViewProps> = ({ onChallengePlayer }) =
         const self = currentUser?.id === player.id;
         const canChallenge = isUserClass && !self;
         return <div key={player.id} className={`qp-soft rounded-[19px] p-3 flex items-center gap-3 ${self ? 'ring-2 ring-violet-100' : ''}`}>
-          <div className="w-11 h-11 rounded-full bg-violet-100 text-violet-700 grid place-items-center font-black">{player.name.charAt(0)}</div>
+          <PlayerAvatar name={player.name} avatarUrl={player.avatarUrl} className="w-11 h-11 text-xs ring-2 ring-white shadow-sm" />
           <div className="min-w-0 flex-1"><p className="text-sm font-black truncate">{player.name}{self ? ' (Você)' : ''}</p><p className="text-[10px] text-slate-500">Classe {player.tennisClass}</p></div>
           {canChallenge ? <button onClick={() => onChallengePlayer(player.id)} className="qp-primary rounded-[14px] px-3 py-2 text-xs font-black flex items-center gap-1"><Plus className="w-3.5 h-3.5"/>Jogar</button> : self ? <span className="text-[10px] font-black text-violet-600 bg-violet-50 px-2 py-1 rounded-lg">Seu perfil</span> : null}
         </div>;

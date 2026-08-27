@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, MapPin, Users } from 'lucide-react';
+import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
 
@@ -27,7 +27,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
       <header className="qp-clean-home__header">
         <div className="qp-clean-home__topline">
 <div className="qp-header-brands" aria-hidden="true" />
-          <div className="qp-clean-home__title"><span className="qp-header-wordmark"><span>Quadra</span><strong>Play</strong><b>+</b></span></div>
+          <div className="qp-clean-home__title">
+            <span className="qp-header-wordmark"><span>Quadra</span><strong>Play</strong><b>+</b></span>
+            <img className="qp-header-nosso-tenis" src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis" />
+          </div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
       </header>
@@ -37,11 +40,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
           <div>
             <h1>Olá, {firstName}</h1>
             <p>Organize seu próximo jogo</p>
-            <div className="qp-clean-home__club"><MapPin size={12} /> Tangará Country Clube</div>
-          </div>
-          <div className="qp-intro-brands" aria-label="Tangará Country Clube e Nosso Tênis">
-            <img className="qp-intro-tangara" src="./tangara-logo-oficial.png" alt="Tangará" />
-            <img className="qp-intro-nosso-tenis" src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis ATT Tour" />
           </div>
         </div>
         <div className="qp-action-grid">

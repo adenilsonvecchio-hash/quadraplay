@@ -1,6 +1,6 @@
 {
   "name": "QuadraPlay",
-  "description": "Aplicativo de agendamento de jogos de tênis para o grupo Nosso Tênis do Tangará Country Clube.",
+  "description": "Aplicativo de agendamento de jogos de tênis do Nosso Tênis.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

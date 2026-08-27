@@ -3,7 +3,7 @@ import { getBrasiliaToday, addDays } from '../utils/dateUtils';
 
 export const DEFAULT_COURT_CONFIG: CourtConfig = {
   courtName: "Quadra 1",
-  clubName: "Tangará Country Clube",
+  clubName: "Nosso Tênis",
   groupName: "Nosso Tênis",
   slotDurationMinutes: 90,
   openTime: "07:00",
@@ -30,64 +30,64 @@ export const COURTS: Court[] = [
 // 10 players for each of the 5 classes (50 players total)
 const initialPlayersData: { name: string; tennisClass: TennisClass; email: string; phone: string; isAdmin?: boolean }[] = [
   // CLASSE A (10 Jogadores)
-  { name: "Rodrigo Silveira", tennisClass: "A", email: "rodrigo.silveira@tangara.com", phone: "(11) 98123-4501", isAdmin: true },
-  { name: "Lucas Faria", tennisClass: "A", email: "lucas.faria@tangara.com", phone: "(11) 98123-4502" },
-  { name: "Guilherme Santos", tennisClass: "A", email: "guilherme.santos@tangara.com", phone: "(11) 98123-4503" },
-  { name: "Felipe Miranda", tennisClass: "A", email: "felipe.miranda@tangara.com", phone: "(11) 98123-4504" },
-  { name: "Marcelo Costa", tennisClass: "A", email: "marcelo.costa@tangara.com", phone: "(11) 98123-4505" },
-  { name: "Eduardo Paiva", tennisClass: "A", email: "eduardo.paiva@tangara.com", phone: "(11) 98123-4506" },
-  { name: "Bruno Nogueira", tennisClass: "A", email: "bruno.nogueira@tangara.com", phone: "(11) 98123-4507" },
-  { name: "Thiago Vasconcelos", tennisClass: "A", email: "thiago.vasconcelos@tangara.com", phone: "(11) 98123-4508" },
-  { name: "Alexandre Pires", tennisClass: "A", email: "alexandre.pires@tangara.com", phone: "(11) 98123-4509" },
-  { name: "Renato Alencar", tennisClass: "A", email: "renato.alencar@tangara.com", phone: "(11) 98123-4510" },
+  { name: "Rodrigo Silveira", tennisClass: "A", email: "rodrigo.silveira@nossotenis.com.br", phone: "(11) 98123-4501", isAdmin: true },
+  { name: "Lucas Faria", tennisClass: "A", email: "lucas.faria@nossotenis.com.br", phone: "(11) 98123-4502" },
+  { name: "Guilherme Santos", tennisClass: "A", email: "guilherme.santos@nossotenis.com.br", phone: "(11) 98123-4503" },
+  { name: "Felipe Miranda", tennisClass: "A", email: "felipe.miranda@nossotenis.com.br", phone: "(11) 98123-4504" },
+  { name: "Marcelo Costa", tennisClass: "A", email: "marcelo.costa@nossotenis.com.br", phone: "(11) 98123-4505" },
+  { name: "Eduardo Paiva", tennisClass: "A", email: "eduardo.paiva@nossotenis.com.br", phone: "(11) 98123-4506" },
+  { name: "Bruno Nogueira", tennisClass: "A", email: "bruno.nogueira@nossotenis.com.br", phone: "(11) 98123-4507" },
+  { name: "Thiago Vasconcelos", tennisClass: "A", email: "thiago.vasconcelos@nossotenis.com.br", phone: "(11) 98123-4508" },
+  { name: "Alexandre Pires", tennisClass: "A", email: "alexandre.pires@nossotenis.com.br", phone: "(11) 98123-4509" },
+  { name: "Renato Alencar", tennisClass: "A", email: "renato.alencar@nossotenis.com.br", phone: "(11) 98123-4510" },
 
   // CLASSE B (10 Jogadores)
-  { name: "Carlos Eduardo Mendes", tennisClass: "B", email: "carlos.mendes@tangara.com", phone: "(11) 98223-4511" },
-  { name: "André Luiz Castro", tennisClass: "B", email: "andre.castro@tangara.com", phone: "(11) 98223-4512" },
-  { name: "Gustavo Henrique", tennisClass: "B", email: "gustavo.henrique@tangara.com", phone: "(11) 98223-4513" },
-  { name: "Fernando Duarte", tennisClass: "B", email: "fernando.duarte@tangara.com", phone: "(11) 98223-4514" },
-  { name: "Leandro Martins", tennisClass: "B", email: "leandro.martins@tangara.com", phone: "(11) 98223-4515" },
-  { name: "Rafael Bittencourt", tennisClass: "B", email: "rafael.bittencourt@tangara.com", phone: "(11) 98223-4516" },
-  { name: "Diego Camargo", tennisClass: "B", email: "diego.camargo@tangara.com", phone: "(11) 98223-4517" },
-  { name: "Vinicius Borges", tennisClass: "B", email: "vinicius.borges@tangara.com", phone: "(11) 98223-4518" },
-  { name: "Caio Prado", tennisClass: "B", email: "caio.prado@tangara.com", phone: "(11) 98223-4519" },
-  { name: "Daniel Fontes", tennisClass: "B", email: "daniel.fontes@tangara.com", phone: "(11) 98223-4520" },
+  { name: "Carlos Eduardo Mendes", tennisClass: "B", email: "carlos.mendes@nossotenis.com.br", phone: "(11) 98223-4511" },
+  { name: "André Luiz Castro", tennisClass: "B", email: "andre.castro@nossotenis.com.br", phone: "(11) 98223-4512" },
+  { name: "Gustavo Henrique", tennisClass: "B", email: "gustavo.henrique@nossotenis.com.br", phone: "(11) 98223-4513" },
+  { name: "Fernando Duarte", tennisClass: "B", email: "fernando.duarte@nossotenis.com.br", phone: "(11) 98223-4514" },
+  { name: "Leandro Martins", tennisClass: "B", email: "leandro.martins@nossotenis.com.br", phone: "(11) 98223-4515" },
+  { name: "Rafael Bittencourt", tennisClass: "B", email: "rafael.bittencourt@nossotenis.com.br", phone: "(11) 98223-4516" },
+  { name: "Diego Camargo", tennisClass: "B", email: "diego.camargo@nossotenis.com.br", phone: "(11) 98223-4517" },
+  { name: "Vinicius Borges", tennisClass: "B", email: "vinicius.borges@nossotenis.com.br", phone: "(11) 98223-4518" },
+  { name: "Caio Prado", tennisClass: "B", email: "caio.prado@nossotenis.com.br", phone: "(11) 98223-4519" },
+  { name: "Daniel Fontes", tennisClass: "B", email: "daniel.fontes@nossotenis.com.br", phone: "(11) 98223-4520" },
 
   // CLASSE C (10 Jogadores)
-  { name: "Marcos Vinicius", tennisClass: "C", email: "marcos.vinicius@tangara.com", phone: "(11) 98323-4521" },
-  { name: "Leonardo Rocha", tennisClass: "C", email: "leonardo.rocha@tangara.com", phone: "(11) 98323-4522" },
-  { name: "Danilo Ferraz", tennisClass: "C", email: "danilo.ferraz@tangara.com", phone: "(11) 98323-4523" },
-  { name: "Fabio Azevedo", tennisClass: "C", email: "fabio.azevedo@tangara.com", phone: "(11) 98323-4524" },
-  { name: "Otavio Guimarães", tennisClass: "C", email: "otavio.guimaraes@tangara.com", phone: "(11) 98323-4525" },
-  { name: "Sergio Brandão", tennisClass: "C", email: "sergio.brandao@tangara.com", phone: "(11) 98323-4526" },
-  { name: "Luciano Ramos", tennisClass: "C", email: "luciano.ramos@tangara.com", phone: "(11) 98323-4527" },
-  { name: "Helio Albuquerque", tennisClass: "C", email: "helio.albuquerque@tangara.com", phone: "(11) 98323-4528" },
-  { name: "Vitor Valente", tennisClass: "C", email: "vitor.valente@tangara.com", phone: "(11) 98323-4529" },
-  { name: "Wagner Lins", tennisClass: "C", email: "wagner.lins@tangara.com", phone: "(11) 98323-4530" },
+  { name: "Marcos Vinicius", tennisClass: "C", email: "marcos.vinicius@nossotenis.com.br", phone: "(11) 98323-4521" },
+  { name: "Leonardo Rocha", tennisClass: "C", email: "leonardo.rocha@nossotenis.com.br", phone: "(11) 98323-4522" },
+  { name: "Danilo Ferraz", tennisClass: "C", email: "danilo.ferraz@nossotenis.com.br", phone: "(11) 98323-4523" },
+  { name: "Fabio Azevedo", tennisClass: "C", email: "fabio.azevedo@nossotenis.com.br", phone: "(11) 98323-4524" },
+  { name: "Otavio Guimarães", tennisClass: "C", email: "otavio.guimaraes@nossotenis.com.br", phone: "(11) 98323-4525" },
+  { name: "Sergio Brandão", tennisClass: "C", email: "sergio.brandao@nossotenis.com.br", phone: "(11) 98323-4526" },
+  { name: "Luciano Ramos", tennisClass: "C", email: "luciano.ramos@nossotenis.com.br", phone: "(11) 98323-4527" },
+  { name: "Helio Albuquerque", tennisClass: "C", email: "helio.albuquerque@nossotenis.com.br", phone: "(11) 98323-4528" },
+  { name: "Vitor Valente", tennisClass: "C", email: "vitor.valente@nossotenis.com.br", phone: "(11) 98323-4529" },
+  { name: "Wagner Lins", tennisClass: "C", email: "wagner.lins@nossotenis.com.br", phone: "(11) 98323-4530" },
 
   // CLASSE D (10 Jogadores)
-  { name: "Paulo Henrique", tennisClass: "D", email: "paulo.henrique@tangara.com", phone: "(11) 98423-4531" },
-  { name: "Cristiano Barreto", tennisClass: "D", email: "cristiano.barreto@tangara.com", phone: "(11) 98423-4532" },
-  { name: "Roberto Maia", tennisClass: "D", email: "roberto.maia@tangara.com", phone: "(11) 98423-4533" },
-  { name: "Adriano Gomes", tennisClass: "D", email: "adriano.gomes@tangara.com", phone: "(11) 98423-4534" },
-  { name: "Julio Cesar", tennisClass: "D", email: "julio.cesar@tangara.com", phone: "(11) 98423-4535" },
-  { name: "Cesar Menotti", tennisClass: "D", email: "cesar.menotti@tangara.com", phone: "(11) 98423-4536" },
-  { name: "Flavio Rezende", tennisClass: "D", email: "flavio.rezende@tangara.com", phone: "(11) 98423-4537" },
-  { name: "Claudio Siqueira", tennisClass: "D", email: "claudio.siqueira@tangara.com", phone: "(11) 98423-4538" },
-  { name: "Gilberto Teles", tennisClass: "D", email: "gilberto.teles@tangara.com", phone: "(11) 98423-4539" },
-  { name: "Emerson Toledo", tennisClass: "D", email: "emerson.toledo@tangara.com", phone: "(11) 98423-4540" },
+  { name: "Paulo Henrique", tennisClass: "D", email: "paulo.henrique@nossotenis.com.br", phone: "(11) 98423-4531" },
+  { name: "Cristiano Barreto", tennisClass: "D", email: "cristiano.barreto@nossotenis.com.br", phone: "(11) 98423-4532" },
+  { name: "Roberto Maia", tennisClass: "D", email: "roberto.maia@nossotenis.com.br", phone: "(11) 98423-4533" },
+  { name: "Adriano Gomes", tennisClass: "D", email: "adriano.gomes@nossotenis.com.br", phone: "(11) 98423-4534" },
+  { name: "Julio Cesar", tennisClass: "D", email: "julio.cesar@nossotenis.com.br", phone: "(11) 98423-4535" },
+  { name: "Cesar Menotti", tennisClass: "D", email: "cesar.menotti@nossotenis.com.br", phone: "(11) 98423-4536" },
+  { name: "Flavio Rezende", tennisClass: "D", email: "flavio.rezende@nossotenis.com.br", phone: "(11) 98423-4537" },
+  { name: "Claudio Siqueira", tennisClass: "D", email: "claudio.siqueira@nossotenis.com.br", phone: "(11) 98423-4538" },
+  { name: "Gilberto Teles", tennisClass: "D", email: "gilberto.teles@nossotenis.com.br", phone: "(11) 98423-4539" },
+  { name: "Emerson Toledo", tennisClass: "D", email: "emerson.toledo@nossotenis.com.br", phone: "(11) 98423-4540" },
 
   // CLASSE E (10 Jogadores)
-  { name: "Mauricio Neves", tennisClass: "E", email: "mauricio.neves@tangara.com", phone: "(11) 98523-4541" },
-  { name: "Henrique Prado", tennisClass: "E", email: "henrique.prado@tangara.com", phone: "(11) 98523-4542" },
-  { name: "Wellington Prado", tennisClass: "E", email: "wellington.prado@tangara.com", phone: "(11) 98523-4543" },
-  { name: "Nelson Antunes", tennisClass: "E", email: "nelson.antunes@tangara.com", phone: "(11) 98523-4544" },
-  { name: "Joaquim Bezerra", tennisClass: "E", email: "joaquim.bezerra@tangara.com", phone: "(11) 98523-4545" },
-  { name: "Everton Santana", tennisClass: "E", email: "everton.santana@tangara.com", phone: "(11) 98523-4546" },
-  { name: "Rogerio Vianna", tennisClass: "E", email: "rogerio.vianna@tangara.com", phone: "(11) 98523-4547" },
-  { name: "Beto Pacheco", tennisClass: "E", email: "beto.pacheco@tangara.com", phone: "(11) 98523-4548" },
-  { name: "Rubens Barrichello", tennisClass: "E", email: "rubens.barrichello@tangara.com", phone: "(11) 98523-4549" },
-  { name: "Denis Carvalho", tennisClass: "E", email: "denis.carvalho@tangara.com", phone: "(11) 98523-4550" },
+  { name: "Mauricio Neves", tennisClass: "E", email: "mauricio.neves@nossotenis.com.br", phone: "(11) 98523-4541" },
+  { name: "Henrique Prado", tennisClass: "E", email: "henrique.prado@nossotenis.com.br", phone: "(11) 98523-4542" },
+  { name: "Wellington Prado", tennisClass: "E", email: "wellington.prado@nossotenis.com.br", phone: "(11) 98523-4543" },
+  { name: "Nelson Antunes", tennisClass: "E", email: "nelson.antunes@nossotenis.com.br", phone: "(11) 98523-4544" },
+  { name: "Joaquim Bezerra", tennisClass: "E", email: "joaquim.bezerra@nossotenis.com.br", phone: "(11) 98523-4545" },
+  { name: "Everton Santana", tennisClass: "E", email: "everton.santana@nossotenis.com.br", phone: "(11) 98523-4546" },
+  { name: "Rogerio Vianna", tennisClass: "E", email: "rogerio.vianna@nossotenis.com.br", phone: "(11) 98523-4547" },
+  { name: "Beto Pacheco", tennisClass: "E", email: "beto.pacheco@nossotenis.com.br", phone: "(11) 98523-4548" },
+  { name: "Rubens Barrichello", tennisClass: "E", email: "rubens.barrichello@nossotenis.com.br", phone: "(11) 98523-4549" },
+  { name: "Denis Carvalho", tennisClass: "E", email: "denis.carvalho@nossotenis.com.br", phone: "(11) 98523-4550" },
 ];
 
 export const INITIAL_PLAYERS: Player[] = initialPlayersData.map((p, idx) => ({
@@ -212,7 +212,7 @@ export function generateInitialBlockedSlots(): BlockedSlot[] {
 
 export const SUPABASE_SQL_SCHEMA = `-- ==========================================
 -- QuadraPlay - Esquema do PostgreSQL / Supabase
--- Clube: Tangará Country Clube
+-- Espaço esportivo: Nosso Tênis
 -- Grupo: Nosso Tênis
 -- ==========================================
 

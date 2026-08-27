@@ -227,7 +227,7 @@ export const supabaseAgendaService = {
     const timeSlots = await this.getTimeSlots(groupId);
     return {
       courtName: 'Quadra 1',
-      clubName: 'Tangará Country Clube',
+      clubName: 'Nosso Tênis',
       groupName: 'Nosso Tênis',
       slotDurationMinutes: data.duracao_minutos,
       openTime: shortTime(data.abre_as),

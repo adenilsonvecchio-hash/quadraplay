@@ -97,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     // Default to Carlos Mendes (Class B) or first player
-    const defaultUser = players.find((p) => p.email === 'carlos.mendes@tangara.com') || players[0];
+    const defaultUser = players.find((p) => p.email === 'carlos.mendes@nossotenis.com.br') || players[0];
     if (defaultUser) {
       setCurrentUser(defaultUser);
       localStorage.setItem('quadraplay_current_user_id_v1', defaultUser.id);

@@ -4,7 +4,7 @@
 
 # QuadraPlay
 
-Projeto mobile de agendamento de jogos do Tangará Country Clube.
+Projeto mobile de agendamento de jogos do Nosso Tênis.
 
 ## Como abrir
 

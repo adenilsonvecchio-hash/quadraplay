@@ -31,8 +31,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
           {menuOpen ? <X className="w-6 h-6 stroke-[2.2]" /> : <Menu className="w-6 h-6 stroke-[2.2]" />}
         </button>
 
-        <div className="justify-self-center">
+        <div className="justify-self-center qp-global-brand-stack">
           <BrandLogo className="qp-global-header-brand" />
+          <img className="qp-header-nosso-tenis" src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis" />
         </div>
 
         <div className="relative"><NotificationsBell onOpenMatches={() => navigate('matches')} /></div>

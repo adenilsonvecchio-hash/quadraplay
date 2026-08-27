@@ -30,7 +30,7 @@ type AdminTab = 'players' | 'matches' | 'blocks' | 'config';
 
 const safeInitialConfig: CourtConfig = {
   courtName: 'Quadra 1',
-  clubName: 'Tangará Country Clube',
+  clubName: 'Nosso Tênis',
   groupName: 'Nosso Tênis',
   slotDurationMinutes: 90,
   openTime: '07:00',
@@ -329,7 +329,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         <div className="mt-3">
           <h2 className="text-xl font-black">Gestão do Nosso Tênis</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Tangará Country Clube • Controle de Atletas, Agendamentos e Horários
+            Controle de Atletas, Agendamentos e Horários
           </p>
         </div>
       </div>
@@ -784,7 +784,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                   disabled={!!editingPlayer && usingSupabase}
                   value={playerEmail}
                   onChange={(e) => setPlayerEmail(e.target.value)}
-                  placeholder="nome@tangara.com"
+                  placeholder="nome@nossotenis.com.br"
                   className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 disabled:bg-slate-100 disabled:text-slate-400"
                 />
               </div>

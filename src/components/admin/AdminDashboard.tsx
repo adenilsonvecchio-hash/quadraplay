@@ -67,6 +67,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const [playerSuccess, setPlayerSuccess] = useState<string | null>(null);
   const [playerSaving, setPlayerSaving] = useState(false);
   const [accessCredentials, setAccessCredentials] = useState<{ email: string; password: string } | null>(null);
+  const [credentialsCopied, setCredentialsCopied] = useState(false);
 
   // Block Modal State
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
@@ -137,6 +138,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setPlayerError(null);
     setPlayerSuccess(null);
     setAccessCredentials(null);
+    setCredentialsCopied(false);
     setIsPlayerModalOpen(true);
   };
 
@@ -150,6 +152,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setPlayerError(null);
     setPlayerSuccess(null);
     setAccessCredentials(null);
+    setCredentialsCopied(false);
     setIsPlayerModalOpen(true);
   };
 
@@ -205,6 +208,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     } finally {
       setPlayerSaving(false);
     }
+  };
+
+  const copyAccessCredentials = async () => {
+    if (!accessCredentials) return;
+    const message = `QuadraPlay\nAcesso: ${accessCredentials.email}\nSenha provisória: ${accessCredentials.password}\nNo primeiro acesso, crie sua senha pessoal.`;
+    let copied = false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(message);
+        copied = true;
+      }
+    } catch {
+      copied = false;
+    }
+    if (!copied) {
+      const textarea = document.createElement('textarea');
+      textarea.value = message;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      copied = document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    setCredentialsCopied(copied);
+    if (copied) window.setTimeout(() => setCredentialsCopied(false), 2500);
   };
 
   const handleConfirmDeletePlayer = async () => {
@@ -770,7 +800,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
               <p className="text-xs font-black text-emerald-800">Acesso provisório criado</p>
               <p className="mt-2 text-[11px] text-emerald-700">E-mail</p><p className="text-sm font-black break-all">{accessCredentials.email}</p>
               <p className="mt-2 text-[11px] text-emerald-700">Senha provisória</p><p className="text-lg font-black tracking-wider">{accessCredentials.password}</p>
-              <button type="button" onClick={() => void navigator.clipboard.writeText(`QuadraPlay\nAcesso: ${accessCredentials.email}\nSenha provisória: ${accessCredentials.password}`)} className="mt-3 w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-black text-white flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" />Copiar para enviar no WhatsApp</button>
+              <button type="button" onClick={() => void copyAccessCredentials()} className="mt-3 w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-black text-white flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" />{credentialsCopied ? 'Copiado!' : 'Copiar para enviar no WhatsApp'}</button>
               <p className="mt-2 text-[10px] font-bold text-emerald-700">O jogador deverá criar uma senha pessoal no primeiro acesso.</p>
             </div>}
 

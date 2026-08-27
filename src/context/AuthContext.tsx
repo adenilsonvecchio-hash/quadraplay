@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { Player } from '../types';
 import { storageService } from '../services/storageService';
+import { supabaseAgendaService } from '../services/supabaseAgendaService';
 import {
   initialPasswordSetupMode,
   isSupabaseConfigured,
@@ -24,6 +25,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   allPlayers: Player[];
   refreshAuth: () => void;
+  updateAvatar: (file: File | null) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -188,6 +190,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('quadraplay_current_user_id_v1');
   };
 
+  const updateAvatar = async (file: File | null) => {
+    if (!currentUser) return { success: false, error: 'Jogador não identificado.' };
+    if (file && (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024)) {
+      return { success: false, error: 'Escolha uma imagem JPG, PNG ou WEBP de até 5 MB.' };
+    }
+
+    if (supabase) {
+      try {
+        let avatarUrl: string | null = null;
+        const folder = currentUser.id;
+        if (file) {
+          const extension = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+          const path = `${folder}/avatar.${extension}`;
+          const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type, cacheControl: '3600' });
+          if (uploadError) throw uploadError;
+          avatarUrl = `${supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl}?v=${Date.now()}`;
+        } else {
+          const { data: files } = await supabase.storage.from('avatars').list(folder);
+          if (files?.length) await supabase.storage.from('avatars').remove(files.map((item) => `${folder}/${item.name}`));
+        }
+        const { error: profileError } = await supabase.from('perfis').update({ avatar_url: avatarUrl }).eq('id', currentUser.id);
+        if (profileError) throw profileError;
+        await loadSupabaseUser(currentUser.id);
+        if (groupId) setAllPlayers(await supabaseAgendaService.getGroupPlayers(groupId));
+        return { success: true };
+      } catch (error: any) {
+        return { success: false, error: error?.message || 'Não foi possível atualizar a foto.' };
+      }
+    }
+
+    if (file) {
+      const avatarUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error('Não foi possível ler a imagem.'));
+        reader.readAsDataURL(file);
+      });
+      storageService.savePlayer({ ...currentUser, avatarUrl });
+    } else storageService.savePlayer({ ...currentUser, avatarUrl: undefined });
+    refreshAuth();
+    return { success: true };
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -205,6 +250,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         allPlayers,
         refreshAuth,
+        updateAvatar,
       }}
     >
       {children}

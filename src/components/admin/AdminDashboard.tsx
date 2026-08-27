@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   X,
   Copy,
+  Printer,
 } from 'lucide-react';
 import { ConfirmModal } from '../common/ConfirmModal';
 
@@ -88,6 +89,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
   // Filter state for matches
   const [matchClassFilter, setMatchClassFilter] = useState<TennisClass | 'ALL'>('ALL');
+  const [reportDate, setReportDate] = useState(getBrasiliaToday());
+  const [reportCopied, setReportCopied] = useState(false);
 
   const loadAll = async () => {
     setAdminLoading(true);
@@ -342,6 +345,32 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     if (matchClassFilter === 'ALL') return true;
     return m.tennisClass === matchClassFilter;
   });
+  const dailyMatches = (Array.isArray(matches) ? matches : [])
+    .filter((match) => match.date === reportDate)
+    .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const matchStatusLabel = (status: Match['status']) => status === 'scheduled' ? 'Confirmado' : status === 'pending' ? 'Aguardando' : status === 'cancelled' ? 'Cancelado' : 'Concluído';
+  const dailyReportText = () => {
+    const titleDate = new Date(`${reportDate}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+    const games = dailyMatches.map((match) => `${match.startTime} às ${match.endTime} — ${match.courtName}\n${match.player1Name} × ${match.player2Name}\nClasse ${match.tennisClass} — ${matchStatusLabel(match.status)}`).join('\n\n');
+    return `QUADRAPLAY — JOGOS DO DIA\n${titleDate.toUpperCase()}\n\n${games || 'Nenhum jogo agendado.'}\n\nTotal: ${dailyMatches.length} jogo${dailyMatches.length === 1 ? '' : 's'}`;
+  };
+  const copyDailyReport = async () => {
+    const value = dailyReportText();
+    let copied = false;
+    try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(value); copied = true; } } catch { copied = false; }
+    if (!copied) {
+      const area = document.createElement('textarea'); area.value = value; area.style.position = 'fixed'; area.style.left = '-9999px'; document.body.appendChild(area); area.select(); copied = document.execCommand('copy'); document.body.removeChild(area);
+    }
+    setReportCopied(copied);
+    if (copied) window.setTimeout(() => setReportCopied(false), 2500);
+  };
+  const printDailyReport = () => {
+    const printWindow = window.open('', '_blank', 'width=760,height=900');
+    if (!printWindow) return;
+    const cards = dailyMatches.map((match) => `<article><strong>${match.startTime} às ${match.endTime} — ${match.courtName}</strong><p>${match.player1Name} × ${match.player2Name}</p><small>Classe ${match.tennisClass} — ${matchStatusLabel(match.status)}</small></article>`).join('');
+    printWindow.document.write(`<html><head><title>Jogos do dia</title><style>body{font-family:Arial;padding:32px;color:#101b3d}h1{margin-bottom:4px}header{border-bottom:3px solid #6d4aff;padding-bottom:16px;margin-bottom:20px}article{border:2px solid #d9deea;border-radius:14px;padding:16px;margin:12px 0}p{font-weight:700}small{color:#59627a}</style></head><body><header><h1>QuadraPlay — Jogos do dia</h1><div>${new Date(`${reportDate}T12:00:00`).toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}</div></header>${cards || '<p>Nenhum jogo agendado.</p>'}<strong>Total: ${dailyMatches.length} jogo${dailyMatches.length === 1 ? '' : 's'}</strong><script>window.onload=()=>window.print()<\/script></body></html>`);
+    printWindow.document.close();
+  };
 
   return (
     <div className="space-y-4 pb-12">
@@ -507,6 +536,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       {/* TAB 2: AGENDAMENTOS (AGENDA COMPLETA) */}
       {activeTab === 'matches' && (
         <div className="space-y-3">
+          <section className="rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <label className="block"><span className="block text-xs font-black text-slate-700 mb-1">Relatório dos jogos do dia</span><input type="date" value={reportDate} onChange={(event) => setReportDate(event.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold" /></label>
+              <div className="flex gap-2"><button type="button" onClick={() => void copyDailyReport()} className="flex-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-black text-violet-700 flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" />{reportCopied ? 'Copiado!' : 'Copiar'}</button><button type="button" onClick={printDailyReport} className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-700 flex items-center justify-center gap-1.5"><Printer className="w-4 h-4" />PDF</button></div>
+            </div>
+            <div className="mt-4 space-y-2">
+              {dailyMatches.length === 0 ? <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center text-xs font-bold text-slate-500">Nenhum jogo agendado nesta data.</div> : dailyMatches.map((match) => <article key={`report-${match.id}`} className="rounded-xl border-2 border-slate-200 bg-slate-50/60 p-3">
+                <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-black text-slate-900">{match.startTime} às {match.endTime} — {match.courtName}</p><p className="mt-1 text-xs font-bold text-slate-700">{match.player1Name} × {match.player2Name}</p></div><span className="shrink-0 rounded-lg border border-violet-200 bg-white px-2 py-1 text-[9px] font-black text-violet-700">{matchStatusLabel(match.status)}</span></div><p className="mt-2 border-t border-slate-200 pt-2 text-[10px] font-bold text-slate-500">Classe {match.tennisClass}</p>
+              </article>)}
+            </div>
+            <p className="mt-3 text-right text-xs font-black text-slate-700">Total: {dailyMatches.length} jogo{dailyMatches.length === 1 ? '' : 's'}</p>
+          </section>
           {/* Class Filter */}
           <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1">
             <span className="text-xs font-bold text-slate-600 shrink-0">Filtrar:</span>

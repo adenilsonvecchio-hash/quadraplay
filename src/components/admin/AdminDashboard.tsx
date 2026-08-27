@@ -348,6 +348,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const dailyMatches = (Array.isArray(matches) ? matches : [])
     .filter((match) => match.date === reportDate)
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const reportSlots = courtConfig.timeSlots?.length ? courtConfig.timeSlots : [
+    { startTime: '07:00', endTime: '08:30' }, { startTime: '08:30', endTime: '10:00' },
+    { startTime: '10:00', endTime: '11:30' }, { startTime: '11:30', endTime: '13:00' },
+    { startTime: '13:00', endTime: '14:30' }, { startTime: '14:30', endTime: '16:00' },
+    { startTime: '16:00', endTime: '17:30' },
+  ];
   const matchStatusLabel = (status: Match['status']) => status === 'scheduled' ? 'Confirmado' : status === 'pending' ? 'Aguardando' : status === 'cancelled' ? 'Cancelado' : 'Concluído';
   const dailyReportText = () => {
     const titleDate = new Date(`${reportDate}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -541,10 +547,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
               <label className="block"><span className="block text-xs font-black text-slate-700 mb-1">Relatório dos jogos do dia</span><input type="date" value={reportDate} onChange={(event) => setReportDate(event.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold" /></label>
               <div className="flex gap-2"><button type="button" onClick={() => void copyDailyReport()} className="flex-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-black text-violet-700 flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" />{reportCopied ? 'Copiado!' : 'Copiar'}</button><button type="button" onClick={printDailyReport} className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-700 flex items-center justify-center gap-1.5"><Printer className="w-4 h-4" />PDF</button></div>
             </div>
-            <div className="mt-4 space-y-2">
-              {dailyMatches.length === 0 ? <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center text-xs font-bold text-slate-500">Nenhum jogo agendado nesta data.</div> : dailyMatches.map((match) => <article key={`report-${match.id}`} className="rounded-xl border-2 border-slate-200 bg-slate-50/60 p-3">
-                <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-black text-slate-900">{match.startTime} às {match.endTime} — {match.courtName}</p><p className="mt-1 text-xs font-bold text-slate-700">{match.player1Name} × {match.player2Name}</p></div><span className="shrink-0 rounded-lg border border-violet-200 bg-white px-2 py-1 text-[9px] font-black text-violet-700">{matchStatusLabel(match.status)}</span></div><p className="mt-2 border-t border-slate-200 pt-2 text-[10px] font-bold text-slate-500">Classe {match.tennisClass}</p>
-              </article>)}
+            <div className="mt-4 overflow-hidden rounded-xl border-2 border-slate-300 bg-white">
+              {reportSlots.map((slot) => {
+                const slotMatches = dailyMatches.filter((match) => match.startTime === slot.startTime);
+                return <div key={`slot-${slot.startTime}`} className="grid grid-cols-[58px_1fr] border-b border-slate-300 last:border-b-0">
+                  <div className="border-r border-slate-300 bg-slate-100 px-2 py-3 text-center"><p className="text-[11px] font-black text-slate-700">{slot.startTime}</p><p className="mt-1 text-[9px] font-bold text-slate-400">{slot.endTime}</p></div>
+                  <div className="min-h-[78px] p-2">
+                    {slotMatches.map((match) => <article key={`report-${match.id}`} className="rounded-lg border-2 border-emerald-300 bg-emerald-50 p-3 shadow-sm">
+                      <div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="text-[10px] font-black uppercase text-emerald-700">Nosso Tênis · Classe {match.tennisClass}</p><p className="mt-1 text-xs font-black text-slate-900">{match.player1Name}</p><p className="text-xs font-black text-slate-900">{match.player2Name}</p><p className="mt-1 text-[9px] font-bold text-slate-500">{match.courtName}</p></div><span className="shrink-0 rounded-md border border-emerald-300 bg-white px-2 py-1 text-[8px] font-black text-emerald-700">{matchStatusLabel(match.status)}</span></div>
+                    </article>)}
+                  </div>
+                </div>;
+              })}
             </div>
             <p className="mt-3 text-right text-xs font-black text-slate-700">Total: {dailyMatches.length} jogo{dailyMatches.length === 1 ? '' : 's'}</p>
           </section>

@@ -2,7 +2,7 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
-# QuadraPlay+ — versão 64 Multiesportes
+# QuadraPlay+ — versão 65 Multiesportes
 
 Projeto de agendamento de horários do Nosso Tênis.
 
@@ -17,6 +17,8 @@ Na versão 62, a escolha de esportes ganhou uma fotografia original e exclusiva 
 Na versão 63, a fotografia foi substituída por uma composição clara com nova personagem brasileira, celular violeta e elementos 3D de agenda, comunicação, notificação e horário. A imagem é exibida completa, sem faixa escura nem texto sobreposto.
 
 Na versão 64, a personagem foi recriada em uma pose anatomicamente clara: exatamente dois braços e duas mãos segurando o mesmo celular, sem braços cruzados. O símbolo de comunicação também passou a ser neutro, sem marca de terceiros.
+
+Na versão 65, os espaços iniciais das modalidades podem ser liberados pela migração 009. O agendamento não carrega mais a Quadra 1 local do Tênis enquanto aguarda o Supabase e mostra uma orientação clara quando não existe espaço ativo.
 
 Antes de publicar a versão 58, execute no Supabase a migração `supabase/migrations/006_multiesportes.sql`. Todos os dados anteriores são preservados e classificados automaticamente como `tenis`; os espaços iniciais das novas modalidades são criados inativos para que o administrador possa revisar, renomear e liberar somente os que realmente existem.
 

@@ -40,9 +40,11 @@ alter table public.configuracoes_agenda drop constraint if exists configuracoes_
 alter table public.configuracoes_agenda add primary key (grupo_id, modalidade);
 
 alter table public.horarios_agenda drop constraint if exists horarios_agenda_grupo_id_hora_inicio_key;
+alter table public.horarios_agenda drop constraint if exists horarios_agenda_grupo_modalidade_hora_key;
 alter table public.horarios_agenda add constraint horarios_agenda_grupo_modalidade_hora_key unique (grupo_id, modalidade, hora_inicio);
 
 alter table public.quadras drop constraint if exists quadras_grupo_id_nome_key;
+alter table public.quadras drop constraint if exists quadras_grupo_modalidade_nome_key;
 alter table public.quadras add constraint quadras_grupo_modalidade_nome_key unique (grupo_id, modalidade, nome);
 
 create index if not exists quadras_modalidade_idx on public.quadras (grupo_id, modalidade, ativa);

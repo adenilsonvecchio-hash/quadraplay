@@ -6,6 +6,7 @@ export const SPORTS = [
   { id: 'handebol', name: 'Handebol', emoji: '🤾', color: '#e7663c' },
   { id: 'volei', name: 'Vôlei', emoji: '🏐', color: '#3479d0' },
   { id: 'basquete', name: 'Basquete', emoji: '🏀', color: '#d96620' },
+  { id: 'peteca', name: 'Peteca', emoji: '🏸', color: '#9a5cc7' },
 ] as const;
 
 export type SportId = typeof SPORTS[number]['id'];

@@ -2,11 +2,11 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
-# QuadraPlay+ — versão 58 Multiesportes
+# QuadraPlay+ — versão 59 Multiesportes
 
 Projeto de agendamento de horários do Nosso Tênis.
 
-Esta versão preserva o fluxo da versão 57 e adiciona uma seleção de modalidade após o login. Tênis, Futsal, Futebol de Campo, Beach Tennis, Handebol, Vôlei e Basquete usam as mesmas telas de agenda, reserva, confirmação, cancelamento, perfil e administração.
+Esta versão preserva o fluxo da versão 57 e adiciona uma seleção de modalidade após o login. Tênis, Futsal, Futebol de Campo, Beach Tennis, Handebol, Vôlei, Basquete e Peteca usam as mesmas telas de agenda, reserva, confirmação, cancelamento, perfil e administração.
 
 Antes de publicar a versão 58, execute no Supabase a migração `supabase/migrations/006_multiesportes.sql`. Todos os dados anteriores são preservados e classificados automaticamente como `tenis`; os espaços iniciais das novas modalidades são criados inativos para que o administrador possa revisar, renomear e liberar somente os que realmente existem.
 

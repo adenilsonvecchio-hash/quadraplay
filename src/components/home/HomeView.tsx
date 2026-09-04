@@ -3,6 +3,8 @@ import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'luc
 import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
 import { Sport } from '../../data/sports';
+import { BrandLogo } from '../common/BrandLogo';
+import { SportSymbol } from '../common/SportSymbol';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -31,8 +33,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
         <div className="qp-clean-home__topline">
 <div className="qp-header-brands" aria-hidden="true" />
           <div className="qp-clean-home__title">
-            <span className="qp-header-wordmark"><span>Quadra</span><strong>Play</strong><b>+</b></span>
-            <img className="qp-header-nosso-tenis" src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis" />
+            <BrandLogo className="qp-standard-brand" />
+            <SportSymbol sport={activeSport} />
           </div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>

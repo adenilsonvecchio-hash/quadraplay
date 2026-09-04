@@ -39,7 +39,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
     <div className="min-h-screen bg-[#eef1f8] flex items-center justify-center px-4 py-7">
       <div className="qp-shell w-full max-w-md rounded-[38px] border border-white p-5 sm:p-7">
         <div className="text-center pt-3 pb-7">
-          <BrandLogo className="justify-center" />
+          <BrandLogo className="justify-center qp-standard-brand" />
           <img className="qp-login-nosso-tenis" src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis" />
           <p className="text-sm font-bold text-slate-500 mt-3">Agende, desafie e jogue.</p>
         </div>

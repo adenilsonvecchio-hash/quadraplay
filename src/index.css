@@ -243,14 +243,14 @@ body {
   }
 
   .qp-clean-home__header {
-    height: 110px;
-    padding: 12px 34px 10px;
+    height: 130px;
+    padding: 14px 34px 12px;
   }
 
   .qp-clean-home__title { font-size: 15px; }
   .qp-club-mark { width:112px; height:38px; }
   .qp-clean-home__panel {
-    height: calc(100% - 110px);
+    height: calc(100% - 130px);
     padding: 42px 48px 34px;
   }
 
@@ -323,12 +323,12 @@ body {
   }
 }
 
-/* Cabeçalho padronizado v45: marca QuadraPlay+ grande em todas as páginas */
+/* Cabeçalho padronizado: QuadraPlay+ e modalidade em todas as páginas */
 .qp-header-wordmark { display:inline-flex; align-items:baseline; white-space:nowrap; letter-spacing:-1.6px; line-height:1; }
 .qp-header-wordmark > span { color:#0f1e36; font-size:21px; font-weight:800; letter-spacing:-1px; }
 .qp-header-wordmark > strong { color:#6c4cf5; font-size:34px; font-weight:900; letter-spacing:-2.2px; }
 .qp-header-wordmark > b { color:#f59e0b; font-size:31px; font-weight:900; margin-left:2px; }
-.qp-clean-home__title { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+.qp-clean-home__title { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
 .qp-global-brand-stack { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; }
 .qp-header-nosso-tenis { width:38px; height:28px; object-fit:contain; display:block; }
 .qp-clean-home__title .qp-header-nosso-tenis { width:64px; height:50px; margin-top:3px; }
@@ -336,25 +336,35 @@ body {
 .qp-global-header-brand .qp-brand-logo__quadra { font-size:21px; font-weight:800; }
 .qp-global-header-brand .qp-brand-logo__play { font-size:34px; }
 .qp-global-header-brand .qp-brand-logo__plus { font-size:31px; }
+.qp-standard-brand .qp-brand-logo__wordmark { display:inline-flex; align-items:baseline; white-space:nowrap; line-height:1; }
+.qp-standard-brand .qp-brand-logo__quadra { color:#0f1e36; font-size:26px; font-weight:850; letter-spacing:-1.4px; }
+.qp-standard-brand .qp-brand-logo__play { color:#6c4cf5; font-size:42px; font-weight:950; letter-spacing:-2.8px; }
+.qp-standard-brand .qp-brand-logo__plus { color:#f59e0b; font-size:39px; font-weight:950; margin-left:2px; }
+.qp-sport-symbol { --sport-color:#6c4cf5; flex:0 0 auto; display:grid; place-items:center; border:1px solid rgba(255,255,255,.95); background:radial-gradient(circle at 32% 25%,#fff 0%,color-mix(in srgb,var(--sport-color) 10%,#fff) 66%,color-mix(in srgb,var(--sport-color) 22%,#fff) 100%); box-shadow:0 5px 12px color-mix(in srgb,var(--sport-color) 20%,transparent),inset 0 1px 2px #fff; }
+.qp-sport-symbol--header { width:38px; height:38px; border-radius:50%; font-size:24px; }
+.qp-sport-symbol--header img { width:31px; height:31px; object-fit:contain; filter:drop-shadow(0 2px 2px rgba(28,38,58,.2)); }
+.qp-sport-symbol--card { grid-column:1/-1; width:43px; height:43px; border-radius:15px; font-size:27px; }
+.qp-sport-symbol--card img { width:36px; height:36px; object-fit:contain; filter:drop-shadow(0 3px 3px rgba(28,38,58,.2)); }
+.qp-sport-symbol > span { line-height:1; filter:drop-shadow(0 2px 2px rgba(28,38,58,.15)); }
 @media (max-width: 380px) {
-  .qp-header-wordmark > span, .qp-global-header-brand .qp-brand-logo__quadra { font-size:18px; }
-  .qp-header-wordmark > strong, .qp-global-header-brand .qp-brand-logo__play { font-size:30px; }
-  .qp-header-wordmark > b, .qp-global-header-brand .qp-brand-logo__plus { font-size:27px; }
+  .qp-standard-brand .qp-brand-logo__quadra { font-size:23px; }
+  .qp-standard-brand .qp-brand-logo__play { font-size:37px; }
+  .qp-standard-brand .qp-brand-logo__plus { font-size:34px; }
 }
 
 /* v47 — somente a marca Nosso Tênis, centralizada abaixo do QuadraPlay+ */
 .qp-clean-home__intro { display:flex; align-items:center; justify-content:flex-start; gap:14px; }
 
 /* v58 — entrada multiesportes, mantendo o restante do aplicativo */
-.qp-sport-picker { min-height:100vh; padding:20px 16px 18px; background:linear-gradient(160deg,#f8f9ff 0%,#eef1f8 100%); }
-.qp-sport-picker__header { text-align:center; margin:2px auto 16px; }
-.qp-sport-picker__header p { margin-top:15px; color:#64748b; font-size:13px; font-weight:700; }
-.qp-sport-picker__header h1 { margin-top:4px; color:#101b3d; font-size:27px; line-height:1.1; font-weight:900; }
+.qp-sport-picker { min-height:100vh; padding:22px 16px 18px; background:linear-gradient(160deg,#f8f9ff 0%,#eef1f8 100%); }
+.qp-sport-picker__header { text-align:center; margin:2px auto 17px; }
+.qp-sport-picker__header p { margin-top:28px; color:#64748b; font-size:14px; font-weight:600; }
+.qp-sport-picker__header p strong { color:#25304e; font-weight:900; }
+.qp-sport-picker__header h1 { margin-top:20px; color:#101b3d; font-size:27px; line-height:1.1; font-weight:900; }
 .qp-sport-picker__header small { display:block; margin-top:6px; color:#8b93a7; font-size:11px; }
 .qp-sport-picker__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; max-width:760px; margin:0 auto; }
 .qp-sport-card { --sport-color:#6c4cf5; min-height:88px; padding:11px 12px; border:1px solid rgba(255,255,255,.9); border-radius:20px; background:rgba(255,255,255,.92); box-shadow:0 8px 22px rgba(31,43,86,.07); display:grid; grid-template-columns:1fr auto; grid-template-rows:1fr auto; text-align:left; color:#172347; transition:transform .18s ease,box-shadow .18s ease; }
 .qp-sport-card:active { transform:scale(.98); }
-.qp-sport-card__emoji { grid-column:1/-1; width:36px; height:36px; display:grid; place-items:center; border-radius:12px; background:color-mix(in srgb,var(--sport-color) 13%,white); font-size:22px; }
 .qp-sport-card strong { align-self:end; font-size:12px; line-height:1.1; font-weight:900; }
 .qp-sport-card svg { align-self:end; color:var(--sport-color); }
 .qp-active-sport { margin-left:auto; display:flex; align-items:center; gap:8px; padding:7px 10px; border:1px solid #e7e9f5; border-radius:15px; background:#fff; box-shadow:0 7px 20px rgba(52,59,95,.08); text-align:left; }
@@ -362,5 +372,5 @@ body {
 .qp-active-sport small,.qp-active-sport strong { display:block; line-height:1.05; }
 .qp-active-sport small { color:#9aa0b2; font-size:8px; font-weight:800; text-transform:uppercase; }
 .qp-active-sport strong { margin-top:3px; color:#283250; font-size:11px; font-weight:900; }
-@media (max-height:680px) { .qp-sport-picker { padding-top:12px; } .qp-sport-picker__header p { margin-top:8px; } .qp-sport-picker__header h1 { font-size:23px; } .qp-sport-picker__header small { display:none; } .qp-sport-card { min-height:76px; } .qp-sport-card__emoji { width:31px; height:31px; font-size:19px; } }
-@media (min-width:768px) { .qp-sport-picker { padding-top:42px; } .qp-sport-picker__grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; } .qp-sport-card { min-height:125px; padding:16px; } .qp-sport-card__emoji { width:46px; height:46px; font-size:27px; } .qp-sport-card strong { font-size:14px; } }
+@media (max-height:680px) { .qp-sport-picker { padding-top:10px; } .qp-sport-picker__header p { margin-top:13px; } .qp-sport-picker__header h1 { margin-top:10px; font-size:23px; } .qp-sport-picker__header small { display:none; } .qp-sport-card { min-height:72px; } .qp-sport-symbol--card { width:34px; height:34px; border-radius:11px; font-size:21px; } .qp-sport-symbol--card img { width:29px; height:29px; } }
+@media (min-width:768px) { .qp-sport-picker { padding-top:42px; } .qp-sport-picker__grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; } .qp-sport-card { min-height:125px; padding:16px; } .qp-sport-symbol--card { width:52px; height:52px; font-size:31px; } .qp-sport-symbol--card img { width:44px; height:44px; } .qp-sport-card strong { font-size:14px; } }

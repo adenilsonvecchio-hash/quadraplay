@@ -31,7 +31,7 @@ export const PasswordResetView: React.FC<PasswordResetViewProps> = ({ mode }) =>
   return (
     <div className="min-h-screen bg-[#eef1f8] flex items-center justify-center px-4 py-7">
       <div className="qp-shell w-full max-w-md rounded-[38px] border border-white p-5 sm:p-7">
-        <div className="text-center pt-3 pb-7"><BrandLogo className="justify-center" /><p className="text-sm font-bold text-slate-500 mt-3">{isInvite ? 'Ative seu acesso com segurança.' : 'Recupere o acesso com segurança.'}</p></div>
+        <div className="text-center pt-3 pb-7"><BrandLogo className="justify-center qp-standard-brand" /><p className="text-sm font-bold text-slate-500 mt-3">{isInvite ? 'Ative seu acesso com segurança.' : 'Recupere o acesso com segurança.'}</p></div>
         <section className="qp-card rounded-[30px] p-5">
           {completed ? <div className="text-center py-4">
             <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />

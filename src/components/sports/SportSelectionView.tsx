@@ -22,7 +22,6 @@ export const SportSelectionView: React.FC<SportSelectionViewProps> = ({ userName
       </header>
       <div className="qp-sport-picker__hero">
         <img src="./quadraplay-multiesportes-hero.png" alt="Atleta usando o QuadraPlay+ em um centro multiesportivo" />
-        <div><strong>Seu esporte.</strong><span>Seu horário.</span></div>
       </div>
       <div className="qp-sport-picker__grid">
         {SPORTS.map((sport) => (

@@ -2,7 +2,7 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
-# QuadraPlay+ — versão 62 Multiesportes
+# QuadraPlay+ — versão 64 Multiesportes
 
 Projeto de agendamento de horários do Nosso Tênis.
 
@@ -13,6 +13,10 @@ Na versão 60, a marca QuadraPlay+ foi ampliada e padronizada. Depois da escolha
 Na versão 61, a marca Nosso Tênis foi retirada da identidade principal e substituída pela assinatura “MULTIESPORTES”. O símbolo da modalidade escolhida aparece entre o QuadraPlay+ e essa assinatura. As Classes A–E são exibidas e validadas exclusivamente no Tênis; todas as demais modalidades trabalham com participantes sem divisão por classe.
 
 Na versão 62, a escolha de esportes ganhou uma fotografia original e exclusiva do QuadraPlay+, com uma atleta usando o celular em um centro multiesportivo. A faixa é responsiva e mantém os oito cartões visíveis no celular.
+
+Na versão 63, a fotografia foi substituída por uma composição clara com nova personagem brasileira, celular violeta e elementos 3D de agenda, comunicação, notificação e horário. A imagem é exibida completa, sem faixa escura nem texto sobreposto.
+
+Na versão 64, a personagem foi recriada em uma pose anatomicamente clara: exatamente dois braços e duas mãos segurando o mesmo celular, sem braços cruzados. O símbolo de comunicação também passou a ser neutro, sem marca de terceiros.
 
 Antes de publicar a versão 58, execute no Supabase a migração `supabase/migrations/006_multiesportes.sql`. Todos os dados anteriores são preservados e classificados automaticamente como `tenis`; os espaços iniciais das novas modalidades são criados inativos para que o administrador possa revisar, renomear e liberar somente os que realmente existem.
 

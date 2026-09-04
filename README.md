@@ -2,7 +2,9 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
-# QuadraPlay+ — versão 65 Multiesportes
+# QuadraPlay+ — versão 66 Agenda Semanal
+
+Esta versão cria uma nova visualização semanal da Agenda, com dias em colunas, horários em linhas, navegação entre semanas e cores para horários disponíveis, reservados, aguardando confirmação e bloqueados. As funções e telas da versão 65 foram preservadas.
 
 Projeto de agendamento de horários do Nosso Tênis.
 

@@ -3,270 +3,106 @@ import { useAuth } from '../../context/AuthContext';
 import { Court, CourtSlot } from '../../types';
 import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
-import { addDays, formatFriendlyDate, getBrasiliaToday } from '../../utils/dateUtils';
-import {
-  CalendarDays,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Clock3,
-  LockKeyhole,
-  Plus,
-  Users,
-} from 'lucide-react';
+import { addDays, getBrasiliaToday } from '../../utils/dateUtils';
+import { ChevronLeft, ChevronRight, Clock3, LockKeyhole, Users } from 'lucide-react';
 
-interface CourtScheduleViewProps {
-  onScheduleSlot?: (date: string, startTime: string, courtId: string) => void;
-}
+interface CourtScheduleViewProps { onScheduleSlot?: (date: string, startTime: string, courtId: string) => void; }
+type DaySchedule = { date: string; slots: CourtSlot[] };
 
+const mondayOf = (dateString: string) => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  const weekday = new Date(year, month - 1, day).getDay();
+  return addDays(dateString, weekday === 0 ? -6 : 1 - weekday);
+};
+
+const dayLabel = (dateString: string) => {
+  const [year, month, day] = dateString.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return { weekday: date.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '').toUpperCase(), day: String(day).padStart(2, '0') };
+};
+
+const monthTitle = (weekStart: string) => {
+  const toDate = (value: string) => { const [y, m, d] = value.split('-').map(Number); return new Date(y, m - 1, d); };
+  const firstDate = toDate(weekStart);
+  const lastDate = toDate(addDays(weekStart, 6));
+  const first = firstDate.toLocaleDateString('pt-BR', { month: 'long' });
+  const last = lastDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  return firstDate.getMonth() === lastDate.getMonth() ? `${first.charAt(0).toUpperCase() + first.slice(1)}, ${lastDate.getFullYear()}` : `${first.charAt(0).toUpperCase() + first.slice(1)} – ${last}`;
+};
 
 export const CourtScheduleView: React.FC<CourtScheduleViewProps> = ({ onScheduleSlot }) => {
   const { currentUser, usingSupabase, groupId } = useAuth();
   const today = getBrasiliaToday();
-  const [selectedDate, setSelectedDate] = useState(today);
+  const currentWeek = mondayOf(today);
+  const [weekStart, setWeekStart] = useState(currentWeek);
   const [selectedCourtId, setSelectedCourtId] = useState('court-1');
-  const [slots, setSlots] = useState<CourtSlot[]>([]);
-  // Não consulta o armazenamento antigo durante a renderização. No modo
-  // Supabase, as quadras reais serão carregadas logo após a página abrir.
   const [courts, setCourts] = useState<Court[]>([]);
+  const [days, setDays] = useState<DaySchedule[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
+  const weekDates = useMemo(() => Array.from({ length: 7 }, (_, index) => addDays(weekStart, index)), [weekStart]);
 
-  const loadSlots = async () => {
-    setLoading(true);
-    setLoadError('');
+  const loadWeek = async () => {
+    setLoading(true); setLoadError('');
     try {
-      if (usingSupabase && groupId) {
-        const nextCourts = await supabaseAgendaService.getCourts(groupId);
-        setCourts(Array.isArray(nextCourts) ? nextCourts : []);
-        const availableCourt = nextCourts.find((court) => court.id === selectedCourtId && court.active) || nextCourts.find((court) => court.active);
-        if (!availableCourt) {
-          setSlots([]);
-          return;
-        }
-        if (availableCourt.id !== selectedCourtId) {
-          setSelectedCourtId(availableCourt.id);
-          return;
-        }
-        setSlots(await supabaseAgendaService.getSchedule(groupId, selectedDate, availableCourt.id));
-      } else {
-        const nextCourts = storageService.getCourts(false);
-        setCourts(Array.isArray(nextCourts) ? nextCourts : []);
-        setSlots(storageService.getCourtScheduleForDate(selectedDate, selectedCourtId));
-      }
-    } catch {
-      setLoadError('Não foi possível carregar a agenda do banco.');
-    } finally {
-      setLoading(false);
-    }
+      const nextCourts = usingSupabase && groupId ? await supabaseAgendaService.getCourts(groupId) : storageService.getCourts(false);
+      setCourts(Array.isArray(nextCourts) ? nextCourts : []);
+      const court = nextCourts.find((item) => item.id === selectedCourtId && item.active) || nextCourts.find((item) => item.active);
+      if (!court) { setDays([]); return; }
+      if (court.id !== selectedCourtId) { setSelectedCourtId(court.id); return; }
+      setDays(await Promise.all(weekDates.map(async (date) => ({
+        date,
+        slots: usingSupabase && groupId ? await supabaseAgendaService.getSchedule(groupId, date, court.id) : storageService.getCourtScheduleForDate(date, court.id),
+      }))));
+    } catch { setLoadError('Não foi possível carregar a agenda da semana.'); }
+    finally { setLoading(false); }
   };
 
   useEffect(() => {
-    void loadSlots();
-    if (usingSupabase && groupId) return supabaseAgendaService.subscribeToMatches(groupId, () => void loadSlots());
-    return storageService.subscribe(() => void loadSlots());
-  }, [selectedDate, selectedCourtId, usingSupabase, groupId]);
+    void loadWeek();
+    if (usingSupabase && groupId) return supabaseAgendaService.subscribeToMatches(groupId, () => void loadWeek());
+    return storageService.subscribe(() => void loadWeek());
+  }, [weekStart, selectedCourtId, usingSupabase, groupId]);
 
-  const dateTitle = useMemo(() => formatFriendlyDate(selectedDate, false), [selectedDate]);
-  const weekday = useMemo(() => {
-    const [year, month, day] = selectedDate.split('-').map(Number);
-    const value = new Date(year, month - 1, day).toLocaleDateString('pt-BR', { weekday: 'long' });
-    return value.charAt(0).toUpperCase() + value.slice(1);
-  }, [selectedDate]);
+  const timeRows = useMemo(() => (days.find((day) => day.slots.length)?.slots || []).map(({ startTime, endTime }) => ({ startTime, endTime })), [days]);
 
-  const handlePrevDay = () => {
-    const previous = addDays(selectedDate, -1);
-    if (previous >= today) setSelectedDate(previous);
-  };
-
-  return (
-    <div className="space-y-3 pb-4">
-      <section className="qp-glass rounded-[26px] p-4 flex items-center gap-3">
-        <div className="w-12 h-12 rounded-[18px] bg-violet-100 text-violet-600 flex items-center justify-center shadow-[0_8px_22px_rgba(105,76,255,0.16)]">
-          <CalendarDays className="w-6 h-6" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-xs font-bold text-slate-400">Agenda</p>
-          <h2 className="text-[20px] leading-tight font-black tracking-tight text-[#101b3d] truncate">{dateTitle}</h2>
-          <p className="text-xs text-slate-500 mt-0.5">{weekday}</p>
-        </div>
-        <button
-          onClick={() => setSelectedDate(today)}
-          className="w-11 h-11 rounded-[16px] qp-button text-slate-700 flex items-center justify-center active:scale-95 transition"
-          aria-label="Ir para hoje"
-        >
-          <CalendarDays className="w-5 h-5" />
-        </button>
-      </section>
-
-      <div className="grid grid-cols-3 gap-2">
-        <button
-          onClick={handlePrevDay}
-          disabled={selectedDate <= today}
-          className="h-12 qp-button rounded-[18px] flex items-center justify-center disabled:opacity-35"
-          aria-label="Dia anterior"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => setSelectedDate(today)}
-          className="h-12 rounded-[18px] text-sm font-black text-violet-600 bg-violet-50/80 border border-white shadow-[0_8px_22px_rgba(105,76,255,0.13)]"
-        >
-          Hoje
-        </button>
-        <button
-          onClick={() => setSelectedDate(addDays(selectedDate, 1))}
-          className="h-12 qp-button rounded-[18px] flex items-center justify-center"
-          aria-label="Próximo dia"
-        >
-          <ChevronRight className="w-5 h-5" />
-        </button>
+  return <div className="qp-weekly-agenda pb-4">
+    <section className="qp-weekly-toolbar">
+      <div><p>AGENDA DE QUADRAS</p><h2>{monthTitle(weekStart)}</h2></div>
+      <div className="qp-weekly-actions">
+        <button onClick={() => setWeekStart(addDays(weekStart, -7))} disabled={weekStart <= currentWeek} aria-label="Semana anterior"><ChevronLeft /></button>
+        <button className="qp-today-button" onClick={() => setWeekStart(currentWeek)}>Hoje</button>
+        <button onClick={() => setWeekStart(addDays(weekStart, 7))} aria-label="Próxima semana"><ChevronRight /></button>
       </div>
+    </section>
 
-      <section className="qp-glass rounded-[26px] p-3.5">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-black text-sm text-[#101b3d]">Quadras</h3>
-          <span className="text-[10px] font-bold text-slate-400">Selecione uma quadra</span>
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {(Array.isArray(courts) ? courts : []).map((court) => {
-            const active = selectedCourtId === court.id;
-            return (
-              <button
-                key={court.id}
-                disabled={!court.active}
-                onClick={() => setSelectedCourtId(court.id)}
-                className={`rounded-[19px] px-1 py-3.5 flex flex-col items-center justify-center gap-2 transition-all ${
-                  active
-                    ? 'bg-gradient-to-br from-[#725cff] to-[#5038eb] text-white shadow-[0_9px_24px_rgba(91,70,238,0.34)] ring-1 ring-white/80'
-                    : court.active ? 'qp-button text-slate-500' : 'bg-slate-100 text-slate-400 opacity-65 cursor-not-allowed'
-                }`}
-              >
-                <div className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center ${active ? 'border-white/90' : 'border-slate-300'}`}>
-                  <span className="w-4 h-px bg-current opacity-70" />
-                </div>
-                <span className="text-[10px] sm:text-[11px] font-black whitespace-nowrap">{court.name}</span>
-                {!court.active && <span className="text-[8px] font-bold">Indisponível</span>}
-              </button>
-            );
-          })}
-        </div>
-      </section>
+    <section className="qp-weekly-courts"><span>Espaço</span><div>{courts.map((court) => <button key={court.id} disabled={!court.active} onClick={() => setSelectedCourtId(court.id)} className={court.id === selectedCourtId ? 'is-active' : ''}>{court.name}{!court.active && ' · indisponível'}</button>)}</div></section>
+    <div className="qp-weekly-legend"><span><i className="is-free" />Disponível</span><span><i className="is-booked" />Reservado</span><span><i className="is-pending" />Aguardando</span><span><i className="is-blocked" />Bloqueado</span></div>
+    {loadError && <div className="rounded-2xl bg-rose-50 border border-rose-100 p-3 text-xs font-bold text-rose-700">{loadError}</div>}
 
-      <>
-          {loadError && <div className="rounded-2xl bg-rose-50 border border-rose-100 p-3 text-xs font-bold text-rose-700">{loadError}</div>}
-          <div className="qp-glass rounded-[20px] px-3 py-2.5 grid grid-cols-4 gap-2 text-[10px] font-semibold text-slate-700">
-            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />Disponível</div>
-            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-blue-600" />Reservado</div>
-            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-orange-400" />Aguardando</div>
-            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-slate-400" />Bloqueado</div>
-          </div>
-
-          <section className="qp-glass rounded-[26px] p-2 space-y-1.5">
-            {loading && <div className="p-6 text-center text-xs font-bold text-slate-500">Carregando agenda...</div>}
-            {(Array.isArray(slots) ? slots : []).map((slot) => {
-              const isMyMatch = !!currentUser && !!slot.match && (slot.match.player1Id === currentUser.id || slot.match.player2Id === currentUser.id);
-              const isPending = slot.match?.status === 'pending';
-
-              if (slot.isBlocked) {
-                return (
-                  <div key={slot.startTime} className="grid grid-cols-[86px_1fr] gap-2 items-stretch">
-                    <TimeBlock start={slot.startTime} end={slot.endTime} />
-                    <div className="rounded-[20px] px-3 py-3 bg-slate-100/85 border border-white flex items-center gap-3 min-h-[72px]">
-                      <StatusIcon tone="gray"><LockKeyhole className="w-4 h-4" /></StatusIcon>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-black text-slate-700">Bloqueado</p>
-                        <p className="text-[11px] text-slate-500 truncate">{slot.blockReason || 'Manutenção'}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-
-              if (slot.match) {
-                return (
-                  <div key={slot.startTime} className="grid grid-cols-[86px_1fr] gap-2 items-stretch">
-                    <TimeBlock start={slot.startTime} end={slot.endTime} />
-                    <div className={`rounded-[20px] px-3 py-3 border border-white flex items-center gap-3 min-h-[72px] ${isPending ? 'bg-orange-50/90' : 'bg-blue-50/90'}`}>
-                      <StatusIcon tone={isPending ? 'orange' : 'blue'}>{isPending ? <Clock3 className="w-4 h-4" /> : <Users className="w-4 h-4" />}</StatusIcon>
-                      <div className="min-w-0 flex-1">
-                        <p className={`text-sm font-black ${isPending ? 'text-orange-700' : 'text-blue-800'}`}>{isPending ? 'Aguardando confirmação' : 'Reservado'}</p>
-                        <p className="text-[11px] text-[#101b3d] truncate">{slot.match.player1Name} & {slot.match.player2Name}</p>
-                      </div>
-                      <ChevronRight className={`w-5 h-5 ${isPending ? 'text-orange-500' : 'text-blue-600'}`} />
-                    </div>
-                  </div>
-                );
-              }
-
-              if (!slot.available) {
-                return (
-                  <div key={slot.startTime} className="grid grid-cols-[86px_1fr] gap-2 items-stretch opacity-55">
-                    <TimeBlock start={slot.startTime} end={slot.endTime} />
-                    <div className="rounded-[20px] px-3 py-3 bg-slate-100 border border-white flex items-center gap-3 min-h-[72px]">
-                      <StatusIcon tone="gray"><Clock3 className="w-4 h-4" /></StatusIcon>
-                      <div>
-                        <p className="text-sm font-black text-slate-600">Horário encerrado</p>
-                        <p className="text-[11px] text-slate-400">Não disponível para reserva</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-
-              return (
-                <button
-                  key={slot.startTime}
-                  onClick={() => onScheduleSlot?.(selectedDate, slot.startTime, selectedCourtId)}
-                  className="w-full grid grid-cols-[86px_1fr] gap-2 items-stretch text-left"
-                >
-                  <TimeBlock start={slot.startTime} end={slot.endTime} />
-                  <div className="rounded-[20px] px-3 py-3 bg-emerald-50/90 border border-white flex items-center gap-3 min-h-[72px] active:scale-[0.99] transition">
-                    <StatusIcon tone="green"><Check className="w-4 h-4 stroke-[3]" /></StatusIcon>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-black text-emerald-800">Disponível</p>
-                      <p className="text-[11px] text-emerald-950/70">Clique para reservar</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-emerald-700" />
-                  </div>
-                </button>
-              );
-            })}
-          </section>
-
-          <button
-            onClick={() => onScheduleSlot?.(selectedDate, '', selectedCourtId)}
-            className="w-full qp-glass rounded-[24px] px-4 py-3.5 flex items-center gap-3 text-left active:scale-[0.99] transition"
-          >
-            <div className="w-11 h-11 rounded-[16px] bg-gradient-to-br from-[#7c63ff] to-[#5c43ed] text-white flex items-center justify-center shadow-[0_8px_20px_rgba(92,67,237,0.3)]">
-              <Plus className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-black text-violet-700">Nova partida / reserva</p>
-              <p className="text-[11px] text-slate-500">Agendar uma nova partida</p>
-            </div>
-            <ChevronRight className="w-5 h-5 text-violet-600" />
-          </button>
-        </>
-
-    </div>
-  );
+    <section className="qp-weekly-frame">
+      {loading && <div className="qp-weekly-loading">Carregando semana...</div>}
+      <div className="qp-weekly-grid">
+        <div className="qp-weekly-corner"><Clock3 size={15} /></div>
+        {weekDates.map((date) => { const label = dayLabel(date); return <div key={date} className={`qp-weekly-day ${date === today ? 'is-today' : ''}`}><strong>{label.weekday}</strong><span>{label.day}</span></div>; })}
+        {timeRows.map((time) => <React.Fragment key={time.startTime}>
+          <div className="qp-weekly-time"><strong>{time.startTime}</strong><span>{time.endTime}</span></div>
+          {weekDates.map((date) => { const slot = days.find((day) => day.date === date)?.slots.find((item) => item.startTime === time.startTime); return <SlotCell key={`${date}-${time.startTime}`} slot={slot} isPast={date < today} currentUserId={currentUser?.id} onSelect={() => slot?.available && !slot.match && !slot.isBlocked && onScheduleSlot?.(date, slot.startTime, selectedCourtId)} />; })}
+        </React.Fragment>)}
+      </div>
+      {!loading && !timeRows.length && <div className="qp-weekly-empty">Nenhum horário configurado para esta semana.</div>}
+    </section>
+    <p className="qp-weekly-hint">Toque em um horário disponível para reservar.</p>
+  </div>;
 };
 
-const TimeBlock: React.FC<{ start: string; end: string }> = ({ start, end }) => (
-  <div className="rounded-[18px] bg-white/55 border border-white px-2 py-2.5 flex flex-col justify-center">
-    <span className="text-sm font-black leading-none text-[#101b3d]">{start}</span>
-    <span className="text-sm font-black leading-none text-[#101b3d] mt-1">{end}</span>
-    <span className="text-[10px] text-slate-400 mt-1">1h30</span>
-  </div>
-);
-
-const StatusIcon: React.FC<{ tone: 'green' | 'blue' | 'orange' | 'gray'; children: React.ReactNode }> = ({ tone, children }) => {
-  const tones = {
-    green: 'bg-emerald-500 text-white',
-    blue: 'bg-blue-600 text-white',
-    orange: 'bg-orange-500 text-white',
-    gray: 'bg-slate-400 text-white',
-  };
-  return <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm ${tones[tone]}`}>{children}</div>;
+const SlotCell: React.FC<{ slot?: CourtSlot; isPast: boolean; currentUserId?: string; onSelect: () => void }> = ({ slot, isPast, currentUserId, onSelect }) => {
+  if (!slot || slot.isBlocked) return <div className="qp-slot is-blocked"><LockKeyhole size={14} /><strong>Bloqueado</strong><small>{slot?.blockReason || 'Indisponível'}</small></div>;
+  if (slot.match) {
+    const pending = slot.match.status === 'pending';
+    const mine = !!currentUserId && [slot.match.player1Id, slot.match.player2Id].includes(currentUserId);
+    return <div className={`qp-slot ${pending ? 'is-pending' : 'is-booked'}`}><Users size={14} /><strong>{pending ? 'Aguardando' : 'Reservado'}</strong><small>{mine ? 'Meu jogo' : `${slot.match.player1Name} × ${slot.match.player2Name}`}</small></div>;
+  }
+  if (!slot.available || isPast) return <div className="qp-slot is-closed"><Clock3 size={14} /><strong>Encerrado</strong></div>;
+  return <button className="qp-slot is-free" onClick={onSelect}><strong>Disponível</strong><small>Reservar</small></button>;
 };

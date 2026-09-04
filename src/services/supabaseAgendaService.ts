@@ -1,6 +1,7 @@
 import { BlockedSlot, Court, CourtConfig, CourtSlot, Match, Player, TennisClass } from '../types';
 import { supabase } from '../lib/supabase';
 import { generateDaySlots, isSlotInPast } from '../utils/dateUtils';
+import { getActiveSportId } from '../data/sports';
 
 const shortTime = (value: string | null | undefined) => (value || '').slice(0, 5);
 const safeString = (value: unknown, fallback = '') => typeof value === 'string' && value.trim() ? value : fallback;
@@ -48,7 +49,7 @@ const mapMatch = (
 // carregados separadamente para não depender dos nomes internos das relações
 // que o PostgREST gera para cada banco Supabase.
 const matchSelect = `
-  id, grupo_id, quadra_id, jogador_1_id, jogador_2_id, classe, data,
+  id, grupo_id, modalidade, quadra_id, jogador_1_id, jogador_2_id, classe, data,
   hora_inicio, hora_fim, status, criado_em, cancelado_por, cancelado_em, motivo_cancelamento
 `;
 
@@ -215,14 +216,14 @@ export const supabaseAgendaService = {
 
   async getCourts(groupId: string): Promise<Court[]> {
     if (!supabase) return [];
-    const { data, error } = await supabase.from('quadras').select('id, nome, piso, ativa, ordem').eq('grupo_id', groupId).order('ordem');
+    const { data, error } = await supabase.from('quadras').select('id, nome, piso, ativa, ordem').eq('grupo_id', groupId).eq('modalidade', getActiveSportId()).order('ordem');
     if (error) throw error;
     return (data || []).map((row) => ({ id: row.id, name: row.nome, surface: row.piso, active: row.ativa }));
   },
 
   async getConfig(groupId: string): Promise<CourtConfig | null> {
     if (!supabase) return null;
-    const { data, error } = await supabase.from('configuracoes_agenda').select('*').eq('grupo_id', groupId).maybeSingle();
+    const { data, error } = await supabase.from('configuracoes_agenda').select('*').eq('grupo_id', groupId).eq('modalidade', getActiveSportId()).maybeSingle();
     if (error) throw error;
     if (!data) return null;
     const timeSlots = await this.getTimeSlots(groupId);
@@ -241,7 +242,7 @@ export const supabaseAgendaService = {
 
   async getTimeSlots(groupId: string): Promise<Array<{ startTime: string; endTime: string }>> {
     if (!supabase) return [];
-    const { data, error } = await supabase.from('horarios_agenda').select('hora_inicio, hora_fim').eq('grupo_id', groupId).eq('ativo', true).order('ordem');
+    const { data, error } = await supabase.from('horarios_agenda').select('hora_inicio, hora_fim').eq('grupo_id', groupId).eq('modalidade', getActiveSportId()).eq('ativo', true).order('ordem');
     if (error) {
       if ((error as any).code === '42P01') return [];
       throw error;
@@ -251,7 +252,7 @@ export const supabaseAgendaService = {
 
   async getBlockedSlots(groupId: string): Promise<BlockedSlot[]> {
     if (!supabase) return [];
-    const { data, error } = await supabase.from('bloqueios_agenda').select('*').eq('grupo_id', groupId).order('data').order('hora_inicio');
+    const { data, error } = await supabase.from('bloqueios_agenda').select('*').eq('grupo_id', groupId).eq('modalidade', getActiveSportId()).order('data').order('hora_inicio');
     if (error) throw error;
     return (data || []).map((row) => ({
       id: row.id, courtId: row.quadra_id || undefined, date: row.data,
@@ -279,15 +280,15 @@ export const supabaseAgendaService = {
       dias_ativos: config.activeDays,
       antecedencia_maxima_dias: config.maxAdvanceBookingDays,
       atualizado_em: new Date().toISOString(),
-    }).eq('grupo_id', groupId);
+    }).eq('grupo_id', groupId).eq('modalidade', getActiveSportId());
     if (configError) throw configError;
 
     if (config.timeSlots) {
-      const { error: deleteError } = await supabase.from('horarios_agenda').delete().eq('grupo_id', groupId);
+      const { error: deleteError } = await supabase.from('horarios_agenda').delete().eq('grupo_id', groupId).eq('modalidade', getActiveSportId());
       if (deleteError) throw deleteError;
       if (config.timeSlots.length) {
         const { error: insertError } = await supabase.from('horarios_agenda').insert(config.timeSlots.map((slot, index) => ({
-          grupo_id: groupId, hora_inicio: slot.startTime, hora_fim: slot.endTime, ativo: true, ordem: index + 1,
+          grupo_id: groupId, modalidade: getActiveSportId(), hora_inicio: slot.startTime, hora_fim: slot.endTime, ativo: true, ordem: index + 1,
         })));
         if (insertError) throw insertError;
       }
@@ -297,7 +298,7 @@ export const supabaseAgendaService = {
   async addBlockedSlot(groupId: string, userId: string, block: Omit<BlockedSlot, 'id' | 'createdAt'>): Promise<void> {
     if (!supabase) throw new Error('Supabase não configurado.');
     const { error } = await supabase.from('bloqueios_agenda').insert({
-      grupo_id: groupId, quadra_id: block.courtId || null, data: block.date,
+      grupo_id: groupId, modalidade: getActiveSportId(), quadra_id: block.courtId || null, data: block.date,
       hora_inicio: block.allDay ? null : block.startTime, hora_fim: block.allDay ? null : block.endTime,
       dia_inteiro: block.allDay, motivo: block.reason, criado_por: userId,
     });
@@ -312,7 +313,7 @@ export const supabaseAgendaService = {
 
   async getMatches(groupId: string): Promise<Match[]> {
     if (!supabase) return [];
-    const { data, error } = await supabase.from('partidas').select(matchSelect).eq('grupo_id', groupId).order('data').order('hora_inicio');
+    const { data, error } = await supabase.from('partidas').select(matchSelect).eq('grupo_id', groupId).eq('modalidade', getActiveSportId()).order('data').order('hora_inicio');
     if (error) throw error;
     return hydrateMatches(data);
   },
@@ -323,6 +324,7 @@ export const supabaseAgendaService = {
       .from('partidas')
       .select(matchSelect)
       .eq('grupo_id', groupId)
+      .eq('modalidade', getActiveSportId())
       .or(`jogador_1_id.eq.${userId},jogador_2_id.eq.${userId}`)
       .order('data')
       .order('hora_inicio');
@@ -343,6 +345,7 @@ export const supabaseAgendaService = {
     if (!supabase) throw new Error('Supabase não configurado.');
     const { data, error } = await supabase.from('partidas').insert({
       grupo_id: params.groupId,
+      modalidade: getActiveSportId(),
       quadra_id: params.courtId,
       jogador_1_id: params.player1Id,
       jogador_2_id: params.player2Id,
@@ -400,8 +403,8 @@ export const supabaseAgendaService = {
     if (!supabase) return [];
     const [config, matchesResult, blocksResult] = await Promise.all([
       this.getConfig(groupId),
-      supabase.from('partidas').select(matchSelect).eq('grupo_id', groupId).eq('quadra_id', courtId).eq('data', date).in('status', ['PENDENTE', 'ACEITA']),
-      supabase.from('bloqueios_agenda').select('*').eq('grupo_id', groupId).eq('data', date),
+      supabase.from('partidas').select(matchSelect).eq('grupo_id', groupId).eq('modalidade', getActiveSportId()).eq('quadra_id', courtId).eq('data', date).in('status', ['PENDENTE', 'ACEITA']),
+      supabase.from('bloqueios_agenda').select('*').eq('grupo_id', groupId).eq('modalidade', getActiveSportId()).eq('data', date),
     ]);
     if (matchesResult.error) throw matchesResult.error;
     if (blocksResult.error) throw blocksResult.error;

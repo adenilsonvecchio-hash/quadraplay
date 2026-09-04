@@ -2,15 +2,18 @@ import React from 'react';
 import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
+import { Sport } from '../../data/sports';
 
 interface HomeViewProps {
   onStartBooking: () => void;
   onViewAllMatches: () => void;
   onViewSchedule: () => void;
   onViewPlayers: () => void;
+  activeSport: Sport;
+  onChangeSport: () => void;
 }
 
-export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers }) => {
+export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers, activeSport, onChangeSport }) => {
   const { currentUser } = useAuth();
   const firstName = typeof currentUser?.name === 'string' && currentUser.name.trim()
     ? currentUser.name.trim().split(/\s+/)[0]
@@ -39,8 +42,9 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
         <div className="qp-clean-home__intro">
           <div>
             <h1>Olá, {firstName}</h1>
-            <p>Organize seu próximo jogo</p>
+            <p>Organize seu próximo horário</p>
           </div>
+          <button type="button" className="qp-active-sport" onClick={onChangeSport}><span>{activeSport.emoji}</span><span><small>Modalidade</small><strong>{activeSport.name}</strong></span></button>
         </div>
         <div className="qp-action-grid">
           {actions.map(({ label, helper, icon: Icon, image, onClick, tone }) => (

@@ -4,14 +4,17 @@ import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from './BrandLogo';
 import { NotificationsBell } from './NotificationsBell';
 import { TabType } from './BottomNav';
+import { Sport } from '../../data/sports';
 
 interface HeaderProps {
   onOpenAdmin?: () => void;
   activeTab: string;
   onNavigate?: (tab: TabType) => void;
+  activeSport: Sport;
+  onChangeSport: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNavigate }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNavigate, activeSport, onChangeSport }) => {
   const { isAdmin } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = (tab: TabType) => {
@@ -55,6 +58,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
               <ShieldCheck className="w-5 h-5" /> Painel administrativo
             </button>
           )}
+          <button type="button" onClick={() => { setMenuOpen(false); onChangeSport(); }} className="w-full flex items-center gap-3 rounded-[17px] px-3 py-3 text-left text-sm font-black text-slate-700 hover:bg-slate-50">
+            <span className="text-xl" aria-hidden="true">{activeSport.emoji}</span> Trocar esporte
+          </button>
         </nav>
       )}
     </header>

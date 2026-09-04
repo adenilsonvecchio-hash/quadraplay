@@ -13,12 +13,15 @@ import { PlayersView } from './components/players/PlayersView';
 import { ProfileView } from './components/profile/ProfileView';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { ScheduledGamesView } from './components/matches/ScheduledGamesView';
+import { SportSelectionView } from './components/sports/SportSelectionView';
+import { ACTIVE_SPORT_STORAGE_KEY, getSport, SportId } from './data/sports';
 
 function MainApp() {
   const { currentUser, authLoading, passwordSetupMode } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [preselectedOpponentId, setPreselectedOpponentId] = useState<string | undefined>();
   const [bookingSeed, setBookingSeed] = useState<{date?: string; startTime?: string; courtId?: string}>({});
+  const [activeSportId, setActiveSportId] = useState<SportId | null>(null);
 
   const navigate = (tab: TabType) => {
     setActiveTab(tab);
@@ -51,6 +54,18 @@ function MainApp() {
   if (!currentUser) return <LoginView onSuccess={() => setActiveTab('home')} />;
   if (currentUser.mustChangePassword) return <FirstAccessPasswordView />;
 
+  const selectSport = (sportId: SportId) => {
+    localStorage.setItem(ACTIVE_SPORT_STORAGE_KEY, sportId);
+    setActiveSportId(sportId);
+    navigate('home');
+  };
+
+  if (!activeSportId) {
+    return <div className="min-h-screen bg-[#eef1f8] flex justify-center"><div className="qp-shell w-full max-w-md lg:max-w-6xl min-h-screen"><SportSelectionView userName={currentUser.name} onSelect={selectSport} /></div></div>;
+  }
+
+  const activeSport = getSport(activeSportId);
+
   const startGeneralBooking = () => {
     setPreselectedOpponentId(undefined);
     setBookingSeed({});
@@ -66,7 +81,7 @@ function MainApp() {
   return (
     <div className="min-h-screen bg-[#eef1f8] text-[#0b1742] flex justify-center items-start sm:py-5 selection:bg-violet-200">
       <div className="qp-shell qp-app-shell w-full max-w-md lg:max-w-6xl min-h-screen sm:min-h-[94vh] sm:rounded-[38px] flex flex-col relative overflow-hidden border border-white">
-        {activeTab !== 'home' && <Header activeTab={activeTab} onOpenAdmin={() => navigate('admin')} onNavigate={navigate} />}
+        {activeTab !== 'home' && <Header activeTab={activeTab} onOpenAdmin={() => navigate('admin')} onNavigate={navigate} activeSport={activeSport} onChangeSport={() => setActiveSportId(null)} />}
 
         <main className={`qp-main ${activeTab === 'home' ? 'flex-1 min-h-0' : 'flex-1 px-4 lg:px-8 pt-1 pb-24 lg:pb-24 overflow-y-auto custom-scrollbar'}`}>
           {activeTab === 'home' && (
@@ -75,6 +90,8 @@ function MainApp() {
               onViewAllMatches={() => navigate('matches')}
               onViewSchedule={() => navigate('schedule')}
               onViewPlayers={() => navigate('players')}
+              activeSport={activeSport}
+              onChangeSport={() => setActiveSportId(null)}
             />
           )}
 

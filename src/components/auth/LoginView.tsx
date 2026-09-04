@@ -40,7 +40,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
       <div className="qp-shell w-full max-w-md rounded-[38px] border border-white p-5 sm:p-7">
         <div className="text-center pt-3 pb-7">
           <BrandLogo className="justify-center qp-standard-brand" />
-          <img className="qp-login-nosso-tenis" src="./nosso-tenis-logo-v2.png" alt="Nosso Tênis" />
+          <span className="qp-multisports-label qp-multisports-label--login">MULTIESPORTES</span>
           <p className="text-sm font-bold text-slate-500 mt-3">Agende, desafie e jogue.</p>
         </div>
 
@@ -69,7 +69,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
           {!usingSupabase && showDemoSelector && <div className="mt-3 max-h-52 overflow-y-auto custom-scrollbar space-y-1.5">{allPlayers.map(player => <button key={player.id} onClick={() => void login(player.email, 'senha123')} className="w-full qp-soft rounded-[15px] px-3 py-2.5 flex items-center gap-2 text-left"><span className="w-8 h-8 rounded-full bg-violet-100 text-violet-700 grid place-items-center text-xs font-black">{player.tennisClass}</span><span className="flex-1 min-w-0 text-xs font-black truncate">{player.name}</span>{player.isAdmin && <span className="text-[9px] font-black text-amber-700 bg-amber-50 px-1.5 py-1 rounded-lg">ADMIN</span>}</button>)}</div>}
         </section>
 
-        <div className="mt-5 text-center text-[10px] text-slate-400"><p className="flex items-center justify-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />Nosso Tênis</p></div>
+        <div className="mt-5 text-center text-[10px] text-slate-400"><p className="flex items-center justify-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />Agendamento multiesportes</p></div>
       </div>
     </div>
   );

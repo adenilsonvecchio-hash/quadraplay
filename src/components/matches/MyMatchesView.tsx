@@ -6,6 +6,7 @@ import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { formatFriendlyDate, getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
 import { ConfirmModal } from '../common/ConfirmModal';
+import { getActiveSportId } from '../../data/sports';
 
 interface MyMatchesViewProps { onStartBooking: () => void; }
 type SubTab = 'upcoming' | 'past' | 'cancelled';
@@ -17,6 +18,7 @@ const safeDate = (value: unknown) => {
 };
 
 export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) => {
+  const isTennis = getActiveSportId() === 'tenis';
   const { currentUser, usingSupabase, groupId } = useAuth();
   const [activeTab, setActiveTab] = useState<SubTab>('upcoming');
   const [matches, setMatches] = useState<Match[]>([]);
@@ -133,7 +135,7 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
             <article key={safeText(match.id, `${match.date}-${match.startTime}`)} className="qp-card rounded-[26px] p-4">
               <div className="flex items-center justify-between gap-3">
                 <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${match.status === 'pending' ? 'bg-orange-50 text-orange-700' : match.status === 'cancelled' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'}`}>{statusLabel}</span>
-                <span className="text-[10px] font-black text-violet-700 bg-violet-50 px-2 py-1 rounded-full">Classe {safeText(match.tennisClass, '—')}</span>
+                {isTennis && <span className="text-[10px] font-black text-violet-700 bg-violet-50 px-2 py-1 rounded-full">Classe {safeText(match.tennisClass, '—')}</span>}
               </div>
               <div className="mt-4 flex gap-3">
                 <div className="w-14 h-14 rounded-[18px] bg-violet-50 text-violet-700 grid place-items-center shrink-0"><CalendarDays className="w-5 h-5"/></div>

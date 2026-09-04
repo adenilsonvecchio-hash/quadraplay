@@ -15,6 +15,7 @@ export const SportSelectionView: React.FC<SportSelectionViewProps> = ({ userName
     <section className="qp-sport-picker" aria-label="Escolha sua modalidade">
       <header className="qp-sport-picker__header">
         <BrandLogo className="qp-standard-brand" />
+        <span className="qp-multisports-label qp-multisports-label--picker">MULTIESPORTES</span>
         <p>Olá, <strong>{firstName}</strong></p>
         <h1>Escolha seu esporte</h1>
         <small>Você poderá trocar de modalidade quando quiser.</small>

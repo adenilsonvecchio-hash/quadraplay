@@ -5,11 +5,13 @@ import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
 import { PlayerAvatar } from '../common/PlayerAvatar';
+import { getActiveSportId } from '../../data/sports';
 
 interface ProfileViewProps { onOpenAdmin: () => void; }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenAdmin }) => {
   const { currentUser, logout, isAdmin, usingSupabase, groupId, updateAvatar } = useAuth();
+  const isTennis = getActiveSportId() === 'tenis';
   const [stats, setStats] = useState({ total: 0, upcoming: 0, completed: 0, cancelled: 0 });
   const [statsLoading, setStatsLoading] = useState(true);
   const [avatarBusy, setAvatarBusy] = useState(false);
@@ -87,7 +89,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenAdmin }) => {
             <input type="file" accept="image/jpeg,image/png,image/webp" disabled={avatarBusy} onChange={(event) => { void changeAvatar(event.target.files?.[0]); event.currentTarget.value = ''; }} className="sr-only" />
           </label>
         </div>
-        <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h3 className="text-lg font-black truncate">{displayName}</h3>{currentUser.isAdmin && <span className="text-[9px] font-black text-amber-700 bg-amber-50 px-2 py-1 rounded-full">ADMIN</span>}</div><p className="text-xs text-slate-500 truncate">{displayEmail}</p><span className="inline-block mt-2 text-[10px] font-black text-violet-700 bg-violet-50 px-2.5 py-1 rounded-full">Classe {currentUser.tennisClass || 'A'}</span></div>
+        <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><h3 className="text-lg font-black truncate">{displayName}</h3>{currentUser.isAdmin && <span className="text-[9px] font-black text-amber-700 bg-amber-50 px-2 py-1 rounded-full">ADMIN</span>}</div><p className="text-xs text-slate-500 truncate">{displayEmail}</p>{isTennis && <span className="inline-block mt-2 text-[10px] font-black text-violet-700 bg-violet-50 px-2.5 py-1 rounded-full">Classe {currentUser.tennisClass || 'A'}</span>}</div>
       </div>
       <div className="mt-3 flex items-center gap-2">
         <label className="flex-1 rounded-[14px] py-2.5 bg-violet-50 text-violet-700 text-xs font-black flex items-center justify-center gap-1.5 cursor-pointer"><Camera className="w-4 h-4" />{currentUser.avatarUrl ? 'Trocar foto' : 'Adicionar foto'}<input type="file" accept="image/jpeg,image/png,image/webp" disabled={avatarBusy} onChange={(event) => { void changeAvatar(event.target.files?.[0]); event.currentTarget.value = ''; }} className="sr-only" /></label>

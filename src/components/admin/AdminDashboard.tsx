@@ -23,6 +23,7 @@ import {
   Printer,
 } from 'lucide-react';
 import { ConfirmModal } from '../common/ConfirmModal';
+import { getActiveSportId, getSport } from '../../data/sports';
 
 interface AdminDashboardProps {
   onBack: () => void;
@@ -44,6 +45,8 @@ const safeInitialConfig: CourtConfig = {
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const { currentUser, usingSupabase, groupId } = useAuth();
+  const isTennis = getActiveSportId() === 'tenis';
+  const activeSportName = getSport(getActiveSportId()).name;
   const [activeTab, setActiveTab] = useState<AdminTab>('players');
 
   // State
@@ -342,6 +345,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   });
 
   const filteredMatches = (Array.isArray(matches) ? matches : []).filter((m) => {
+    if (!isTennis) return true;
     if (matchClassFilter === 'ALL') return true;
     return m.tennisClass === matchClassFilter;
   });
@@ -357,7 +361,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const matchStatusLabel = (status: Match['status']) => status === 'scheduled' ? 'Confirmado' : status === 'pending' ? 'Aguardando' : status === 'cancelled' ? 'Cancelado' : 'Concluído';
   const dailyReportText = () => {
     const titleDate = new Date(`${reportDate}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
-    const games = dailyMatches.map((match) => `${match.startTime} às ${match.endTime} — ${match.courtName}\n${match.player1Name} × ${match.player2Name}\nClasse ${match.tennisClass} — ${matchStatusLabel(match.status)}`).join('\n\n');
+    const games = dailyMatches.map((match) => `${match.startTime} às ${match.endTime} — ${match.courtName}\n${match.player1Name} × ${match.player2Name}\n${isTennis ? `Classe ${match.tennisClass} — ` : ''}${matchStatusLabel(match.status)}`).join('\n\n');
     return `QUADRAPLAY — JOGOS DO DIA\n${titleDate.toUpperCase()}\n\n${games || 'Nenhum jogo agendado.'}\n\nTotal: ${dailyMatches.length} jogo${dailyMatches.length === 1 ? '' : 's'}`;
   };
   const copyDailyReport = async () => {
@@ -373,7 +377,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const printDailyReport = () => {
     const printWindow = window.open('', '_blank', 'width=760,height=900');
     if (!printWindow) return;
-    const cards = dailyMatches.map((match) => `<article><strong>${match.startTime} às ${match.endTime} — ${match.courtName}</strong><p>${match.player1Name} × ${match.player2Name}</p><small>Classe ${match.tennisClass} — ${matchStatusLabel(match.status)}</small></article>`).join('');
+    const cards = dailyMatches.map((match) => `<article><strong>${match.startTime} às ${match.endTime} — ${match.courtName}</strong><p>${match.player1Name} × ${match.player2Name}</p><small>${isTennis ? `Classe ${match.tennisClass} — ` : ''}${matchStatusLabel(match.status)}</small></article>`).join('');
     printWindow.document.write(`<html><head><title>Jogos do dia</title><style>body{font-family:Arial;padding:32px;color:#101b3d}h1{margin-bottom:4px}header{border-bottom:3px solid #6d4aff;padding-bottom:16px;margin-bottom:20px}article{border:2px solid #d9deea;border-radius:14px;padding:16px;margin:12px 0}p{font-weight:700}small{color:#59627a}</style></head><body><header><h1>QuadraPlay — Jogos do dia</h1><div>${new Date(`${reportDate}T12:00:00`).toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}</div></header>${cards || '<p>Nenhum jogo agendado.</p>'}<strong>Total: ${dailyMatches.length} jogo${dailyMatches.length === 1 ? '' : 's'}</strong><script>window.onload=()=>window.print()<\/script></body></html>`);
     printWindow.document.close();
   };
@@ -397,7 +401,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         </div>
 
         <div className="mt-3">
-          <h2 className="text-xl font-black">Gestão do Nosso Tênis</h2>
+          <h2 className="text-xl font-black">Gestão de {activeSportName}</h2>
           <p className="text-xs text-slate-500 mt-0.5">
             Controle de Atletas, Agendamentos e Horários
           </p>
@@ -496,9 +500,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#0b1742] font-black text-sm flex items-center justify-center border border-slate-200">
-                    {player.tennisClass}
-                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#0b1742] font-black text-sm flex items-center justify-center border border-slate-200">{isTennis ? player.tennisClass : <Users className="w-4 h-4" />}</div>
                   <div>
                     <div className="flex items-center gap-1.5">
                       <p className="text-sm font-black text-slate-900">{player.name}</p>
@@ -517,7 +519,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                     id={`btn-edit-player-${player.id}`}
                     onClick={() => handleOpenEditPlayer(player)}
                     className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-                    title="Editar jogador e classe"
+                    title={isTennis ? 'Editar jogador e classe' : 'Editar participante'}
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
@@ -554,7 +556,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                   <div className="border-r border-slate-300 bg-slate-100 px-2 py-3 text-center"><p className="text-[11px] font-black text-slate-700">{slot.startTime}</p><p className="mt-1 text-[9px] font-bold text-slate-400">{slot.endTime}</p></div>
                   <div className="min-h-[78px] p-2">
                     {slotMatches.map((match) => <article key={`report-${match.id}`} className="rounded-lg border-2 border-emerald-300 bg-emerald-50 p-3 shadow-sm">
-                      <div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="text-[10px] font-black uppercase text-emerald-700">Nosso Tênis · Classe {match.tennisClass}</p><p className="mt-1 text-xs font-black text-slate-900">{match.player1Name}</p><p className="text-xs font-black text-slate-900">{match.player2Name}</p><p className="mt-1 text-[9px] font-bold text-slate-500">{match.courtName}</p></div><span className="shrink-0 rounded-md border border-emerald-300 bg-white px-2 py-1 text-[8px] font-black text-emerald-700">{matchStatusLabel(match.status)}</span></div>
+                      <div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="text-[10px] font-black uppercase text-emerald-700">{isTennis ? `Classe ${match.tennisClass}` : 'Agendamento'}</p><p className="mt-1 text-xs font-black text-slate-900">{match.player1Name}</p><p className="text-xs font-black text-slate-900">{match.player2Name}</p><p className="mt-1 text-[9px] font-bold text-slate-500">{match.courtName}</p></div><span className="shrink-0 rounded-md border border-emerald-300 bg-white px-2 py-1 text-[8px] font-black text-emerald-700">{matchStatusLabel(match.status)}</span></div>
                     </article>)}
                   </div>
                 </div>;
@@ -563,7 +565,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <p className="mt-3 text-right text-xs font-black text-slate-700">Total: {dailyMatches.length} jogo{dailyMatches.length === 1 ? '' : 's'}</p>
           </section>
           {/* Class Filter */}
-          <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1">
+          {isTennis && <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1">
             <span className="text-xs font-bold text-slate-600 shrink-0">Filtrar:</span>
             {(['ALL', 'A', 'B', 'C', 'D', 'E'] as const).map((cls) => (
               <button
@@ -579,7 +581,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 {cls === 'ALL' ? 'Todas as Classes' : `Classe ${cls}`}
               </button>
             ))}
-          </div>
+          </div>}
 
           <div className="space-y-2">
             {filteredMatches.length === 0 ? (
@@ -594,9 +596,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 >
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-black px-2 py-0.5 rounded bg-slate-100 text-slate-800 text-[10px]">
-                        Classe {m.tennisClass}
-                      </span>
+                      {isTennis && <span className="font-black px-2 py-0.5 rounded bg-slate-100 text-slate-800 text-[10px]">Classe {m.tennisClass}</span>}
                       <span
                         className={`font-bold px-2 py-0.5 rounded text-[10px] ${
                           m.status === 'scheduled'
@@ -841,7 +841,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             </h3>
             <p className="text-xs text-slate-500 mb-4">
               {editingPlayer
-                ? 'Atualize os dados e a classe do jogador no grupo.'
+                ? isTennis ? 'Atualize os dados e a classe do jogador no grupo.' : 'Atualize os dados do participante.'
                 : 'Informe os dados. O QuadraPlay criará e aprovará a conta sem enviar e-mail.'}
             </p>
 
@@ -899,7 +899,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 />
               </div>
 
-              <div>
+              {isTennis && <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Classe do Jogador</label>
                 <div className="grid grid-cols-5 gap-1">
                   {(['A', 'B', 'C', 'D', 'E'] as TennisClass[]).map((cls) => (
@@ -917,7 +917,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                     </button>
                   ))}
                 </div>
-              </div>
+              </div>}
 
               <div className="flex items-center gap-2 pt-1">
                 <input
@@ -1088,7 +1088,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           deleteError
             ? deleteError
             : deletingPlayer
-            ? `Deseja realmente remover o jogador ${deletingPlayer.name} da Classe ${deletingPlayer.tennisClass}? Esta ação não pode ser desfeita.`
+            ? `Deseja realmente remover ${deletingPlayer.name}${isTennis ? ` da Classe ${deletingPlayer.tennisClass}` : ''}? Esta ação não pode ser desfeita.`
             : ''
         }
         confirmLabel={deleteSaving ? 'Excluindo...' : 'Excluir Jogador'}

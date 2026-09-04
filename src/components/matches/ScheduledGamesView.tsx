@@ -6,8 +6,11 @@ import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { useAuth } from '../../context/AuthContext';
 import { formatFriendlyDate, getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
 import { PlayerAvatar } from '../common/PlayerAvatar';
+import { getActiveSportId, getSport } from '../../data/sports';
 
 export const ScheduledGamesView: React.FC = () => {
+  const isTennis = getActiveSportId() === 'tenis';
+  const activeSportName = getSport(getActiveSportId()).name;
   const { currentUser, allPlayers, usingSupabase, groupId } = useAuth();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +69,7 @@ export const ScheduledGamesView: React.FC = () => {
           <CalendarDays className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-xs font-bold text-slate-400">Nosso Tênis</p>
+          <p className="text-xs font-bold text-slate-400">{activeSportName} · Multiesportes</p>
           <h2 className="text-xl font-black text-[#101b3d]">Jogos agendados</h2>
           <p className="text-xs text-slate-500">Todos os próximos jogos do grupo</p>
         </div>
@@ -115,7 +118,7 @@ export const ScheduledGamesView: React.FC = () => {
                 </div>
                 <div className="mt-2 flex items-center justify-between text-[11px] font-bold text-slate-500">
                   <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{match.courtName}</span>
-                  <span>Classe {match.tennisClass}</span>
+                  {isTennis && <span>Classe {match.tennisClass}</span>}
                 </div>
               </div>
               {incoming && <div className="mt-3 pt-3 border-t border-slate-100 flex gap-2">

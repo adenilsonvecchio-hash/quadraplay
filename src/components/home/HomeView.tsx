@@ -24,7 +24,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
     { label: 'Agendar', helper: 'Escolha a quadra e o horário', icon: CalendarPlus, image: undefined, onClick: onStartBooking, tone: 'featured' },
     { label: 'Horários livres', helper: 'Veja a grade disponível', icon: CalendarDays, image: undefined, onClick: onViewSchedule, tone: 'blue' },
     { label: 'Meus jogos', helper: 'Convites e reservas', icon: ListChecks, image: undefined, onClick: onViewAllMatches, tone: 'amber' },
-    { label: 'Jogadores', helper: 'Sua classe', icon: Users, image: undefined, onClick: onViewPlayers, tone: 'green' },
+    { label: 'Participantes', helper: activeSport.id === 'tenis' ? 'Sua classe' : 'Pessoas disponíveis', icon: Users, image: undefined, onClick: onViewPlayers, tone: 'green' },
   ] as const;
 
   return (
@@ -35,6 +35,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
           <div className="qp-clean-home__title">
             <BrandLogo className="qp-standard-brand" />
             <SportSymbol sport={activeSport} />
+            <span className="qp-multisports-label">MULTIESPORTES</span>
           </div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>

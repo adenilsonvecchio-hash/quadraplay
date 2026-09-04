@@ -174,13 +174,14 @@ export const supabaseAgendaService = {
     // Carrega primeiro os membros e depois os perfis. Esta forma não depende
     // do nome da relação que o PostgREST atribui à FK e funciona também em
     // bancos que já tinham a tabela antes da migração atual.
-    const { data: members, error: membersError } = await supabase
+    let membersQuery = supabase
       .from('membros_grupo')
       .select('usuario_id, classe, perfil')
       .eq('grupo_id', groupId)
-      .eq('classe', tennisClass)
       .eq('aprovado', true)
       .neq('usuario_id', currentUserId);
+    if (getActiveSportId() === 'tenis') membersQuery = membersQuery.eq('classe', tennisClass);
+    const { data: members, error: membersError } = await membersQuery;
     if (membersError) throw membersError;
     if (!members?.length) return [];
 

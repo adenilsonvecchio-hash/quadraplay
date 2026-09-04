@@ -38,6 +38,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
         <div className="justify-self-center qp-global-brand-stack">
           <BrandLogo className="qp-standard-brand" />
           <SportSymbol sport={activeSport} />
+          <span className="qp-multisports-label">MULTIESPORTES</span>
         </div>
 
         <div className="relative"><NotificationsBell onOpenMatches={() => navigate('matches')} /></div>

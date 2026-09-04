@@ -7,6 +7,7 @@ import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { addDays, formatFriendlyDate, getBrasiliaToday, isBeforeDate } from '../../utils/dateUtils';
 import { PlayerAvatar } from '../common/PlayerAvatar';
+import { getActiveSportId } from '../../data/sports';
 
 interface BookingWizardProps {
   preselectedOpponentId?: string;
@@ -28,6 +29,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
   onCancel,
 }) => {
   const { currentUser, usingSupabase, groupId } = useAuth();
+  const isTennis = getActiveSportId() === 'tenis';
   const today = getBrasiliaToday();
   const [step, setStep] = useState<Step>(1);
   const [selectedDate, setSelectedDate] = useState(preselectedDate && !isBeforeDate(preselectedDate, today) ? preselectedDate : today);
@@ -52,7 +54,7 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
               supabaseAgendaService.getPlayersByClass(groupId, currentUser.tennisClass, currentUser.id),
               supabaseAgendaService.getCourts(groupId),
             ])
-          : [storageService.getPlayersByClass(currentUser.tennisClass).filter(p => p.id !== currentUser.id), storageService.getCourts()];
+          : [(isTennis ? storageService.getPlayersByClass(currentUser.tennisClass) : storageService.getPlayers()).filter(p => p.id !== currentUser.id), storageService.getCourts()];
         const activeCourts = nextCourts.filter((court) => court.active);
         setOpponents(list);
         setCourts(activeCourts);
@@ -171,12 +173,12 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({
     </motion.section>}
 
     {step === 3 && <motion.section initial={{opacity:0,x:12}} animate={{opacity:1,x:0}} className="qp-glass rounded-[26px] p-4">
-      <div className="flex items-center gap-3 mb-4"><div className="w-11 h-11 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center"><UserRound className="w-5 h-5" /></div><div><h3 className="font-black text-[#101b3d]">Escolha o adversário</h3><p className="text-xs text-slate-500">Jogadores da Classe {currentUser.tennisClass}</p></div></div>
-      {loadingOpponents ? <div className="rounded-[18px] bg-white/60 border border-white p-5 text-center text-xs font-bold text-slate-500"><LoaderCircle className="w-5 h-5 mx-auto mb-2 animate-spin text-violet-600" />Carregando adversários...</div> : opponents.length === 0 ? <div className="rounded-[18px] bg-amber-50 border border-amber-100 p-4 text-center"><p className="text-sm font-black text-amber-900">Nenhum adversário disponível</p><p className="text-xs text-amber-700 mt-1">É necessário outro jogador aprovado na Classe {currentUser.tennisClass}.</p><button type="button" onClick={() => window.location.reload()} className="mt-3 mx-auto px-4 py-2 rounded-xl bg-white text-amber-800 text-xs font-black flex items-center gap-1.5"><RefreshCw className="w-3.5 h-3.5" />Atualizar jogadores</button></div> : <div className="space-y-2">{opponents.map(player => <button key={player.id} onClick={() => chooseOpponent(player)} className={`w-full rounded-[18px] p-3 flex items-center gap-3 text-left border ${selectedOpponent?.id===player.id?'bg-violet-50 border-violet-200':'bg-white/60 border-white'}`}><PlayerAvatar name={player.name} avatarUrl={player.avatarUrl} className="w-11 h-11 text-xs ring-2 ring-white shadow-sm" /><div className="min-w-0 flex-1"><p className="text-sm font-black text-[#101b3d] truncate">{player.name}</p><p className="text-[10px] text-slate-500">Classe {player.tennisClass}</p></div><ChevronRight className="w-4 h-4 text-violet-500" /></button>)}</div>}
+      <div className="flex items-center gap-3 mb-4"><div className="w-11 h-11 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center"><UserRound className="w-5 h-5" /></div><div><h3 className="font-black text-[#101b3d]">Escolha o participante</h3><p className="text-xs text-slate-500">{isTennis ? `Jogadores da Classe ${currentUser.tennisClass}` : 'Todos os participantes aprovados'}</p></div></div>
+      {loadingOpponents ? <div className="rounded-[18px] bg-white/60 border border-white p-5 text-center text-xs font-bold text-slate-500"><LoaderCircle className="w-5 h-5 mx-auto mb-2 animate-spin text-violet-600" />Carregando participantes...</div> : opponents.length === 0 ? <div className="rounded-[18px] bg-amber-50 border border-amber-100 p-4 text-center"><p className="text-sm font-black text-amber-900">Nenhum participante disponível</p><p className="text-xs text-amber-700 mt-1">{isTennis ? `É necessário outro jogador aprovado na Classe ${currentUser.tennisClass}.` : 'É necessário outro participante aprovado.'}</p><button type="button" onClick={() => window.location.reload()} className="mt-3 mx-auto px-4 py-2 rounded-xl bg-white text-amber-800 text-xs font-black flex items-center gap-1.5"><RefreshCw className="w-3.5 h-3.5" />Atualizar participantes</button></div> : <div className="space-y-2">{opponents.map(player => <button key={player.id} onClick={() => chooseOpponent(player)} className={`w-full rounded-[18px] p-3 flex items-center gap-3 text-left border ${selectedOpponent?.id===player.id?'bg-violet-50 border-violet-200':'bg-white/60 border-white'}`}><PlayerAvatar name={player.name} avatarUrl={player.avatarUrl} className="w-11 h-11 text-xs ring-2 ring-white shadow-sm" /><div className="min-w-0 flex-1"><p className="text-sm font-black text-[#101b3d] truncate">{player.name}</p>{isTennis && <p className="text-[10px] text-slate-500">Classe {player.tennisClass}</p>}</div><ChevronRight className="w-4 h-4 text-violet-500" /></button>)}</div>}
     </motion.section>}
 
     {step === 4 && <motion.section initial={{opacity:0,x:12}} animate={{opacity:1,x:0}} className="space-y-3">
-      <div className="qp-glass rounded-[26px] p-4"><h3 className="font-black text-[#101b3d] mb-3">Resumo da reserva</h3><div className="space-y-2 text-sm"><Summary label="Data" value={formatFriendlyDate(selectedDate, false)} /><Summary label="Horário" value={`${selectedSlot?.startTime} - ${selectedSlot?.endTime}`} /><Summary label="Quadra" value={`${selectedCourt?.name || ''} · ${selectedCourt?.surface || ''}`} /><Summary label="Adversário" value={`${selectedOpponent?.name} · Classe ${selectedOpponent?.tennisClass}`} /></div></div>
+      <div className="qp-glass rounded-[26px] p-4"><h3 className="font-black text-[#101b3d] mb-3">Resumo da reserva</h3><div className="space-y-2 text-sm"><Summary label="Data" value={formatFriendlyDate(selectedDate, false)} /><Summary label="Horário" value={`${selectedSlot?.startTime} - ${selectedSlot?.endTime}`} /><Summary label="Quadra" value={`${selectedCourt?.name || ''} · ${selectedCourt?.surface || ''}`} /><Summary label="Participante" value={`${selectedOpponent?.name}${isTennis ? ` · Classe ${selectedOpponent?.tennisClass}` : ''}`} /></div></div>
       <div className="rounded-[22px] bg-orange-50 border border-orange-100 p-3 text-xs text-orange-800"><strong>Após confirmar:</strong> o horário ficará como “Aguardando confirmação” até o adversário aceitar.</div>
       <button disabled={saving} onClick={confirm} className="w-full h-14 rounded-[20px] bg-gradient-to-r from-[#765cff] to-[#543beb] text-white font-black shadow-[0_12px_28px_rgba(91,70,238,0.28)] disabled:opacity-60">{saving?'Confirmando...':'Confirmar reserva'}</button>
     </motion.section>}

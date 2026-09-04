@@ -365,6 +365,12 @@ body {
 .qp-sport-picker__header p strong { color:#25304e; font-weight:900; }
 .qp-sport-picker__header h1 { margin-top:20px; color:#101b3d; font-size:27px; line-height:1.1; font-weight:900; }
 .qp-sport-picker__header small { display:block; margin-top:6px; color:#8b93a7; font-size:11px; }
+.qp-sport-picker__hero { position:relative; height:92px; max-width:760px; margin:0 auto 10px; overflow:hidden; border:2px solid #fff; border-radius:22px; background:#ebe8f8; box-shadow:0 10px 25px rgba(31,43,86,.09); }
+.qp-sport-picker__hero::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,rgba(16,27,61,.78) 0%,rgba(35,35,75,.30) 48%,transparent 72%); pointer-events:none; }
+.qp-sport-picker__hero img { width:100%; height:100%; object-fit:cover; object-position:62% center; display:block; }
+.qp-sport-picker__hero div { position:absolute; z-index:1; left:16px; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; color:#fff; text-shadow:0 2px 8px rgba(10,18,45,.25); }
+.qp-sport-picker__hero strong { font-size:16px; line-height:1.05; font-weight:950; }
+.qp-sport-picker__hero span { margin-top:3px; color:#f6b52e; font-size:12px; font-weight:900; }
 .qp-sport-picker__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; max-width:760px; margin:0 auto; }
 .qp-sport-card { --sport-color:#6c4cf5; min-height:88px; padding:11px 12px; border:1px solid rgba(255,255,255,.9); border-radius:20px; background:rgba(255,255,255,.92); box-shadow:0 8px 22px rgba(31,43,86,.07); display:grid; grid-template-columns:1fr auto; grid-template-rows:1fr auto; text-align:left; color:#172347; transition:transform .18s ease,box-shadow .18s ease; }
 .qp-sport-card:active { transform:scale(.98); }
@@ -375,8 +381,8 @@ body {
 .qp-active-sport small,.qp-active-sport strong { display:block; line-height:1.05; }
 .qp-active-sport small { color:#9aa0b2; font-size:8px; font-weight:800; text-transform:uppercase; }
 .qp-active-sport strong { margin-top:3px; color:#283250; font-size:11px; font-weight:900; }
-@media (max-height:680px) { .qp-sport-picker { padding-top:10px; } .qp-sport-picker__header p { margin-top:13px; } .qp-sport-picker__header h1 { margin-top:10px; font-size:23px; } .qp-sport-picker__header small { display:none; } .qp-sport-card { min-height:72px; } .qp-sport-symbol--card { width:34px; height:34px; border-radius:11px; font-size:21px; } .qp-sport-symbol--card img { width:29px; height:29px; } }
-@media (min-width:768px) { .qp-sport-picker { padding-top:42px; } .qp-sport-picker__grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; } .qp-sport-card { min-height:125px; padding:16px; } .qp-sport-symbol--card { width:52px; height:52px; font-size:31px; } .qp-sport-symbol--card img { width:44px; height:44px; } .qp-sport-card strong { font-size:14px; } }
+@media (max-height:680px) { .qp-sport-picker { padding-top:8px; } .qp-sport-picker__header { margin-bottom:10px; } .qp-sport-picker__header p { margin-top:9px; } .qp-sport-picker__header h1 { margin-top:7px; font-size:22px; } .qp-sport-picker__header small { display:none; } .qp-sport-picker__hero { height:68px; margin-bottom:7px; } .qp-sport-card { min-height:64px; padding:8px 10px; } .qp-sport-symbol--card { width:30px; height:30px; border-radius:10px; font-size:19px; } .qp-sport-symbol--card img { width:26px; height:26px; } }
+@media (min-width:768px) { .qp-sport-picker { padding-top:32px; } .qp-sport-picker__hero { height:150px; margin-bottom:16px; border-radius:28px; } .qp-sport-picker__hero div { left:28px; } .qp-sport-picker__hero strong { font-size:25px; } .qp-sport-picker__hero span { font-size:17px; } .qp-sport-picker__grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; } .qp-sport-card { min-height:112px; padding:14px; } .qp-sport-symbol--card { width:48px; height:48px; font-size:29px; } .qp-sport-symbol--card img { width:41px; height:41px; } .qp-sport-card strong { font-size:14px; } }
 
 /* v61 — cabeçalho comporta marca, modalidade e assinatura multiesportes. */
 .qp-clean-home__header { height:122px; }

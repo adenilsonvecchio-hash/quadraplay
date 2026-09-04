@@ -174,8 +174,9 @@ body {
 .qp-notification-icon.is-confirmed { color:#147a56; background:#dff8ee; }
 .qp-notification-icon.is-cancelled { color:#b33b4b; background:#ffe6ea; }
 .qp-notification-empty { padding:34px 18px; color:#8b91a7; text-align:center; font-size:12px; font-weight:800; }
-.qp-clean-home__panel { height:calc(100% - 104px); padding:18px 18px 18px; border-radius:0; background:#f3f4f9; box-shadow:none; pointer-events:auto; isolation:isolate; }
-.qp-clean-home__panel::before { content:''; position:absolute; z-index:-1; top:2%; right:-10%; width:92%; height:64%; background:url('/tennis-court-watermark.svg') center/contain no-repeat; opacity:.11; pointer-events:none; }
+.qp-clean-home__panel { height:calc(100% - 104px); padding:18px 18px 18px; border-radius:0; background:linear-gradient(145deg,#f5f6fb 0%,#f1f3fb 48%,#f8f8fc 100%); box-shadow:none; pointer-events:auto; isolation:isolate; overflow:hidden; }
+.qp-clean-home__panel::before { content:''; position:absolute; z-index:-1; inset:-10% -8% 0 -8%; background:radial-gradient(circle at 18% 28%,rgba(108,76,245,.12) 0 0,transparent 29%),radial-gradient(circle at 82% 10%,rgba(74,168,245,.11) 0 0,transparent 28%),radial-gradient(circle at 58% 72%,rgba(245,158,11,.055) 0 0,transparent 25%),linear-gradient(128deg,transparent 18%,rgba(255,255,255,.75) 18.2% 18.7%,transparent 18.9% 47%,rgba(108,76,245,.065) 47.2% 47.65%,transparent 47.9%); pointer-events:none; }
+.qp-clean-home__panel::after { content:''; position:absolute; z-index:-1; left:-8%; bottom:5%; width:76%; height:42%; border:2px solid rgba(255,255,255,.8); border-right-color:rgba(108,76,245,.08); border-radius:50%; transform:rotate(8deg); box-shadow:0 0 0 18px rgba(255,255,255,.22),0 0 0 20px rgba(245,158,11,.045); pointer-events:none; }
 .qp-clean-home__intro { position:relative; z-index:1; margin:0 2px 20px; }
 .qp-clean-home__brand { margin:0 0 14px; }
 .qp-clean-home__brand .qp-brand-logo__quadra { font-size:14px; }
@@ -409,10 +410,10 @@ button.qp-slot:active { transform:scale(.97); }
 .qp-sport-symbol { --sport-color:#6c4cf5; flex:0 0 auto; display:grid; place-items:center; border:1px solid rgba(255,255,255,.95); background:radial-gradient(circle at 32% 25%,#fff 0%,color-mix(in srgb,var(--sport-color) 10%,#fff) 66%,color-mix(in srgb,var(--sport-color) 22%,#fff) 100%); box-shadow:0 5px 12px color-mix(in srgb,var(--sport-color) 20%,transparent),inset 0 1px 2px #fff; }
 .qp-sport-symbol--header { width:38px; height:38px; border-radius:50%; font-size:24px; }
 .qp-sport-symbol--header img { width:31px; height:31px; object-fit:contain; filter:drop-shadow(0 2px 2px rgba(28,38,58,.2)); }
-.qp-sport-symbol--card { grid-column:1/-1; width:43px; height:43px; border-radius:15px; font-size:27px; }
-.qp-sport-symbol--card img { width:36px; height:36px; object-fit:contain; filter:drop-shadow(0 3px 3px rgba(28,38,58,.2)); }
+.qp-sport-symbol--card { grid-column:1/-1; width:54px; height:54px; overflow:hidden; border-radius:50%; font-size:27px; }
+.qp-sport-symbol--card img { width:100%; height:100%; object-fit:cover; filter:none; }
 .qp-sport-symbol > span { line-height:1; filter:drop-shadow(0 2px 2px rgba(28,38,58,.15)); }
-.qp-multisports-label { display:block; color:#7a8195; font-size:7px; line-height:1; font-weight:900; letter-spacing:2.1px; text-transform:uppercase; }
+.qp-multisports-label { display:block; margin-top:7px; color:#7a8195; font-size:8px; line-height:1; font-weight:900; letter-spacing:2.5px; text-transform:uppercase; }
 .qp-multisports-label--picker { margin-top:8px; font-size:9px; letter-spacing:2.8px; }
 .qp-multisports-label--login { margin-top:10px; font-size:9px; letter-spacing:2.8px; }
 @media (max-width: 380px) {
@@ -425,26 +426,38 @@ button.qp-slot:active { transform:scale(.97); }
 .qp-clean-home__intro { display:flex; align-items:center; justify-content:flex-start; gap:14px; }
 
 /* v58 — entrada multiesportes, mantendo o restante do aplicativo */
-.qp-sport-picker { min-height:100vh; padding:22px 16px 18px; background:linear-gradient(160deg,#f8f9ff 0%,#eef1f8 100%); }
+.qp-sport-picker { min-height:100vh; padding:22px 16px 18px; background:radial-gradient(circle at 50% -8%,rgba(108,76,245,.11),transparent 34%),linear-gradient(160deg,#fbfcff 0%,#eef2ff 100%); }
 .qp-sport-picker__header { text-align:center; margin:2px auto 17px; }
 .qp-sport-picker__header p { margin-top:28px; color:#64748b; font-size:14px; font-weight:600; }
 .qp-sport-picker__header p strong { color:#25304e; font-weight:900; }
 .qp-sport-picker__header h1 { margin-top:20px; color:#101b3d; font-size:27px; line-height:1.1; font-weight:900; }
+.qp-sport-picker__header h1 em { color:#6c4cf5; font-style:normal; }
 .qp-sport-picker__header small { display:block; margin-top:6px; color:#8b93a7; font-size:11px; }
-.qp-sport-picker__hero { position:relative; height:150px; max-width:760px; margin:0 auto 10px; overflow:hidden; border:2px solid #fff; border-radius:22px; background:#fff; box-shadow:0 10px 25px rgba(31,43,86,.07); }
-.qp-sport-picker__hero img { width:100%; height:100%; object-fit:contain; object-position:center; display:block; }
+.qp-sport-picker__hero { position:relative; height:150px; max-width:760px; margin:0 auto 12px; overflow:hidden; border:2px solid rgba(255,255,255,.9); border-radius:24px; background:#fff; box-shadow:0 18px 42px rgba(69,54,174,.15),inset 0 0 0 1px rgba(108,76,245,.12); }
+.qp-sport-picker__hero img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
 .qp-sport-picker__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; max-width:760px; margin:0 auto; }
-.qp-sport-card { --sport-color:#6c4cf5; min-height:88px; padding:11px 12px; border:1px solid rgba(255,255,255,.9); border-radius:20px; background:rgba(255,255,255,.92); box-shadow:0 8px 22px rgba(31,43,86,.07); display:grid; grid-template-columns:1fr auto; grid-template-rows:1fr auto; text-align:left; color:#172347; transition:transform .18s ease,box-shadow .18s ease; }
+.qp-sport-card { --sport-color:#6c4cf5; min-height:94px; padding:11px 12px; border:1px solid color-mix(in srgb,var(--sport-color) 28%,#fff); border-radius:22px; background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(248,249,255,.88)); box-shadow:0 10px 25px rgba(31,43,86,.08),inset 2px 0 0 color-mix(in srgb,var(--sport-color) 70%,#fff); display:grid; grid-template-columns:1fr auto; grid-template-rows:1fr auto; text-align:left; color:#172347; transition:transform .18s ease,box-shadow .18s ease; backdrop-filter:blur(14px); }
 .qp-sport-card:active { transform:scale(.98); }
 .qp-sport-card strong { align-self:end; font-size:12px; line-height:1.1; font-weight:900; }
 .qp-sport-card svg { align-self:end; color:var(--sport-color); }
-.qp-active-sport { margin-left:auto; display:flex; align-items:center; gap:8px; padding:7px 10px; border:1px solid #e7e9f5; border-radius:15px; background:#fff; box-shadow:0 7px 20px rgba(52,59,95,.08); text-align:left; }
+.qp-active-sport { margin-left:auto; display:flex; align-items:center; gap:8px; min-width:154px; padding:8px 11px; border:1px solid rgba(255,255,255,.95); border-radius:16px; background:rgba(255,255,255,.94); box-shadow:0 9px 24px rgba(52,59,95,.1); text-align:left; transition:transform .16s ease,box-shadow .16s ease; }
+.qp-active-sport:hover { transform:translateY(-1px); box-shadow:0 12px 28px rgba(52,59,95,.14); }
+.qp-active-sport:focus-visible { outline:3px solid rgba(108,76,245,.25); outline-offset:2px; }
 .qp-active-sport > span:first-child { font-size:23px; }
+.qp-active-sport > span:nth-child(2) { flex:1; }
+.qp-active-sport__chevron { flex:0 0 auto; color:#202844; }
 .qp-active-sport small,.qp-active-sport strong { display:block; line-height:1.05; }
 .qp-active-sport small { color:#9aa0b2; font-size:8px; font-weight:800; text-transform:uppercase; }
 .qp-active-sport strong { margin-top:3px; color:#283250; font-size:11px; font-weight:900; }
 @media (max-height:680px) { .qp-sport-picker { padding-top:8px; } .qp-sport-picker__header { margin-bottom:8px; } .qp-sport-picker__header p { margin-top:8px; } .qp-sport-picker__header h1 { margin-top:6px; font-size:21px; } .qp-sport-picker__header small { display:none; } .qp-sport-picker__hero { height:92px; margin-bottom:6px; } .qp-sport-card { min-height:59px; padding:7px 9px; } .qp-sport-symbol--card { width:28px; height:28px; border-radius:9px; font-size:17px; } .qp-sport-symbol--card img { width:24px; height:24px; } }
-@media (min-width:768px) { .qp-sport-picker { padding-top:26px; } .qp-sport-picker__hero { height:210px; margin-bottom:16px; border-radius:28px; } .qp-sport-picker__grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; } .qp-sport-card { min-height:105px; padding:13px; } .qp-sport-symbol--card { width:46px; height:46px; font-size:28px; } .qp-sport-symbol--card img { width:39px; height:39px; } .qp-sport-card strong { font-size:14px; } }
+@media (min-width:768px) { .qp-sport-picker { padding-top:26px; } .qp-sport-picker__hero { height:250px; margin-bottom:16px; border-radius:30px; } .qp-sport-picker__grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; } .qp-sport-card { min-height:112px; padding:13px; } .qp-sport-symbol--card { width:62px; height:62px; font-size:28px; } .qp-sport-symbol--card img { width:100%; height:100%; } .qp-sport-card strong { font-size:14px; } }
+
+/* v68 — wordmark esportivo futurista e maior. */
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__wordmark { transform:skewX(-8deg); filter:drop-shadow(0 5px 7px rgba(52,39,160,.2)); }
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__quadra { font-size:34px; font-weight:950; letter-spacing:-2px; text-shadow:0 1px #fff; }
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play { font-size:54px; background:linear-gradient(180deg,#875cff 0%,#4927e8 72%,#244ee7 100%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__plus { font-size:50px; color:#ff9500; text-shadow:0 0 12px rgba(255,149,0,.3); }
+.qp-sport-picker__header .qp-multisports-label--picker { margin-top:8px; font-size:10px; letter-spacing:4px; }
 
 /* v61 — cabeçalho comporta marca, modalidade e assinatura multiesportes. */
 .qp-clean-home__header { height:122px; }

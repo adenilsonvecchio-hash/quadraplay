@@ -5,7 +5,6 @@ import { BrandLogo } from './BrandLogo';
 import { NotificationsBell } from './NotificationsBell';
 import { TabType } from './BottomNav';
 import { Sport } from '../../data/sports';
-import { SportSymbol } from './SportSymbol';
 
 interface HeaderProps {
   onOpenAdmin?: () => void;
@@ -37,8 +36,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
 
         <div className="justify-self-center qp-global-brand-stack">
           <BrandLogo className="qp-standard-brand" />
-          <SportSymbol sport={activeSport} />
-          <span className="qp-multisports-label">MULTIESPORTES</span>
+          <span className="qp-multisports-label">AGENDAMENTO DE HORÁRIOS</span>
         </div>
 
         <div className="relative"><NotificationsBell onOpenMatches={() => navigate('matches')} /></div>

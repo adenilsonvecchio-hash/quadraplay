@@ -15,13 +15,13 @@ export const SportSelectionView: React.FC<SportSelectionViewProps> = ({ userName
     <section className="qp-sport-picker" aria-label="Escolha sua modalidade">
       <header className="qp-sport-picker__header">
         <BrandLogo className="qp-standard-brand" />
-        <span className="qp-multisports-label qp-multisports-label--picker">MULTIESPORTES</span>
+        <span className="qp-multisports-label qp-multisports-label--picker">AGENDAMENTO DE HORÁRIOS</span>
         <p>Olá, <strong>{firstName}</strong></p>
-        <h1>Escolha seu esporte</h1>
+        <h1>Escolha seu <em>esporte</em></h1>
         <small>Você poderá trocar de modalidade quando quiser.</small>
       </header>
       <div className="qp-sport-picker__hero">
-        <img src="./quadraplay-multiesportes-hero.png" alt="Atleta usando o QuadraPlay+ em um centro multiesportivo" />
+        <img src="./quadraplay-scheduling-hero-v68.png" alt="Atleta usando o QuadraPlay+ para agendar um horário" />
       </div>
       <div className="qp-sport-picker__grid">
         {SPORTS.map((sport) => (

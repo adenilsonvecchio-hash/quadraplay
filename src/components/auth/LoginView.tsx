@@ -40,7 +40,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onSuccess }) => {
       <div className="qp-shell w-full max-w-md rounded-[38px] border border-white p-5 sm:p-7">
         <div className="text-center pt-3 pb-7">
           <BrandLogo className="justify-center qp-standard-brand" />
-          <span className="qp-multisports-label qp-multisports-label--login">MULTIESPORTES</span>
+          <span className="qp-multisports-label qp-multisports-label--login">AGENDAMENTO DE HORÁRIOS</span>
           <p className="text-sm font-bold text-slate-500 mt-3">Agende, desafie e jogue.</p>
         </div>
 

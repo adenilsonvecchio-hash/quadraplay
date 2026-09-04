@@ -13,8 +13,8 @@ export const SportSymbol: React.FC<SportSymbolProps> = ({ sport, size = 'header'
     role="img"
     aria-label={sport.name}
   >
-    {sport.id === 'tenis'
-      ? <img src="./tennis-ball-realistic.png" alt="" aria-hidden="true" />
+    {'image' in sport && sport.image
+      ? <img src={sport.image} alt="" aria-hidden="true" />
       : <span aria-hidden="true">{sport.emoji}</span>}
   </span>
 );

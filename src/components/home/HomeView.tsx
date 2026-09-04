@@ -1,10 +1,9 @@
 import React from 'react';
-import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'lucide-react';
+import { CalendarDays, CalendarPlus, ChevronDown, ChevronRight, ListChecks, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
 import { Sport } from '../../data/sports';
 import { BrandLogo } from '../common/BrandLogo';
-import { SportSymbol } from '../common/SportSymbol';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -34,8 +33,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
 <div className="qp-header-brands" aria-hidden="true" />
           <div className="qp-clean-home__title">
             <BrandLogo className="qp-standard-brand" />
-            <SportSymbol sport={activeSport} />
-            <span className="qp-multisports-label">MULTIESPORTES</span>
+            <span className="qp-multisports-label">AGENDAMENTO DE HORÁRIOS</span>
           </div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
@@ -47,7 +45,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
             <h1>Olá, {firstName}</h1>
             <p>Organize seu próximo horário</p>
           </div>
-          <button type="button" className="qp-active-sport" onClick={onChangeSport}><span>{activeSport.emoji}</span><span><small>Modalidade</small><strong>{activeSport.name}</strong></span></button>
+          <button type="button" className="qp-active-sport" onClick={onChangeSport} aria-label={`Trocar modalidade. Atual: ${activeSport.name}`}>
+            <span>{activeSport.emoji}</span>
+            <span><small>Modalidade</small><strong>{activeSport.name}</strong></span>
+            <ChevronDown className="qp-active-sport__chevron" size={16} aria-hidden="true" />
+          </button>
         </div>
         <div className="qp-action-grid">
           {actions.map(({ label, helper, icon: Icon, image, onClick, tone }) => (

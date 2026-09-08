@@ -830,10 +830,10 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   width:68px;
   height:68px;
   object-fit:contain;
-  filter:brightness(0) saturate(100%) invert(74%) sepia(99%) saturate(1361%) hue-rotate(359deg) brightness(101%) contrast(103%);
+  filter:none;
 }
 .qp-active-sport .qp-sport-symbol--header img {
-  filter:brightness(0) saturate(100%) invert(74%) sepia(99%) saturate(1361%) hue-rotate(359deg) brightness(101%) contrast(103%);
+  filter:none;
 }
 @media (max-width:767px) {
   .qp-brand-logo,

@@ -1,36 +1,41 @@
 import React from 'react';
-import { CalendarDays, CalendarPlus, ChevronRight, MapPin, Users } from 'lucide-react';
+import { CalendarDays, CalendarPlus, ChevronDown, ChevronRight, ListChecks, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { BrandLogo } from '../common/BrandLogo';
 import { NotificationsBell } from '../common/NotificationsBell';
+import { Sport } from '../../data/sports';
+import { BrandLogo } from '../common/BrandLogo';
+import { SportSymbol } from '../common/SportSymbol';
 
 interface HomeViewProps {
   onStartBooking: () => void;
   onViewAllMatches: () => void;
   onViewSchedule: () => void;
   onViewPlayers: () => void;
+  activeSport: Sport;
+  onChangeSport: () => void;
 }
 
-export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers }) => {
-  const { currentUser, clubName, groupName } = useAuth();
+export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers, activeSport, onChangeSport }) => {
+  const { currentUser } = useAuth();
   const firstName = typeof currentUser?.name === 'string' && currentUser.name.trim()
     ? currentUser.name.trim().split(/\s+/)[0]
     : 'Jogador';
   const actions = [
     { label: 'Agendar', helper: 'Escolha a quadra e o horário', icon: CalendarPlus, image: undefined, onClick: onStartBooking, tone: 'featured' },
-    { label: 'Agenda', helper: 'Horários livres', icon: CalendarDays, image: undefined, onClick: onViewSchedule, tone: 'blue' },
-    { label: 'Meus jogos', helper: 'Convites e reservas', icon: undefined, image: '/icon-512.png', onClick: onViewAllMatches, tone: 'amber' },
-    { label: 'Jogadores', helper: 'Seu nível', icon: Users, image: undefined, onClick: onViewPlayers, tone: 'green' },
+    { label: 'Horários livres', helper: 'Veja a grade disponível', icon: CalendarDays, image: undefined, onClick: onViewSchedule, tone: 'blue' },
+    { label: 'Meus jogos', helper: 'Convites e reservas', icon: ListChecks, image: undefined, onClick: onViewAllMatches, tone: 'amber' },
+    { label: 'Participantes', helper: activeSport.id === 'tenis' ? 'Sua classe' : 'Pessoas disponíveis', icon: Users, image: undefined, onClick: onViewPlayers, tone: 'green' },
   ] as const;
 
   return (
     <section className="qp-clean-home" aria-label="Início do QuadraPlay">
       <header className="qp-clean-home__header">
         <div className="qp-clean-home__topline">
-          <div className="qp-header-brands qp-header-brands--text">
-            <span className="qp-group-mark qp-group-mark--text">{groupName}</span>
+<div className="qp-header-brands" aria-hidden="true" />
+          <div className="qp-clean-home__title">
+            <BrandLogo className="qp-standard-brand" />
+            <span className="qp-multisports-label">AGENDAMENTO DE HORÁRIOS</span>
           </div>
-          <div className="qp-clean-home__title flex items-center gap-2">Início</div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
       </header>
@@ -38,11 +43,14 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
       <div className="qp-clean-home__panel">
         <div className="qp-clean-home__intro">
           <div>
-            <BrandLogo className="qp-clean-home__brand" />
             <h1>Olá, {firstName}</h1>
-            <p>Organize seu próximo jogo</p>
-            <div className="qp-clean-home__club"><MapPin size={12} /> {clubName}</div>
+            <p>Organize seu próximo horário</p>
           </div>
+          <button type="button" className="qp-active-sport" onClick={onChangeSport} aria-label={`Trocar modalidade. Atual: ${activeSport.name}`}>
+            <SportSymbol sport={activeSport} size="header" />
+            <span><small>Modalidade</small><strong>{activeSport.name}</strong></span>
+            <ChevronDown className="qp-active-sport__chevron" size={16} aria-hidden="true" />
+          </button>
         </div>
         <div className="qp-action-grid">
           {actions.map(({ label, helper, icon: Icon, image, onClick, tone }) => (

@@ -19,8 +19,11 @@ import {
   Settings,
   ArrowLeft,
   X,
+  Copy,
+  Printer,
 } from 'lucide-react';
 import { ConfirmModal } from '../common/ConfirmModal';
+import { getActiveSportId, getSport } from '../../data/sports';
 
 interface AdminDashboardProps {
   onBack: () => void;
@@ -30,8 +33,8 @@ type AdminTab = 'players' | 'matches' | 'blocks' | 'config';
 
 const safeInitialConfig: CourtConfig = {
   courtName: 'Quadra 1',
-  clubName: 'Meu Clube',
-  groupName: 'Meu Grupo',
+  clubName: 'Nosso Tênis',
+  groupName: 'Nosso Tênis',
   slotDurationMinutes: 90,
   openTime: '07:00',
   closeTime: '17:30',
@@ -41,7 +44,9 @@ const safeInitialConfig: CourtConfig = {
 };
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
-  const { currentUser, usingSupabase, groupId, clubName, groupName } = useAuth();
+  const { currentUser, usingSupabase, groupId } = useAuth();
+  const isTennis = getActiveSportId() === 'tenis';
+  const activeSportName = getSport(getActiveSportId()).name;
   const [activeTab, setActiveTab] = useState<AdminTab>('players');
 
   // State
@@ -65,6 +70,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   const [playerError, setPlayerError] = useState<string | null>(null);
   const [playerSuccess, setPlayerSuccess] = useState<string | null>(null);
   const [playerSaving, setPlayerSaving] = useState(false);
+  const [accessCredentials, setAccessCredentials] = useState<{ email: string; password: string } | null>(null);
+  const [credentialsCopied, setCredentialsCopied] = useState(false);
 
   // Block Modal State
   const [isBlockModalOpen, setIsBlockModalOpen] = useState(false);
@@ -85,6 +92,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
   // Filter state for matches
   const [matchClassFilter, setMatchClassFilter] = useState<TennisClass | 'ALL'>('ALL');
+  const [reportDate, setReportDate] = useState(getBrasiliaToday());
+  const [reportCopied, setReportCopied] = useState(false);
 
   const loadAll = async () => {
     setAdminLoading(true);
@@ -134,6 +143,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setPlayerIsAdmin(false);
     setPlayerError(null);
     setPlayerSuccess(null);
+    setAccessCredentials(null);
+    setCredentialsCopied(false);
     setIsPlayerModalOpen(true);
   };
 
@@ -142,10 +153,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     setPlayerName(p.name);
     setPlayerEmail(p.email);
     setPlayerPhone(p.phone || '');
-    setPlayerClass(p.level);
+    setPlayerClass(p.tennisClass);
     setPlayerIsAdmin(p.isAdmin);
     setPlayerError(null);
     setPlayerSuccess(null);
+    setAccessCredentials(null);
+    setCredentialsCopied(false);
     setIsPlayerModalOpen(true);
   };
 
@@ -163,22 +176,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         name: playerName.trim(),
         email: playerEmail.trim(),
         phone: playerPhone.trim() || undefined,
-        level: playerClass,
+        tennisClass: playerClass,
         isAdmin: playerIsAdmin,
       };
       if (usingSupabase && groupId) {
         if (editingPlayer) await supabaseAgendaService.updateGroupPlayer(groupId, editingPlayer.id, payload);
         else {
           const result = await supabaseAgendaService.addGroupPlayer(groupId, payload);
-          setPlayerSuccess(result.status === 'invited'
-            ? `Convite enviado para ${payload.email}. O jogador já foi aprovado no grupo.`
-            : `A conta ${payload.email} já existia e foi vinculada ao grupo.`);
+          if (result.status === 'created' && result.temporaryPassword) {
+            setAccessCredentials({ email: payload.email, password: result.temporaryPassword });
+            setPlayerSuccess('Conta criada e aprovada sem envio de e-mail. Copie os dados de acesso.');
+          } else setPlayerSuccess(`A conta ${payload.email} já existia e foi vinculada ao grupo.`);
         }
       } else {
         storageService.savePlayer({ id: editingPlayer?.id, ...payload });
         if (!editingPlayer) setPlayerSuccess('Jogador cadastrado com sucesso.');
       }
-      setIsPlayerModalOpen(false);
+      if (editingPlayer || !usingSupabase) setIsPlayerModalOpen(false);
       await loadAll();
     } catch (saveError) {
       const message = saveError instanceof Error ? saveError.message : 'Não foi possível salvar o jogador.';
@@ -200,6 +214,33 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     } finally {
       setPlayerSaving(false);
     }
+  };
+
+  const copyAccessCredentials = async () => {
+    if (!accessCredentials) return;
+    const message = `QuadraPlay\nAcesse: https://quadraplay.centercalculos.com.br\n\nAcesso: ${accessCredentials.email}\nSenha provisória: ${accessCredentials.password}\n\nNo primeiro acesso, crie sua senha pessoal.`;
+    let copied = false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(message);
+        copied = true;
+      }
+    } catch {
+      copied = false;
+    }
+    if (!copied) {
+      const textarea = document.createElement('textarea');
+      textarea.value = message;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      textarea.select();
+      copied = document.execCommand('copy');
+      document.body.removeChild(textarea);
+    }
+    setCredentialsCopied(copied);
+    if (copied) window.setTimeout(() => setCredentialsCopied(false), 2500);
   };
 
   const handleConfirmDeletePlayer = async () => {
@@ -304,19 +345,52 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   });
 
   const filteredMatches = (Array.isArray(matches) ? matches : []).filter((m) => {
+    if (!isTennis) return true;
     if (matchClassFilter === 'ALL') return true;
-    return m.level === matchClassFilter;
+    return m.tennisClass === matchClassFilter;
   });
+  const dailyMatches = (Array.isArray(matches) ? matches : [])
+    .filter((match) => match.date === reportDate)
+    .sort((a, b) => a.startTime.localeCompare(b.startTime));
+  const reportSlots = courtConfig.timeSlots?.length ? courtConfig.timeSlots : [
+    { startTime: '07:00', endTime: '08:30' }, { startTime: '08:30', endTime: '10:00' },
+    { startTime: '10:00', endTime: '11:30' }, { startTime: '11:30', endTime: '13:00' },
+    { startTime: '13:00', endTime: '14:30' }, { startTime: '14:30', endTime: '16:00' },
+    { startTime: '16:00', endTime: '17:30' },
+  ];
+  const matchStatusLabel = (status: Match['status']) => status === 'scheduled' ? 'Confirmado' : status === 'pending' ? 'Aguardando' : status === 'cancelled' ? 'Cancelado' : 'Concluído';
+  const dailyReportText = () => {
+    const titleDate = new Date(`${reportDate}T12:00:00`).toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+    const games = dailyMatches.map((match) => `${match.startTime} às ${match.endTime} — ${match.courtName}\n${match.player1Name} × ${match.player2Name}\n${isTennis ? `Classe ${match.tennisClass} — ` : ''}${matchStatusLabel(match.status)}`).join('\n\n');
+    return `QUADRAPLAY — JOGOS DO DIA\n${titleDate.toUpperCase()}\n\n${games || 'Nenhum jogo agendado.'}\n\nTotal: ${dailyMatches.length} jogo${dailyMatches.length === 1 ? '' : 's'}`;
+  };
+  const copyDailyReport = async () => {
+    const value = dailyReportText();
+    let copied = false;
+    try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(value); copied = true; } } catch { copied = false; }
+    if (!copied) {
+      const area = document.createElement('textarea'); area.value = value; area.style.position = 'fixed'; area.style.left = '-9999px'; document.body.appendChild(area); area.select(); copied = document.execCommand('copy'); document.body.removeChild(area);
+    }
+    setReportCopied(copied);
+    if (copied) window.setTimeout(() => setReportCopied(false), 2500);
+  };
+  const printDailyReport = () => {
+    const printWindow = window.open('', '_blank', 'width=760,height=900');
+    if (!printWindow) return;
+    const cards = dailyMatches.map((match) => `<article><strong>${match.startTime} às ${match.endTime} — ${match.courtName}</strong><p>${match.player1Name} × ${match.player2Name}</p><small>${isTennis ? `Classe ${match.tennisClass} — ` : ''}${matchStatusLabel(match.status)}</small></article>`).join('');
+    printWindow.document.write(`<html><head><title>Jogos do dia</title><style>body{font-family:Arial;padding:32px;color:#101b3d}h1{margin-bottom:4px}header{border-bottom:3px solid #6d4aff;padding-bottom:16px;margin-bottom:20px}article{border:2px solid #d9deea;border-radius:14px;padding:16px;margin:12px 0}p{font-weight:700}small{color:#59627a}</style></head><body><header><h1>QuadraPlay — Jogos do dia</h1><div>${new Date(`${reportDate}T12:00:00`).toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}</div></header>${cards || '<p>Nenhum jogo agendado.</p>'}<strong>Total: ${dailyMatches.length} jogo${dailyMatches.length === 1 ? '' : 's'}</strong><script>window.onload=()=>window.print()<\/script></body></html>`);
+    printWindow.document.close();
+  };
 
   return (
     <div className="space-y-4 pb-12">
       {/* Top Header */}
-      <div className="bg-gradient-to-br from-white via-[#f7f5ff] to-[#eef7ff] text-[#101b3d] rounded-3xl p-5 border border-white shadow-[0_12px_34px_rgba(91,70,238,0.10)]">
+      <div className="bg-gradient-to-br from-white via-[#f7f5ff] to-[#eef7ff] text-[#101b3d] rounded-3xl p-5 border border-white shadow-[0_12px_34px_rgba(190,145,0,0.10)]">
         <div className="flex items-center justify-between">
           <button
             id="btn-admin-back"
             onClick={onBack}
-            className="text-xs font-bold text-violet-700 hover:text-violet-900 flex items-center gap-1.5 p-1.5 -ml-1.5 rounded-lg hover:bg-violet-100"
+            className="text-xs font-bold text-amber-700 hover:text-amber-900 flex items-center gap-1.5 p-1.5 -ml-1.5 rounded-lg hover:bg-amber-100"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Voltar ao App</span>
@@ -327,9 +401,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
         </div>
 
         <div className="mt-3">
-          <h2 className="text-xl font-black">Gestão do {groupName}</h2>
+          <h2 className="text-xl font-black">Gestão de {activeSportName}</h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            {clubName} • Controle de Jogadores, Agendamentos e Horários
+            Controle de Atletas, Agendamentos e Horários
           </p>
         </div>
       </div>
@@ -341,7 +415,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       )}
 
       {adminLoading && (
-        <div className="rounded-2xl bg-violet-50 border border-violet-100 p-3 text-xs font-bold text-violet-700">
+        <div className="rounded-2xl bg-amber-50 border border-amber-100 p-3 text-xs font-bold text-amber-700">
           Carregando dados administrativos...
         </div>
       )}
@@ -353,7 +427,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('players')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'players'
-              ? 'bg-violet-100 text-violet-700 shadow-sm'
+              ? 'bg-amber-100 text-amber-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -364,7 +438,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('matches')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'matches'
-              ? 'bg-violet-100 text-violet-700 shadow-sm'
+              ? 'bg-amber-100 text-amber-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -375,7 +449,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('blocks')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'blocks'
-              ? 'bg-violet-100 text-violet-700 shadow-sm'
+              ? 'bg-amber-100 text-amber-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -386,7 +460,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('config')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'config'
-              ? 'bg-violet-100 text-violet-700 shadow-sm'
+              ? 'bg-amber-100 text-amber-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -412,7 +486,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <button
               id="btn-admin-add-player"
               onClick={handleOpenNewPlayer}
-              className="text-xs font-black bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
+              className="text-xs font-black bg-amber-500 hover:bg-amber-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Novo Jogador</span>
@@ -426,9 +500,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#0b1742] font-black text-sm flex items-center justify-center border border-slate-200">
-                    {player.level}
-                  </div>
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-[#0b1742] font-black text-sm flex items-center justify-center border border-slate-200">{isTennis ? player.tennisClass : <Users className="w-4 h-4" />}</div>
                   <div>
                     <div className="flex items-center gap-1.5">
                       <p className="text-sm font-black text-slate-900">{player.name}</p>
@@ -447,7 +519,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                     id={`btn-edit-player-${player.id}`}
                     onClick={() => handleOpenEditPlayer(player)}
                     className="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
-                    title="Editar jogador e classe"
+                    title={isTennis ? 'Editar jogador e classe' : 'Editar participante'}
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
@@ -472,8 +544,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       {/* TAB 2: AGENDAMENTOS (AGENDA COMPLETA) */}
       {activeTab === 'matches' && (
         <div className="space-y-3">
+          <section className="rounded-2xl border-2 border-amber-200 bg-white p-4 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <label className="block"><span className="block text-xs font-black text-slate-700 mb-1">Relatório dos jogos do dia</span><input type="date" value={reportDate} onChange={(event) => setReportDate(event.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold" /></label>
+              <div className="flex gap-2"><button type="button" onClick={() => void copyDailyReport()} className="flex-1 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-700 flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" />{reportCopied ? 'Copiado!' : 'Copiar'}</button><button type="button" onClick={printDailyReport} className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-700 flex items-center justify-center gap-1.5"><Printer className="w-4 h-4" />PDF</button></div>
+            </div>
+            <div className="mt-4 overflow-hidden rounded-xl border-2 border-slate-300 bg-white">
+              {reportSlots.map((slot) => {
+                const slotMatches = dailyMatches.filter((match) => match.startTime === slot.startTime);
+                return <div key={`slot-${slot.startTime}`} className="grid grid-cols-[58px_1fr] border-b border-slate-300 last:border-b-0">
+                  <div className="border-r border-slate-300 bg-slate-100 px-2 py-3 text-center"><p className="text-[11px] font-black text-slate-700">{slot.startTime}</p><p className="mt-1 text-[9px] font-bold text-slate-400">{slot.endTime}</p></div>
+                  <div className="min-h-[78px] p-2">
+                    {slotMatches.map((match) => <article key={`report-${match.id}`} className="rounded-lg border-2 border-emerald-300 bg-emerald-50 p-3 shadow-sm">
+                      <div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="text-[10px] font-black uppercase text-emerald-700">{isTennis ? `Classe ${match.tennisClass}` : 'Agendamento'}</p><p className="mt-1 text-xs font-black text-slate-900">{match.player1Name}</p><p className="text-xs font-black text-slate-900">{match.player2Name}</p><p className="mt-1 text-[9px] font-bold text-slate-500">{match.courtName}</p></div><span className="shrink-0 rounded-md border border-emerald-300 bg-white px-2 py-1 text-[8px] font-black text-emerald-700">{matchStatusLabel(match.status)}</span></div>
+                    </article>)}
+                  </div>
+                </div>;
+              })}
+            </div>
+            <p className="mt-3 text-right text-xs font-black text-slate-700">Total: {dailyMatches.length} jogo{dailyMatches.length === 1 ? '' : 's'}</p>
+          </section>
           {/* Class Filter */}
-          <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1">
+          {isTennis && <div className="flex items-center justify-between gap-1 overflow-x-auto pb-1">
             <span className="text-xs font-bold text-slate-600 shrink-0">Filtrar:</span>
             {(['ALL', 'A', 'B', 'C', 'D', 'E'] as const).map((cls) => (
               <button
@@ -482,14 +574,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 onClick={() => setMatchClassFilter(cls)}
                 className={`text-xs px-2.5 py-1 rounded-lg font-bold transition-colors ${
                   matchClassFilter === cls
-                    ? 'bg-violet-100 text-violet-700 border border-violet-200'
+                    ? 'bg-amber-100 text-amber-700 border border-amber-200'
                     : 'bg-white text-slate-600 border border-slate-200'
                 }`}
               >
                 {cls === 'ALL' ? 'Todas as Classes' : `Classe ${cls}`}
               </button>
             ))}
-          </div>
+          </div>}
 
           <div className="space-y-2">
             {filteredMatches.length === 0 ? (
@@ -504,9 +596,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 >
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5">
-                      <span className="font-black px-2 py-0.5 rounded bg-slate-100 text-slate-800 text-[10px]">
-                        Classe {m.level}
-                      </span>
+                      {isTennis && <span className="font-black px-2 py-0.5 rounded bg-slate-100 text-slate-800 text-[10px]">Classe {m.tennisClass}</span>}
                       <span
                         className={`font-bold px-2 py-0.5 rounded text-[10px] ${
                           m.status === 'scheduled'
@@ -570,7 +660,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <button
               id="btn-admin-add-block"
               onClick={() => setIsBlockModalOpen(true)}
-              className="text-xs font-black bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
+              className="text-xs font-black bg-amber-500 hover:bg-amber-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Novo Bloqueio</span>
@@ -659,7 +749,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-700">Horários disponíveis</label>
-              <button type="button" onClick={addTimeSlot} className="text-[10px] font-black text-violet-700 flex items-center gap-1">
+              <button type="button" onClick={addTimeSlot} className="text-[10px] font-black text-amber-700 flex items-center gap-1">
                 <Plus className="w-3.5 h-3.5" /> Adicionar horário
               </button>
             </div>
@@ -727,7 +817,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           <button
             id="btn-save-court-config"
             type="submit"
-            className="w-full py-3 bg-gradient-to-r from-[#765fff] to-[#5d45ed] hover:from-[#6d55f7] hover:to-[#553de2] text-white font-bold text-xs rounded-xl shadow-[0_8px_20px_rgba(93,69,237,0.22)] transition-colors"
+            className="w-full py-3 bg-gradient-to-r from-[#ffca2d] to-[#e9a900] hover:from-[#f7ba0a] hover:to-[#dc9f00] text-white font-bold text-xs rounded-xl shadow-[0_8px_20px_rgba(190,145,0,0.22)] transition-colors"
           >
             Salvar Configurações da Quadra
           </button>
@@ -751,8 +841,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             </h3>
             <p className="text-xs text-slate-500 mb-4">
               {editingPlayer
-                ? 'Atualize os dados e a classe do jogador no grupo.'
-                : 'Informe os dados. O QuadraPlay criará a conta, aprovará o jogador no grupo e enviará o convite por e-mail.'}
+                ? isTennis ? 'Atualize os dados e a classe do jogador no grupo.' : 'Atualize os dados do participante.'
+                : 'Informe os dados. O QuadraPlay criará e aprovará a conta sem enviar e-mail.'}
             </p>
 
             {playerError && (
@@ -761,7 +851,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
               </div>
             )}
 
-            <form onSubmit={handleSavePlayer} className="space-y-3">
+            {accessCredentials && <div className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+              <p className="text-xs font-black text-emerald-800">Acesso provisório criado</p>
+              <p className="mt-2 text-[11px] text-emerald-700">E-mail</p><p className="text-sm font-black break-all">{accessCredentials.email}</p>
+              <p className="mt-2 text-[11px] text-emerald-700">Senha provisória</p><p className="text-lg font-black tracking-wider">{accessCredentials.password}</p>
+              <button type="button" onClick={() => void copyAccessCredentials()} className="mt-3 w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-black text-white flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" />{credentialsCopied ? 'Copiado!' : 'Copiar para enviar no WhatsApp'}</button>
+              <p className="mt-2 text-[10px] font-bold text-emerald-700">O jogador deverá criar uma senha pessoal no primeiro acesso.</p>
+            </div>}
+
+            {!accessCredentials && <form onSubmit={handleSavePlayer} className="space-y-3">
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Nome Completo</label>
                 <input
@@ -784,7 +882,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                   disabled={!!editingPlayer && usingSupabase}
                   value={playerEmail}
                   onChange={(e) => setPlayerEmail(e.target.value)}
-                  placeholder="nome@email.com"
+                  placeholder="nome@nossotenis.com.br"
                   className="w-full text-xs font-semibold p-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-slate-900 disabled:bg-slate-100 disabled:text-slate-400"
                 />
               </div>
@@ -801,7 +899,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 />
               </div>
 
-              <div>
+              {isTennis && <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">Classe do Jogador</label>
                 <div className="grid grid-cols-5 gap-1">
                   {(['A', 'B', 'C', 'D', 'E'] as TennisClass[]).map((cls) => (
@@ -811,7 +909,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                       onClick={() => setPlayerClass(cls)}
                       className={`py-2 rounded-xl text-xs font-black transition-all ${
                         playerClass === cls
-                          ? 'bg-violet-100 text-violet-700 ring-1 ring-violet-200 shadow-sm'
+                          ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-200 shadow-sm'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
@@ -819,7 +917,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                     </button>
                   ))}
                 </div>
-              </div>
+              </div>}
 
               <div className="flex items-center gap-2 pt-1">
                 <input
@@ -846,14 +944,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                   id="btn-save-player-submit"
                   type="submit"
                   disabled={playerSaving}
-                  className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm disabled:opacity-60"
+                  className="flex-1 py-2.5 text-xs font-bold text-white bg-amber-500 hover:bg-amber-700 rounded-xl shadow-sm disabled:opacity-60"
                 >
                   {playerSaving
-                    ? (editingPlayer ? 'Salvando...' : 'Enviando convite...')
+                    ? (editingPlayer ? 'Salvando...' : 'Criando acesso...')
                     : (editingPlayer ? 'Salvar' : 'Convidar e salvar')}
                 </button>
               </div>
-            </form>
+            </form>}
           </div>
         </div>
       )}
@@ -955,7 +1053,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm"
+                  className="flex-1 py-2.5 text-xs font-bold text-white bg-amber-500 hover:bg-amber-700 rounded-xl shadow-sm"
                 >
                   Confirmar Bloqueio
                 </button>
@@ -990,7 +1088,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           deleteError
             ? deleteError
             : deletingPlayer
-            ? `Deseja realmente remover o jogador ${deletingPlayer.name} da Classe ${deletingPlayer.level}? Esta ação não pode ser desfeita.`
+            ? `Deseja realmente remover ${deletingPlayer.name}${isTennis ? ` da Classe ${deletingPlayer.tennisClass}` : ''}? Esta ação não pode ser desfeita.`
             : ''
         }
         confirmLabel={deleteSaving ? 'Excluindo...' : 'Excluir Jogador'}

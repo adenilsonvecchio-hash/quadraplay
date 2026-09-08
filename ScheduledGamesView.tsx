@@ -1,13 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { CalendarDays, CheckCircle2, Clock3, MapPin, Users, XCircle } from 'lucide-react';
+import { CalendarDays, CheckCircle2, Clock3, MapPin, XCircle } from 'lucide-react';
 import { Match } from '../../types';
 import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { useAuth } from '../../context/AuthContext';
 import { formatFriendlyDate, getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
+import { PlayerAvatar } from '../common/PlayerAvatar';
+import { getActiveSportId, getSport } from '../../data/sports';
 
 export const ScheduledGamesView: React.FC = () => {
-  const { currentUser, usingSupabase, groupId, groupName } = useAuth();
+  const isTennis = getActiveSportId() === 'tenis';
+  const activeSportName = getSport(getActiveSportId()).name;
+  const { currentUser, allPlayers, usingSupabase, groupId } = useAuth();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -65,7 +69,7 @@ export const ScheduledGamesView: React.FC = () => {
           <CalendarDays className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-xs font-bold text-slate-400">{groupName}</p>
+          <p className="text-xs font-bold text-slate-400">{activeSportName} · Multiesportes</p>
           <h2 className="text-xl font-black text-[#101b3d]">Jogos agendados</h2>
           <p className="text-xs text-slate-500">Todos os próximos jogos do grupo</p>
         </div>
@@ -83,6 +87,8 @@ export const ScheduledGamesView: React.FC = () => {
       ) : (
         <div className="grid gap-3 lg:grid-cols-2">
           {upcoming.map((match) => {
+            const player1 = allPlayers.find((player) => player.id === match.player1Id);
+            const player2 = allPlayers.find((player) => player.id === match.player2Id);
             // Em bancos migrados, usa o ID como regra principal e o nome do
             // perfil como compatibilidade para identificar o convidado.
             const incoming = match.status === 'pending' && !!currentUser && (
@@ -92,24 +98,27 @@ export const ScheduledGamesView: React.FC = () => {
             return <article key={match.id} className="qp-glass rounded-[24px] p-4 border border-white">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-black text-violet-700">{formatFriendlyDate(match.date)}</p>
+                  <p className="text-xs font-black text-amber-700">{formatFriendlyDate(match.date)}</p>
                   <div className="mt-1 flex items-center gap-1.5 text-sm font-black text-[#101b3d]">
-                    <Clock3 className="w-4 h-4 text-violet-600" />
+                    <Clock3 className="w-4 h-4 text-amber-500" />
                     {match.startTime} às {match.endTime}
                   </div>
                 </div>
-                <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${match.status === 'scheduled' ? 'bg-emerald-100 text-emerald-700' : incoming ? 'bg-violet-100 text-violet-700' : 'bg-orange-100 text-orange-700'}`}>
+                <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${match.status === 'scheduled' ? 'bg-emerald-100 text-emerald-700' : incoming ? 'bg-amber-100 text-amber-700' : 'bg-orange-100 text-orange-700'}`}>
                   {match.status === 'scheduled' ? 'Confirmado' : incoming ? 'Convite para você' : 'Aguardando'}
                 </span>
               </div>
               <div className="mt-4 rounded-[18px] bg-white/65 p-3">
-                <div className="flex items-center gap-2 text-sm font-black text-slate-800">
-                  <Users className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center gap-3 text-sm font-black text-slate-800">
+                  <div className="flex shrink-0 -space-x-2" aria-label="Fotos dos jogadores">
+                    <PlayerAvatar name={match.player1Name} avatarUrl={player1?.avatarUrl} className="w-10 h-10 text-[10px] ring-2 ring-white" />
+                    <PlayerAvatar name={match.player2Name} avatarUrl={player2?.avatarUrl} className="w-10 h-10 text-[10px] ring-2 ring-white" />
+                  </div>
                   <span className="truncate">{match.player1Name} × {match.player2Name}</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-[11px] font-bold text-slate-500">
                   <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{match.courtName}</span>
-                  <span>Classe {match.level}</span>
+                  {isTennis && <span>Classe {match.tennisClass}</span>}
                 </div>
               </div>
               {incoming && <div className="mt-3 pt-3 border-t border-slate-100 flex gap-2">

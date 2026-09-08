@@ -1,4 +1,4 @@
--- QuadraPlay+ — banco inicial para o Tangará Country Clube
+-- QuadraPlay+ — banco inicial para o Nosso Tênis
 -- Execute no SQL Editor do Supabase em um projeto novo.
 
 create extension if not exists pgcrypto;

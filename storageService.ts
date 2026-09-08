@@ -119,11 +119,11 @@ class StorageService {
     return this.players.find((p) => p.email.toLowerCase() === email.trim().toLowerCase());
   }
 
-  public getPlayersByClass(level: TennisClass): Player[] {
-    return this.players.filter((p) => p.level === level);
+  public getPlayersByClass(tennisClass: TennisClass): Player[] {
+    return this.players.filter((p) => p.tennisClass === tennisClass);
   }
 
-  public savePlayer(playerData: Partial<Player> & { name: string; email: string; level: TennisClass }): Player {
+  public savePlayer(playerData: Partial<Player> & { name: string; email: string; tennisClass: TennisClass }): Player {
     if (playerData.id) {
       // Edit
       const index = this.players.findIndex((p) => p.id === playerData.id);
@@ -143,7 +143,7 @@ class StorageService {
       name: playerData.name,
       email: playerData.email,
       phone: playerData.phone,
-      level: playerData.level,
+      tennisClass: playerData.tennisClass,
       isAdmin: !!playerData.isAdmin,
       createdAt: new Date().toISOString(),
     };
@@ -315,10 +315,10 @@ class StorageService {
     }
 
     // 4. Validation: different classes
-    if (player1.level !== player2.level) {
+    if (player1.tennisClass !== player2.tennisClass) {
       return {
         success: false,
-        error: `Não é permitido agendar contra outra classe (${player1.level} vs ${player2.level}).`,
+        error: `Não é permitido agendar contra outra classe (${player1.tennisClass} vs ${player2.tennisClass}).`,
       };
     }
 
@@ -369,12 +369,11 @@ class StorageService {
     // Success: Create match
     const newMatch: Match = {
       id: `match-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
-      sportId: court.sportId,
       player1Id: player1.id,
       player1Name: player1.name,
       player2Id: player2.id,
       player2Name: player2.name,
-      level: player1.level,
+      tennisClass: player1.tennisClass,
       courtId: court.id,
       courtName: court.name,
       date: params.date,

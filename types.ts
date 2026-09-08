@@ -1,29 +1,14 @@
-// Nível de habilidade do jogador dentro de um grupo/esporte.
-// Antes era travado em 'A'..'E' (só tênis). Agora é livre para caber em
-// qualquer sistema de classificação (ranking, categoria, faixa, etc.).
-export type PlayerLevel = string;
-/** @deprecated use PlayerLevel */
-export type TennisClass = PlayerLevel;
-
-export interface Sport {
-  id: string;
-  slug: string; // 'tenis' | 'padel' | 'volei' | ... | 'outro'
-  name: string;
-  icon: string; // nome do ícone lucide-react
-  playersPerMatch: number; // ex.: 2 (tênis), 4 (padel/vôlei de dupla), 12 (vôlei de quadra)
-  defaultDurationMinutes: number;
-  usesLevel: boolean; // se este esporte classifica jogadores por nível
-  active: boolean;
-}
+export type TennisClass = 'A' | 'B' | 'C' | 'D' | 'E';
 
 export interface Player {
   id: string;
   name: string;
   email: string;
   phone?: string;
-  level: PlayerLevel;
+  tennisClass: TennisClass;
   isAdmin: boolean;
   avatarUrl?: string;
+  mustChangePassword?: boolean;
   createdAt: string;
 }
 
@@ -34,19 +19,15 @@ export interface Court {
   name: string;
   surface: string;
   active: boolean;
-  sportId: string;
-  sportName?: string;
 }
 
 export interface Match {
   id: string;
-  sportId: string;
-  sportName?: string;
   player1Id: string;
   player1Name: string;
   player2Id: string;
   player2Name: string;
-  level: PlayerLevel;
+  tennisClass: TennisClass;
   courtId: string;
   courtName: string;
   date: string; // YYYY-MM-DD
@@ -76,16 +57,6 @@ export interface BlockedSlot {
   endTime?: string;
   allDay: boolean;
   reason: string;
-  createdAt: string;
-}
-
-// Grupo = clube, academia, condomínio ou grupo de amigos que compartilha quadras.
-export interface Group {
-  id: string;
-  name: string;
-  clubName: string;
-  inviteCode: string;
-  sports: Sport[];
   createdAt: string;
 }
 

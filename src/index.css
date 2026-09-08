@@ -852,3 +852,29 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   .qp-sport-card .qp-sport-symbol--card { width:50px; height:50px; }
   .qp-sport-card .qp-sport-symbol--card img { width:47px; height:47px; }
 }
+
+/* v83 — mascote assistente do RacharHoje na capa. */
+.qp-sport-picker { position:relative; }
+.qp-sport-picker__mascot {
+  position:absolute;
+  z-index:2;
+  top:18px;
+  left:max(18px,calc((100vw - 1180px) / 2));
+  width:clamp(118px,13vw,178px);
+  height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 14px 20px rgba(8,36,82,.16));
+  pointer-events:none;
+  user-select:none;
+}
+@media (max-width:767px) {
+  .qp-sport-picker__mascot {
+    top:max(7px,env(safe-area-inset-top));
+    left:7px;
+    width:68px;
+    filter:drop-shadow(0 7px 10px rgba(8,36,82,.14));
+  }
+}
+@media (max-width:359px) {
+  .qp-sport-picker__mascot { width:58px; left:4px; }
+}

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <g fill="none" stroke="#082452" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" opacity=".11">
+    <!-- Tênis -->
+    <g transform="translate(95 135) rotate(-10)">
+      <circle cx="55" cy="25" r="18" fill="#082452" stroke="none"/><path d="M56 50l28 63-35 58m34-59 61 27m-88-68-46 55m72-13 42-58"/><ellipse cx="151" cy="43" rx="24" ry="36"/><path d="M142 75l-17 29"/><circle cx="190" cy="40" r="8" fill="#F5B400" stroke="none"/>
+    </g>
+    <!-- Futsal -->
+    <g transform="translate(390 84) rotate(8)">
+      <circle cx="70" cy="25" r="18" fill="#082452" stroke="none"/><path d="M70 48l-10 72-48 45m50-44 55 35m-50-74 60-13m-61 16-40 39"/><circle cx="139" cy="174" r="20"/><path d="M126 160l25 28m-27 0 29-26"/>
+    </g>
+    <!-- Futebol de campo -->
+    <g transform="translate(710 112) rotate(-5)">
+      <circle cx="66" cy="22" r="18" fill="#082452" stroke="none"/><path d="M66 45l15 69-52 52m52-52 66 18m-74-60-54 8m57-9 48-40"/><circle cx="157" cy="155" r="22"/><path d="M143 140l28 31m-29 1 30-32"/>
+    </g>
+    <!-- Beach tennis -->
+    <g transform="translate(1060 105) rotate(10)">
+      <circle cx="62" cy="26" r="18" fill="#082452" stroke="none"/><path d="M62 49l18 66-54 50m54-50 55 45M68 72l66 13m-65-10-50 38"/><ellipse cx="161" cy="77" rx="25" ry="34"/><path d="M143 103l-23 31"/><circle cx="207" cy="42" r="8" fill="#F5B400" stroke="none"/>
+    </g>
+    <!-- Handebol -->
+    <g transform="translate(115 580) rotate(5)">
+      <circle cx="62" cy="22" r="18" fill="#082452" stroke="none"/><path d="M62 45l14 70-46 54m46-54 55 47M68 69l61-37m-63 39-52 35"/><circle cx="145" cy="20" r="18" fill="#F5B400" stroke="none"/>
+    </g>
+    <!-- Vôlei -->
+    <g transform="translate(405 570) rotate(-7)">
+      <circle cx="72" cy="44" r="18" fill="#082452" stroke="none"/><path d="M72 67l8 68-48 48m48-48 52 48M73 79l-39-62m43 61 42-66"/><circle cx="78" cy="-20" r="24"/><path d="M60-30q25 12 36 36M61-9q23-5 37-23"/>
+    </g>
+    <!-- Basquete -->
+    <g transform="translate(730 555) rotate(4)">
+      <circle cx="66" cy="25" r="18" fill="#082452" stroke="none"/><path d="M66 48l16 70-45 62m45-62 58 52M71 70l62-33m-64 35-46 43"/><circle cx="151" cy="23" r="24" fill="#F5B400" stroke="none"/><path d="M127 23h48m-24-24v48"/>
+    </g>
+    <!-- Peteca -->
+    <g transform="translate(1060 570) rotate(-7)">
+      <circle cx="64" cy="27" r="18" fill="#082452" stroke="none"/><path d="M64 50l17 67-52 55m52-55 58 48M68 72l61 16m-62-13-48 44"/><path d="M174 39l-22 40m22-40 13 40m-13-40-2 43"/><path d="M151 79q22 20 39 0" fill="#F5B400"/>
+    </g>
+  </g>
+</svg>

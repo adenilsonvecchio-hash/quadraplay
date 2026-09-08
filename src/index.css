@@ -64,7 +64,7 @@ body {
 
 .qp-brand-logo__wordmark { display:inline-flex; align-items:baseline; letter-spacing:-1.6px; }
 .qp-brand-logo__quadra { color:#0f1e36; font-size:21px; font-weight:700; letter-spacing:-1px; }
-.qp-brand-logo__play { color:#6c4cf5; font-size:34px; font-weight:900; letter-spacing:-2.2px; }
+.qp-brand-logo__play { color:#f5b400; font-size:34px; font-weight:900; letter-spacing:-2.2px; }
 .qp-brand-logo__plus { color:#f59e0b; font-size:31px; font-weight:900; margin-left:2px; }
 
 .qp-brand-logo--compact .qp-brand-logo__quadra { font-size:12px; letter-spacing:-.5px; }
@@ -127,7 +127,7 @@ body {
 .qp-action-card { min-height:126px; padding:15px 12px 13px; display:flex; flex-direction:column; align-items:flex-start; text-align:left; border:1px solid #eef0f7; border-radius:22px; background:#fff; box-shadow:0 9px 22px rgba(34,44,92,.08); transition:transform .16s ease,box-shadow .16s ease; }
 .qp-action-card:active { transform:scale(.97); box-shadow:0 5px 13px rgba(34,44,92,.08); }
 .qp-action-card__icon { width:46px; height:46px; display:grid; place-items:center; border-radius:15px; margin-bottom:11px; }
-.qp-action-card__icon--violet { color:#5835eb; background:#eeeaff; }
+.qp-action-card__icon--violet { color:#d89d00; background:#fff4cc; }
 .qp-action-card__icon--blue { color:#176bd4; background:#e8f2ff; }
 .qp-action-card__icon--amber { color:#dc8211; background:#fff3dd; }
 .qp-action-card__icon--cyan { color:#078da9; background:#e3f8fc; }
@@ -152,7 +152,7 @@ body {
 .qp-clean-home__title { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-size:13px; font-weight:900; }
 .qp-club-mark { width:104px; height:38px; border:0; box-shadow:none; background:#fff; }
 .qp-clean-home__bell { width:34px; height:34px; color:#1d2041; background:#f7f7fb; border-color:#eceef4; border-radius:12px; }
-.qp-clean-home__bell span { background:#6955e3; border-color:#fff; }
+.qp-clean-home__bell span { background:#f5b400; border-color:#fff; }
 
 .qp-notification-count { position:absolute; right:-4px; top:-5px; min-width:19px; height:19px; padding:0 5px; display:grid; place-items:center; border-radius:999px; border:2px solid #f8f9ff; background:#ef4444 !important; color:#fff; font-size:10px; line-height:1; font-weight:900; }
 .qp-clean-home__bell .qp-notification-count { right:-6px; top:-6px; border-color:#fff; }
@@ -187,7 +187,7 @@ body {
 .qp-clean-home__club { color:#777d91; font-size:9px; }
 .qp-action-grid { height:390px; grid-template-columns:1.08fr .92fr; grid-template-rows:1fr 1fr .8fr; gap:11px; position:relative; z-index:3; pointer-events:auto; }
 .qp-action-card { min-height:0; padding:14px; border-color:#fff; border-radius:20px; box-shadow:0 7px 18px rgba(42,48,85,.055); position:relative; z-index:4; justify-content:flex-start; pointer-events:auto; cursor:pointer; touch-action:manipulation; user-select:none; }
-.qp-action-card--featured { grid-row:span 2; background:linear-gradient(145deg,#7563e8,#6150d9); color:#fff; }
+.qp-action-card--featured { grid-row:span 2; background:linear-gradient(145deg,#ffca2d,#e9a900); color:#fff; }
 .qp-action-card--green { grid-column:1/-1; flex-direction:row; align-items:center; gap:12px; }
 .qp-action-card__icon { width:42px; height:42px; margin-bottom:9px; border-radius:13px; }
 .qp-action-card__icon--featured { width:54px; height:54px; color:#fff; background:rgba(255,255,255,.18); margin:4px 0 auto; }
@@ -220,7 +220,7 @@ body {
 }
 
 .qp-primary {
-  background: linear-gradient(100deg, #6f4cff 0%, #5428f3 100%);
+  background: linear-gradient(100deg, #ffca2d 0%, #e9a900 100%);
   color: white;
   box-shadow: 0 10px 22px rgba(92, 53, 255, .25), inset 0 1px 0 rgba(255,255,255,.35);
 }
@@ -233,12 +233,12 @@ body {
 .qp-weekly-actions { display:flex; gap:7px; }
 .qp-weekly-actions button { min-width:40px; height:40px; display:grid; place-items:center; padding:0 10px; border:1px solid #e6e8f0; border-radius:13px; background:#f8f8fc; color:#575f78; }
 .qp-weekly-actions button:disabled { opacity:.3; }
-.qp-weekly-actions .qp-today-button { color:#fff; background:#6851df; border-color:#6851df; font-size:11px; font-weight:900; }
+.qp-weekly-actions .qp-today-button { color:#fff; background:#f5b400; border-color:#f5b400; font-size:11px; font-weight:900; }
 .qp-weekly-courts { display:flex; align-items:center; gap:12px; padding:10px 13px; border:1px solid #e8eaf2; border-radius:18px; background:#fff; }
 .qp-weekly-courts>span { color:#8990a3; font-size:10px; font-weight:900; text-transform:uppercase; }
 .qp-weekly-courts>div { display:flex; gap:7px; overflow-x:auto; }
 .qp-weekly-courts button { flex:0 0 auto; padding:8px 13px; border:1px solid #e7e9f1; border-radius:11px; color:#687087; background:#f8f9fc; font-size:11px; font-weight:800; }
-.qp-weekly-courts button.is-active { color:#fff; border-color:#6851df; background:#6851df; box-shadow:0 5px 13px rgba(104,81,223,.22); }
+.qp-weekly-courts button.is-active { color:#fff; border-color:#f5b400; background:#f5b400; box-shadow:0 5px 13px rgba(104,81,223,.22); }
 .qp-weekly-courts button:disabled { opacity:.4; }
 .qp-weekly-legend { display:flex; flex-wrap:wrap; gap:8px 15px; padding:0 4px; color:#6f768a; font-size:9px; font-weight:800; }
 .qp-weekly-legend span { display:flex; align-items:center; gap:5px; }
@@ -254,7 +254,7 @@ body {
 .qp-weekly-day { flex-direction:column; gap:2px; color:#656c80; }
 .qp-weekly-day strong { font-size:9px; letter-spacing:.7px; }
 .qp-weekly-day span { font-size:18px; font-weight:900; }
-.qp-weekly-day.is-today { color:#fff; background:#6851df; }
+.qp-weekly-day.is-today { color:#fff; background:#f5b400; }
 .qp-weekly-time { position:sticky; left:0; z-index:3; min-height:92px; display:flex; flex-direction:column; align-items:center; justify-content:center; border-right:1px solid #dfe2ea; border-bottom:1px solid #e8eaf0; background:#f9fafc; color:#242c4d; }
 .qp-weekly-time strong { font-size:12px; font-weight:900; }
 .qp-weekly-time span { color:#a0a5b4; font-size:9px; font-weight:700; }
@@ -393,7 +393,7 @@ button.qp-slot:active { transform:scale(.97); }
 /* Cabeçalho padronizado: QuadraPlay+ e modalidade em todas as páginas */
 .qp-header-wordmark { display:inline-flex; align-items:baseline; white-space:nowrap; letter-spacing:-1.6px; line-height:1; }
 .qp-header-wordmark > span { color:#0f1e36; font-size:21px; font-weight:800; letter-spacing:-1px; }
-.qp-header-wordmark > strong { color:#6c4cf5; font-size:34px; font-weight:900; letter-spacing:-2.2px; }
+.qp-header-wordmark > strong { color:#f5b400; font-size:34px; font-weight:900; letter-spacing:-2.2px; }
 .qp-header-wordmark > b { color:#f59e0b; font-size:31px; font-weight:900; margin-left:2px; }
 .qp-clean-home__title { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
 .qp-global-brand-stack { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; }
@@ -405,9 +405,9 @@ button.qp-slot:active { transform:scale(.97); }
 .qp-global-header-brand .qp-brand-logo__plus { font-size:31px; }
 .qp-standard-brand .qp-brand-logo__wordmark { display:inline-flex; align-items:baseline; white-space:nowrap; line-height:1; }
 .qp-standard-brand .qp-brand-logo__quadra { color:#0f1e36; font-size:26px; font-weight:850; letter-spacing:-1.4px; }
-.qp-standard-brand .qp-brand-logo__play { color:#6c4cf5; font-size:42px; font-weight:950; letter-spacing:-2.8px; }
+.qp-standard-brand .qp-brand-logo__play { color:#f5b400; font-size:42px; font-weight:950; letter-spacing:-2.8px; }
 .qp-standard-brand .qp-brand-logo__plus { color:#f59e0b; font-size:39px; font-weight:950; margin-left:2px; }
-.qp-sport-symbol { --sport-color:#6c4cf5; flex:0 0 auto; display:grid; place-items:center; border:1px solid rgba(255,255,255,.95); background:radial-gradient(circle at 32% 25%,#fff 0%,color-mix(in srgb,var(--sport-color) 10%,#fff) 66%,color-mix(in srgb,var(--sport-color) 22%,#fff) 100%); box-shadow:0 5px 12px color-mix(in srgb,var(--sport-color) 20%,transparent),inset 0 1px 2px #fff; }
+.qp-sport-symbol { --sport-color:#f5b400; flex:0 0 auto; display:grid; place-items:center; border:1px solid rgba(255,255,255,.95); background:radial-gradient(circle at 32% 25%,#fff 0%,color-mix(in srgb,var(--sport-color) 10%,#fff) 66%,color-mix(in srgb,var(--sport-color) 22%,#fff) 100%); box-shadow:0 5px 12px color-mix(in srgb,var(--sport-color) 20%,transparent),inset 0 1px 2px #fff; }
 .qp-sport-symbol--header { width:38px; height:38px; border-radius:50%; font-size:24px; }
 .qp-sport-symbol--header img { width:31px; height:31px; object-fit:contain; filter:drop-shadow(0 2px 2px rgba(28,38,58,.2)); }
 .qp-sport-symbol--card { grid-column:1/-1; width:54px; height:54px; overflow:hidden; border-radius:50%; font-size:27px; }
@@ -431,12 +431,12 @@ button.qp-slot:active { transform:scale(.97); }
 .qp-sport-picker__header p { margin-top:28px; color:#64748b; font-size:14px; font-weight:600; }
 .qp-sport-picker__header p strong { color:#25304e; font-weight:900; }
 .qp-sport-picker__header h1 { margin-top:20px; color:#101b3d; font-size:27px; line-height:1.1; font-weight:900; }
-.qp-sport-picker__header h1 em { color:#6c4cf5; font-style:normal; }
+.qp-sport-picker__header h1 em { color:#f5b400; font-style:normal; }
 .qp-sport-picker__header small { display:block; margin-top:6px; color:#8b93a7; font-size:11px; }
 .qp-sport-picker__hero { position:relative; height:150px; max-width:760px; margin:0 auto 12px; overflow:hidden; border:2px solid rgba(255,255,255,.9); border-radius:24px; background:#fff; box-shadow:0 18px 42px rgba(69,54,174,.15),inset 0 0 0 1px rgba(108,76,245,.12); }
 .qp-sport-picker__hero img { width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
 .qp-sport-picker__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; max-width:760px; margin:0 auto; }
-.qp-sport-card { --sport-color:#6c4cf5; min-height:94px; padding:11px 12px; border:1px solid color-mix(in srgb,var(--sport-color) 28%,#fff); border-radius:22px; background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(248,249,255,.88)); box-shadow:0 10px 25px rgba(31,43,86,.08),inset 2px 0 0 color-mix(in srgb,var(--sport-color) 70%,#fff); display:grid; grid-template-columns:1fr auto; grid-template-rows:1fr auto; text-align:left; color:#172347; transition:transform .18s ease,box-shadow .18s ease; backdrop-filter:blur(14px); }
+.qp-sport-card { --sport-color:#f5b400; min-height:94px; padding:11px 12px; border:1px solid color-mix(in srgb,var(--sport-color) 28%,#fff); border-radius:22px; background:linear-gradient(145deg,rgba(255,255,255,.97),rgba(248,249,255,.88)); box-shadow:0 10px 25px rgba(31,43,86,.08),inset 2px 0 0 color-mix(in srgb,var(--sport-color) 70%,#fff); display:grid; grid-template-columns:1fr auto; grid-template-rows:1fr auto; text-align:left; color:#172347; transition:transform .18s ease,box-shadow .18s ease; backdrop-filter:blur(14px); }
 .qp-sport-card:active { transform:scale(.98); }
 .qp-sport-card strong { align-self:end; font-size:12px; line-height:1.1; font-weight:900; }
 .qp-sport-card svg { align-self:end; color:var(--sport-color); }
@@ -455,7 +455,7 @@ button.qp-slot:active { transform:scale(.97); }
 /* v68 — wordmark esportivo futurista e maior. */
 .qp-sport-picker__header .qp-standard-brand .qp-brand-logo__wordmark { transform:skewX(-8deg); filter:drop-shadow(0 5px 7px rgba(52,39,160,.2)); }
 .qp-sport-picker__header .qp-standard-brand .qp-brand-logo__quadra { font-size:34px; font-weight:950; letter-spacing:-2px; text-shadow:0 1px #fff; }
-.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play { font-size:54px; background:linear-gradient(180deg,#875cff 0%,#4927e8 72%,#244ee7 100%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play { font-size:54px; background:linear-gradient(180deg,#ffd34d 0%,#f5b400 72%,#dc9f00 100%); -webkit-background-clip:text; background-clip:text; color:transparent; }
 .qp-sport-picker__header .qp-standard-brand .qp-brand-logo__plus { font-size:50px; color:#ff9500; text-shadow:0 0 12px rgba(255,149,0,.3); }
 .qp-sport-picker__header .qp-multisports-label--picker { margin-top:8px; font-size:10px; letter-spacing:4px; }
 
@@ -537,7 +537,7 @@ button.qp-slot:active { transform:scale(.97); }
 }
 
 /* v70 — identidade neumórfica compartilhada por todas as telas. */
-:root { --qp-bg:#e9eef0; --qp-surface:#f2f5f6; --qp-navy:#0b2347; --qp-muted:#74808b; --qp-yellow:#f5b400; --qp-purple:#6c4cf5; --qp-shadow:#b8c0c5; }
+:root { --qp-bg:#e9eef0; --qp-surface:#f2f5f6; --qp-navy:#0b2347; --qp-muted:#74808b; --qp-yellow:#f5b400; --qp-accent:#f5b400; --qp-shadow:#b8c0c5; }
 body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy); }
 .qp-shell,.qp-app-shell { background:linear-gradient(145deg,#edf1f3 0%,#e5eaed 100%); border-color:rgba(255,255,255,.82) !important; box-shadow:16px 16px 34px rgba(166,176,182,.36),-12px -12px 30px rgba(255,255,255,.78); }
 .qp-main { background:transparent; }
@@ -556,7 +556,7 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
 .qp-menu-item:hover { background:rgba(255,255,255,.48); }
 .qp-menu-item.is-active { color:#17233b; background:linear-gradient(145deg,#ffca2d,#edae00); box-shadow:4px 4px 9px rgba(184,150,47,.24),-4px -4px 9px rgba(255,255,255,.72); }
 .qp-app-shell input,.qp-app-shell select,.qp-app-shell textarea { border-color:rgba(255,255,255,.9) !important; background:#e8edef !important; color:var(--qp-navy) !important; box-shadow:inset 3px 3px 7px rgba(169,178,184,.3),inset -3px -3px 7px rgba(255,255,255,.78); }
-.qp-app-shell button.bg-violet-600,.qp-app-shell button.from-\[\#765cff\],.qp-app-shell button.from-\[\#765fff\] { color:#17233b !important; background:#f5b400 !important; background-image:linear-gradient(145deg,#ffca2d,#e9a900) !important; }
+.qp-app-shell button.bg-amber-500,.qp-app-shell button.from-\[\#ffca2d\],.qp-app-shell button.from-\[\#ffca2d\] { color:#17233b !important; background:#f5b400 !important; background-image:linear-gradient(145deg,#ffca2d,#e9a900) !important; }
 .qp-clean-home { background:linear-gradient(145deg,#edf1f3,#e3e9ec); }
 .qp-clean-home__header { background:rgba(238,242,244,.96); border-color:rgba(255,255,255,.8); }
 .qp-clean-home__panel { background:transparent; }
@@ -575,6 +575,25 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   .qp-bottom-nav__button { min-width:62px !important; height:56px !important; }
   .qp-bottom-nav__button span:first-child { width:34px; height:34px; }
 }
+
+/* v71 — símbolos esportivos monocromáticos no padrão cinza neumórfico. */
+.qp-sport-card { --sport-color:#929da5 !important; }
+.qp-sport-card .qp-sport-symbol {
+  border-color:rgba(255,255,255,.9);
+  background:linear-gradient(145deg,#f7f9fa,#dfe5e8);
+  box-shadow:4px 4px 9px rgba(160,170,176,.4),-4px -4px 9px rgba(255,255,255,.92),inset 1px 1px 0 rgba(255,255,255,.86);
+}
+.qp-sport-card .qp-sport-symbol img {
+  filter:grayscale(1) saturate(0) contrast(.78) brightness(1.08);
+  opacity:.72;
+  mix-blend-mode:multiply;
+}
+.qp-sport-card .qp-sport-symbol > span {
+  filter:grayscale(1) saturate(0);
+  opacity:.66;
+}
+.qp-sport-card svg { color:#8f9aa2; }
+.qp-sport-card:hover .qp-sport-symbol img,.qp-sport-card:focus-visible .qp-sport-symbol img { opacity:.9; }
 
 /* v61 — cabeçalho comporta marca, modalidade e assinatura multiesportes. */
 .qp-clean-home__header { height:122px; }

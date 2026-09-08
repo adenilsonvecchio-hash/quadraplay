@@ -123,7 +123,7 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
 
       {error && <div className="rounded-2xl bg-rose-50 border border-rose-100 p-3 text-xs font-bold text-rose-700">{error}</div>}
       {loading && <div className="qp-card rounded-[28px] p-8 text-center text-sm font-bold text-slate-500">Carregando seus jogos...</div>}
-      {!loading && visibleMatches.length === 0 && <div className="qp-card rounded-[28px] p-8 text-center"><CalendarDays className="w-8 h-8 text-violet-400 mx-auto"/><h3 className="font-black mt-3">Nenhum jogo nesta seção</h3><p className="text-xs text-slate-500 mt-1">Quando houver movimentações, elas aparecerão aqui.</p></div>}
+      {!loading && visibleMatches.length === 0 && <div className="qp-card rounded-[28px] p-8 text-center"><CalendarDays className="w-8 h-8 text-amber-500 mx-auto"/><h3 className="font-black mt-3">Nenhum jogo nesta seção</h3><p className="text-xs text-slate-500 mt-1">Quando houver movimentações, elas aparecerão aqui.</p></div>}
 
       <div className="space-y-3">
         {!loading && visibleMatches.map((match) => {
@@ -135,14 +135,14 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
             <article key={safeText(match.id, `${match.date}-${match.startTime}`)} className="qp-card rounded-[26px] p-4">
               <div className="flex items-center justify-between gap-3">
                 <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${match.status === 'pending' ? 'bg-orange-50 text-orange-700' : match.status === 'cancelled' ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700'}`}>{statusLabel}</span>
-                {isTennis && <span className="text-[10px] font-black text-violet-700 bg-violet-50 px-2 py-1 rounded-full">Classe {safeText(match.tennisClass, '—')}</span>}
+                {isTennis && <span className="text-[10px] font-black text-amber-700 bg-amber-50 px-2 py-1 rounded-full">Classe {safeText(match.tennisClass, '—')}</span>}
               </div>
               <div className="mt-4 flex gap-3">
-                <div className="w-14 h-14 rounded-[18px] bg-violet-50 text-violet-700 grid place-items-center shrink-0"><CalendarDays className="w-5 h-5"/></div>
+                <div className="w-14 h-14 rounded-[18px] bg-amber-50 text-amber-700 grid place-items-center shrink-0"><CalendarDays className="w-5 h-5"/></div>
                 <div className="min-w-0 flex-1"><p className="text-xs text-slate-500 font-bold">{safeDate(match.date)}</p><h3 className="text-base font-black mt-1 truncate">vs {safeText(opponent, 'Adversário')}</h3><div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[11px] text-slate-500"><span className="flex items-center gap-1"><Clock3 className="w-3.5 h-3.5"/>{safeText(match.startTime, '--:--')} - {safeText(match.endTime, '--:--')}</span><span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5"/>{safeText(match.courtName, 'Quadra')}</span></div></div>
               </div>
               {outgoing && <div className="mt-3 rounded-[15px] bg-orange-50 px-3 py-2 text-[11px] font-bold text-orange-700">O horário está reservado provisoriamente. A partida será confirmada quando o adversário aceitar.</div>}
-              {incoming && <div className="mt-3 rounded-[15px] bg-violet-50 px-3 py-2 text-[11px] font-bold text-violet-700">Você recebeu este convite. Aceite para confirmar a partida ou recuse para liberar o horário.</div>}
+              {incoming && <div className="mt-3 rounded-[15px] bg-amber-50 px-3 py-2 text-[11px] font-bold text-amber-700">Você recebeu este convite. Aceite para confirmar a partida ou recuse para liberar o horário.</div>}
               {activeTab === 'upcoming' && <div className="mt-4 pt-3 border-t border-slate-100 flex gap-2">
                 {incoming ? <><button type="button" disabled={busyId === match.id} onClick={() => void respond(match, false)} className="flex-1 qp-soft rounded-[15px] py-2.5 text-xs font-black text-rose-600 disabled:opacity-50">Recusar</button><button type="button" disabled={busyId === match.id} onClick={() => void respond(match, true)} className="flex-1 rounded-[15px] py-2.5 text-xs font-black bg-emerald-500 text-white flex items-center justify-center gap-1 disabled:opacity-50"><CheckCircle2 className="w-4 h-4"/>{busyId === match.id ? 'Salvando...' : 'Aceitar'}</button></> : <button type="button" disabled={busyId === match.id} onClick={() => setCancelling(match)} className="w-full qp-soft rounded-[15px] py-2.5 text-xs font-black text-rose-600 flex items-center justify-center gap-1 disabled:opacity-50"><XCircle className="w-4 h-4"/>Cancelar partida</button>}
               </div>}

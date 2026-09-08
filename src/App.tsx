@@ -49,7 +49,7 @@ function MainApp() {
     return () => window.removeEventListener('quadraplay:navigate-profile', openProfile);
   }, []);
 
-  if (authLoading) return <div className="min-h-screen grid place-items-center bg-[#eef1f8] text-[#6855df] font-black">Carregando QuadraPlay+...</div>;
+  if (authLoading) return <div className="min-h-screen grid place-items-center bg-[#eef1f8] text-[#f5b400] font-black">Carregando QuadraPlay+...</div>;
   if (passwordSetupMode) return <PasswordResetView mode={passwordSetupMode} />;
   if (!currentUser) return <LoginView onSuccess={() => setActiveTab('home')} />;
   if (currentUser.mustChangePassword) return <FirstAccessPasswordView />;
@@ -79,7 +79,7 @@ function MainApp() {
   };
 
   return (
-    <div className="min-h-screen bg-[#eef1f8] text-[#0b1742] flex justify-center items-start sm:py-5 selection:bg-violet-200">
+    <div className="min-h-screen bg-[#eef1f8] text-[#0b1742] flex justify-center items-start sm:py-5 selection:bg-amber-200">
       <div className="qp-shell qp-app-shell w-full max-w-md lg:max-w-6xl min-h-screen sm:min-h-[94vh] sm:rounded-[38px] flex flex-col relative overflow-hidden border border-white">
         {activeTab !== 'home' && <Header activeTab={activeTab} onOpenAdmin={() => navigate('admin')} onNavigate={navigate} activeSport={activeSport} onChangeSport={() => setActiveSportId(null)} />}
 

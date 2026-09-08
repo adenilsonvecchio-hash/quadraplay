@@ -385,12 +385,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
   return (
     <div className="space-y-4 pb-12">
       {/* Top Header */}
-      <div className="bg-gradient-to-br from-white via-[#f7f5ff] to-[#eef7ff] text-[#101b3d] rounded-3xl p-5 border border-white shadow-[0_12px_34px_rgba(91,70,238,0.10)]">
+      <div className="bg-gradient-to-br from-white via-[#f7f5ff] to-[#eef7ff] text-[#101b3d] rounded-3xl p-5 border border-white shadow-[0_12px_34px_rgba(190,145,0,0.10)]">
         <div className="flex items-center justify-between">
           <button
             id="btn-admin-back"
             onClick={onBack}
-            className="text-xs font-bold text-violet-700 hover:text-violet-900 flex items-center gap-1.5 p-1.5 -ml-1.5 rounded-lg hover:bg-violet-100"
+            className="text-xs font-bold text-amber-700 hover:text-amber-900 flex items-center gap-1.5 p-1.5 -ml-1.5 rounded-lg hover:bg-amber-100"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Voltar ao App</span>
@@ -415,7 +415,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       )}
 
       {adminLoading && (
-        <div className="rounded-2xl bg-violet-50 border border-violet-100 p-3 text-xs font-bold text-violet-700">
+        <div className="rounded-2xl bg-amber-50 border border-amber-100 p-3 text-xs font-bold text-amber-700">
           Carregando dados administrativos...
         </div>
       )}
@@ -427,7 +427,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('players')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'players'
-              ? 'bg-violet-100 text-violet-700 shadow-sm'
+              ? 'bg-amber-100 text-amber-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -438,7 +438,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('matches')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'matches'
-              ? 'bg-violet-100 text-violet-700 shadow-sm'
+              ? 'bg-amber-100 text-amber-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -449,7 +449,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('blocks')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'blocks'
-              ? 'bg-violet-100 text-violet-700 shadow-sm'
+              ? 'bg-amber-100 text-amber-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -460,7 +460,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           onClick={() => setActiveTab('config')}
           className={`py-2 px-1 rounded-xl transition-all ${
             activeTab === 'config'
-              ? 'bg-violet-100 text-violet-700 shadow-sm'
+              ? 'bg-amber-100 text-amber-700 shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
@@ -486,7 +486,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <button
               id="btn-admin-add-player"
               onClick={handleOpenNewPlayer}
-              className="text-xs font-black bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
+              className="text-xs font-black bg-amber-500 hover:bg-amber-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Novo Jogador</span>
@@ -544,10 +544,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
       {/* TAB 2: AGENDAMENTOS (AGENDA COMPLETA) */}
       {activeTab === 'matches' && (
         <div className="space-y-3">
-          <section className="rounded-2xl border-2 border-violet-200 bg-white p-4 shadow-sm">
+          <section className="rounded-2xl border-2 border-amber-200 bg-white p-4 shadow-sm">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <label className="block"><span className="block text-xs font-black text-slate-700 mb-1">Relatório dos jogos do dia</span><input type="date" value={reportDate} onChange={(event) => setReportDate(event.target.value)} className="rounded-xl border border-slate-300 px-3 py-2 text-xs font-bold" /></label>
-              <div className="flex gap-2"><button type="button" onClick={() => void copyDailyReport()} className="flex-1 rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-xs font-black text-violet-700 flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" />{reportCopied ? 'Copiado!' : 'Copiar'}</button><button type="button" onClick={printDailyReport} className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-700 flex items-center justify-center gap-1.5"><Printer className="w-4 h-4" />PDF</button></div>
+              <div className="flex gap-2"><button type="button" onClick={() => void copyDailyReport()} className="flex-1 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-black text-amber-700 flex items-center justify-center gap-1.5"><Copy className="w-4 h-4" />{reportCopied ? 'Copiado!' : 'Copiar'}</button><button type="button" onClick={printDailyReport} className="flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-700 flex items-center justify-center gap-1.5"><Printer className="w-4 h-4" />PDF</button></div>
             </div>
             <div className="mt-4 overflow-hidden rounded-xl border-2 border-slate-300 bg-white">
               {reportSlots.map((slot) => {
@@ -574,7 +574,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 onClick={() => setMatchClassFilter(cls)}
                 className={`text-xs px-2.5 py-1 rounded-lg font-bold transition-colors ${
                   matchClassFilter === cls
-                    ? 'bg-violet-100 text-violet-700 border border-violet-200'
+                    ? 'bg-amber-100 text-amber-700 border border-amber-200'
                     : 'bg-white text-slate-600 border border-slate-200'
                 }`}
               >
@@ -660,7 +660,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <button
               id="btn-admin-add-block"
               onClick={() => setIsBlockModalOpen(true)}
-              className="text-xs font-black bg-violet-600 hover:bg-violet-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
+              className="text-xs font-black bg-amber-500 hover:bg-amber-700 text-white px-3 py-2 rounded-xl flex items-center gap-1 shadow-sm"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
               <span>Novo Bloqueio</span>
@@ -749,7 +749,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-700">Horários disponíveis</label>
-              <button type="button" onClick={addTimeSlot} className="text-[10px] font-black text-violet-700 flex items-center gap-1">
+              <button type="button" onClick={addTimeSlot} className="text-[10px] font-black text-amber-700 flex items-center gap-1">
                 <Plus className="w-3.5 h-3.5" /> Adicionar horário
               </button>
             </div>
@@ -817,7 +817,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           <button
             id="btn-save-court-config"
             type="submit"
-            className="w-full py-3 bg-gradient-to-r from-[#765fff] to-[#5d45ed] hover:from-[#6d55f7] hover:to-[#553de2] text-white font-bold text-xs rounded-xl shadow-[0_8px_20px_rgba(93,69,237,0.22)] transition-colors"
+            className="w-full py-3 bg-gradient-to-r from-[#ffca2d] to-[#e9a900] hover:from-[#f7ba0a] hover:to-[#dc9f00] text-white font-bold text-xs rounded-xl shadow-[0_8px_20px_rgba(190,145,0,0.22)] transition-colors"
           >
             Salvar Configurações da Quadra
           </button>
@@ -909,7 +909,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                       onClick={() => setPlayerClass(cls)}
                       className={`py-2 rounded-xl text-xs font-black transition-all ${
                         playerClass === cls
-                          ? 'bg-violet-100 text-violet-700 ring-1 ring-violet-200 shadow-sm'
+                          ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-200 shadow-sm'
                           : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                       }`}
                     >
@@ -944,7 +944,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                   id="btn-save-player-submit"
                   type="submit"
                   disabled={playerSaving}
-                  className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm disabled:opacity-60"
+                  className="flex-1 py-2.5 text-xs font-bold text-white bg-amber-500 hover:bg-amber-700 rounded-xl shadow-sm disabled:opacity-60"
                 >
                   {playerSaving
                     ? (editingPlayer ? 'Salvando...' : 'Criando acesso...')
@@ -1053,7 +1053,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 text-xs font-bold text-white bg-violet-600 hover:bg-violet-700 rounded-xl shadow-sm"
+                  className="flex-1 py-2.5 text-xs font-bold text-white bg-amber-500 hover:bg-amber-700 rounded-xl shadow-sm"
                 >
                   Confirmar Bloqueio
                 </button>

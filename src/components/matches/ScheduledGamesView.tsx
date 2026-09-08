@@ -98,13 +98,13 @@ export const ScheduledGamesView: React.FC = () => {
             return <article key={match.id} className="qp-glass rounded-[24px] p-4 border border-white">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-black text-violet-700">{formatFriendlyDate(match.date)}</p>
+                  <p className="text-xs font-black text-amber-700">{formatFriendlyDate(match.date)}</p>
                   <div className="mt-1 flex items-center gap-1.5 text-sm font-black text-[#101b3d]">
-                    <Clock3 className="w-4 h-4 text-violet-600" />
+                    <Clock3 className="w-4 h-4 text-amber-500" />
                     {match.startTime} às {match.endTime}
                   </div>
                 </div>
-                <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${match.status === 'scheduled' ? 'bg-emerald-100 text-emerald-700' : incoming ? 'bg-violet-100 text-violet-700' : 'bg-orange-100 text-orange-700'}`}>
+                <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase ${match.status === 'scheduled' ? 'bg-emerald-100 text-emerald-700' : incoming ? 'bg-amber-100 text-amber-700' : 'bg-orange-100 text-orange-700'}`}>
                   {match.status === 'scheduled' ? 'Confirmado' : incoming ? 'Convite para você' : 'Aguardando'}
                 </span>
               </div>

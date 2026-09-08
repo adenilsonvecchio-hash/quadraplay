@@ -677,3 +677,75 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   border-radius:10px;
   object-fit:cover;
 }
+
+/* v77 — ícones 3D centralizados e logomarca sem sobreposição. */
+.qp-brand-logo__quadra,.qp-brand-logo__play,.qp-brand-logo__plus { flex:0 0 auto; }
+.qp-brand-logo__play,
+.qp-standard-brand .qp-brand-logo__play,
+.qp-global-header-brand .qp-brand-logo__play,
+.qp-clean-home__brand .qp-brand-logo__play,
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play { margin-left:8px; }
+.qp-brand-logo__plus,
+.qp-standard-brand .qp-brand-logo__plus,
+.qp-global-header-brand .qp-brand-logo__plus,
+.qp-clean-home__brand .qp-brand-logo__plus,
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__plus { margin-left:8px; }
+.qp-sport-symbol img,.qp-sport-card .qp-sport-symbol img { filter:none; mix-blend-mode:normal; opacity:1; }
+.qp-sport-card .qp-sport-symbol { justify-self:center; }
+@media (max-width:767px) {
+  .qp-sport-card { grid-template-columns:minmax(0,1fr) 14px; grid-template-rows:1fr auto; column-gap:4px; padding:4px 8px 6px; }
+  .qp-sport-card .qp-sport-symbol--card { grid-column:1/-1; grid-row:1; justify-self:center; width:50px; height:50px; }
+  .qp-sport-card .qp-sport-symbol--card img { width:48px; height:48px; }
+  .qp-sport-card strong { grid-column:1; grid-row:2; align-self:end; }
+  .qp-sport-card svg { grid-column:2; grid-row:2; align-self:end; }
+}
+
+/* v78 — logomarca em três blocos e símbolos esportivos azuis. */
+.qp-brand-logo__wordmark,
+.qp-standard-brand .qp-brand-logo__wordmark,
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__wordmark {
+  display:inline-flex;
+  align-items:baseline;
+  gap:8px;
+  width:max-content;
+  padding-inline:4px 12px;
+  overflow:visible;
+}
+.qp-brand-logo__quadra,
+.qp-brand-logo__play,
+.qp-brand-logo__plus,
+.qp-standard-brand .qp-brand-logo__play,
+.qp-standard-brand .qp-brand-logo__plus,
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play,
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__plus {
+  margin-left:0 !important;
+  letter-spacing:0;
+  overflow:visible;
+}
+.qp-brand-logo__play { position:relative; z-index:2; padding:0 2px; }
+.qp-sport-card { --sport-color:#1239b8 !important; }
+.qp-sport-card .qp-sport-symbol { background:transparent; border:0; box-shadow:none; }
+.qp-sport-symbol img,.qp-sport-card .qp-sport-symbol img { filter:none; mix-blend-mode:normal; }
+
+/* v79 — QuadraPlay+ monocromático em azul-marinho. */
+.qp-brand-logo__quadra,
+.qp-brand-logo__play,
+.qp-brand-logo__plus,
+.qp-standard-brand .qp-brand-logo__quadra,
+.qp-standard-brand .qp-brand-logo__play,
+.qp-standard-brand .qp-brand-logo__plus,
+.qp-global-header-brand .qp-brand-logo__play,
+.qp-global-header-brand .qp-brand-logo__plus,
+.qp-clean-home__brand .qp-brand-logo__play,
+.qp-clean-home__brand .qp-brand-logo__plus,
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play,
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__plus,
+.qp-header-wordmark > span,
+.qp-header-wordmark > strong,
+.qp-header-wordmark > b {
+  color:#0b2347;
+  background:none;
+  -webkit-background-clip:border-box;
+  background-clip:border-box;
+  text-shadow:none;
+}

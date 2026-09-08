@@ -600,3 +600,59 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
 .qp-clean-home__panel { height:calc(100% - 122px); }
 @media (max-height:690px) { .qp-clean-home__header { height:112px; } .qp-clean-home__panel { height:calc(100% - 112px); } }
 @media (min-width:1024px) { .qp-clean-home__header { height:142px; } .qp-clean-home__panel { height:calc(100% - 142px); } }
+
+/* v74 — símbolos esportivos maiores e uniformes. */
+.qp-sport-symbol--card {
+  width:62px;
+  height:62px;
+  border-radius:50%;
+}
+.qp-sport-symbol--card img {
+  width:58px;
+  height:58px;
+  object-fit:cover;
+  border-radius:50%;
+}
+@media (max-width:767px) {
+  .qp-sport-card { grid-template-columns:48px minmax(0,1fr) 14px; column-gap:7px; }
+  .qp-sport-symbol--card { width:46px; height:46px; border-radius:50%; }
+  .qp-sport-symbol--card img { width:43px; height:43px; border-radius:50%; }
+}
+@media (max-width:359px) {
+  .qp-sport-card { grid-template-columns:42px minmax(0,1fr) 12px; column-gap:5px; }
+  .qp-sport-symbol--card { width:40px; height:40px; }
+  .qp-sport-symbol--card img { width:38px; height:38px; }
+}
+
+/* v75 — Play maior e Y totalmente visível em todas as páginas. */
+.qp-brand-logo,.qp-brand-logo__wordmark { overflow:visible; }
+.qp-brand-logo__wordmark { padding:0 7px 0 1px; letter-spacing:0; }
+.qp-brand-logo__play,
+.qp-standard-brand .qp-brand-logo__play,
+.qp-global-header-brand .qp-brand-logo__play,
+.qp-clean-home__brand .qp-brand-logo__play {
+  font-size:48px;
+  letter-spacing:-1.2px;
+  line-height:1;
+}
+.qp-brand-logo__plus,
+.qp-standard-brand .qp-brand-logo__plus,
+.qp-global-header-brand .qp-brand-logo__plus,
+.qp-clean-home__brand .qp-brand-logo__plus {
+  font-size:36px;
+  margin-left:6px;
+  line-height:1;
+}
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__wordmark { transform:none; }
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play { font-size:52px; letter-spacing:-1.2px; }
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__plus { font-size:39px; margin-left:7px; }
+@media (max-width:380px) {
+  .qp-brand-logo__play,
+  .qp-standard-brand .qp-brand-logo__play,
+  .qp-global-header-brand .qp-brand-logo__play { font-size:43px; letter-spacing:-1px; }
+  .qp-brand-logo__plus,
+  .qp-standard-brand .qp-brand-logo__plus,
+  .qp-global-header-brand .qp-brand-logo__plus { font-size:33px; margin-left:6px; }
+  .qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play { font-size:47px; }
+  .qp-sport-picker__header .qp-standard-brand .qp-brand-logo__plus { font-size:36px; }
+}

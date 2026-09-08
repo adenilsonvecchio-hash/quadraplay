@@ -584,16 +584,16 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   box-shadow:4px 4px 9px rgba(160,170,176,.4),-4px -4px 9px rgba(255,255,255,.92),inset 1px 1px 0 rgba(255,255,255,.86);
 }
 .qp-sport-card .qp-sport-symbol img {
-  filter:grayscale(1) saturate(0) contrast(.78) brightness(1.08);
-  opacity:.72;
-  mix-blend-mode:multiply;
+  filter:none;
+  opacity:1;
+  mix-blend-mode:normal;
 }
 .qp-sport-card .qp-sport-symbol > span {
   filter:grayscale(1) saturate(0);
   opacity:.66;
 }
 .qp-sport-card svg { color:#8f9aa2; }
-.qp-sport-card:hover .qp-sport-symbol img,.qp-sport-card:focus-visible .qp-sport-symbol img { opacity:.9; }
+.qp-sport-card:hover .qp-sport-symbol img,.qp-sport-card:focus-visible .qp-sport-symbol img { opacity:1; }
 
 /* v61 — cabeçalho comporta marca, modalidade e assinatura multiesportes. */
 .qp-clean-home__header { height:122px; }

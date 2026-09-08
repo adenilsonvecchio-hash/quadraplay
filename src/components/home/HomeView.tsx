@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
 import { Sport } from '../../data/sports';
 import { BrandLogo } from '../common/BrandLogo';
+import { SportSymbol } from '../common/SportSymbol';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -46,7 +47,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
             <p>Organize seu próximo horário</p>
           </div>
           <button type="button" className="qp-active-sport" onClick={onChangeSport} aria-label={`Trocar modalidade. Atual: ${activeSport.name}`}>
-            <span>{activeSport.emoji}</span>
+            <SportSymbol sport={activeSport} size="header" />
             <span><small>Modalidade</small><strong>{activeSport.name}</strong></span>
             <ChevronDown className="qp-active-sport__chevron" size={16} aria-hidden="true" />
           </button>

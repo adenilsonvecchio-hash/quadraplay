@@ -656,3 +656,24 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   .qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play { font-size:47px; }
   .qp-sport-picker__header .qp-standard-brand .qp-brand-logo__plus { font-size:36px; }
 }
+
+/* v76 — desenhos esportivos amarelos e símbolo único por modalidade. */
+.qp-sport-symbol img {
+  filter:sepia(1) saturate(4.2) hue-rotate(350deg) brightness(1.08) contrast(.88);
+  mix-blend-mode:multiply;
+}
+.qp-sport-card .qp-sport-symbol img {
+  filter:sepia(1) saturate(4.2) hue-rotate(350deg) brightness(1.08) contrast(.88);
+  mix-blend-mode:multiply;
+}
+.qp-active-sport .qp-sport-symbol--header {
+  width:34px;
+  height:34px;
+  border-radius:12px;
+}
+.qp-active-sport .qp-sport-symbol--header img {
+  width:31px;
+  height:31px;
+  border-radius:10px;
+  object-fit:cover;
+}

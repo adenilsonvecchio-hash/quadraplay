@@ -5,6 +5,7 @@ import { BrandLogo } from './BrandLogo';
 import { NotificationsBell } from './NotificationsBell';
 import { TabType } from './BottomNav';
 import { Sport } from '../../data/sports';
+import { SportSymbol } from './SportSymbol';
 
 interface HeaderProps {
   onOpenAdmin?: () => void;
@@ -59,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
             </button>
           )}
           <button type="button" onClick={() => { setMenuOpen(false); onChangeSport(); }} className="w-full flex items-center gap-3 rounded-[17px] px-3 py-3 text-left text-sm font-black text-slate-700 hover:bg-slate-50">
-            <span className="text-xl" aria-hidden="true">{activeSport.emoji}</span> Trocar esporte
+            <SportSymbol sport={activeSport} size="header" /> Trocar esporte
           </button>
         </nav>
       )}

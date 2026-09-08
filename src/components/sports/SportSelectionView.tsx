@@ -21,7 +21,7 @@ export const SportSelectionView: React.FC<SportSelectionViewProps> = ({ userName
         <small>Você poderá trocar de modalidade quando quiser.</small>
       </header>
       <div className="qp-sport-picker__hero">
-        <img src="./quadraplay-scheduling-hero-v68.png" alt="Atleta usando o QuadraPlay+ para agendar um horário" />
+        <img src="./quadraplay-athlete-hero-v69.png" alt="Atleta usando o QuadraPlay+ para agendar um horário" />
       </div>
       <div className="qp-sport-picker__grid">
         {SPORTS.map((sport) => (

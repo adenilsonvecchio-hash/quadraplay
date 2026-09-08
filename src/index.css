@@ -749,3 +749,50 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   background-clip:border-box;
   text-shadow:none;
 }
+
+/* v80 — Play+ amarelo forte e nomes centralizados sob os símbolos. */
+.qp-brand-logo__play,
+.qp-brand-logo__plus,
+.qp-standard-brand .qp-brand-logo__play,
+.qp-standard-brand .qp-brand-logo__plus,
+.qp-global-header-brand .qp-brand-logo__play,
+.qp-global-header-brand .qp-brand-logo__plus,
+.qp-clean-home__brand .qp-brand-logo__play,
+.qp-clean-home__brand .qp-brand-logo__plus,
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__play,
+.qp-sport-picker__header .qp-standard-brand .qp-brand-logo__plus,
+.qp-header-wordmark > strong,
+.qp-header-wordmark > b {
+  color:#f5b400 !important;
+  background:none !important;
+  -webkit-background-clip:border-box;
+  background-clip:border-box;
+  text-shadow:none;
+}
+.qp-sport-card {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  text-align:center;
+}
+.qp-sport-card .qp-sport-symbol--card { flex:0 0 auto; margin:0 auto; }
+.qp-sport-card strong {
+  width:calc(100% - 20px);
+  margin:0 auto;
+  align-self:center;
+  text-align:center;
+  line-height:1.1;
+}
+.qp-sport-card > svg {
+  position:absolute;
+  right:10px;
+  bottom:10px;
+}
+@media (max-width:767px) {
+  .qp-sport-card { display:flex; padding:5px 8px 7px; gap:4px; }
+  .qp-sport-card strong { width:calc(100% - 18px); font-size:10px; }
+  .qp-sport-card > svg { right:7px; bottom:7px; }
+}

@@ -1,6 +1,6 @@
 {
-  "name": "QuadraPlay",
-  "description": "Aplicativo de agendamento de jogos de tênis do Nosso Tênis.",
+  "name": "RacharHoje",
+  "description": "Agende seu horário esportivo com praticidade.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

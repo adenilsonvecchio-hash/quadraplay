@@ -57,10 +57,21 @@ body {
 .qp-brand-logo {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   line-height: 1;
-  white-space: nowrap;
   user-select: none;
+  width: min(286px, 100%);
+  max-width: 100%;
 }
+
+.qp-brand-logo__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.qp-brand-logo--compact { width: 154px; }
 
 .qp-brand-logo__wordmark { display:inline-flex; align-items:baseline; letter-spacing:-1.6px; }
 .qp-brand-logo__quadra { color:#0f1e36; font-size:21px; font-weight:700; letter-spacing:-1px; }
@@ -795,4 +806,49 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   .qp-sport-card { display:flex; padding:5px 8px 7px; gap:4px; }
   .qp-sport-card strong { width:calc(100% - 18px); font-size:10px; }
   .qp-sport-card > svg { right:7px; bottom:7px; }
+}
+
+/* v81 — nova identidade RacharHoje e símbolos esportivos maiores em amarelo. */
+.qp-brand-logo,
+.qp-standard-brand,
+.qp-global-header-brand,
+.qp-clean-home__brand,
+.qp-sport-picker__header .qp-standard-brand {
+  width:min(290px,100%);
+  max-width:100%;
+  overflow:visible;
+}
+.qp-brand-logo--compact { width:154px; }
+.qp-brand-logo__image { width:100%; height:auto; object-fit:contain; }
+.qp-multisports-label { display:none; }
+.qp-sport-card { --sport-color:#f5b400 !important; }
+.qp-sport-card .qp-sport-symbol--card {
+  width:72px;
+  height:72px;
+}
+.qp-sport-card .qp-sport-symbol--card img {
+  width:68px;
+  height:68px;
+  object-fit:contain;
+  filter:brightness(0) saturate(100%) invert(74%) sepia(99%) saturate(1361%) hue-rotate(359deg) brightness(101%) contrast(103%);
+}
+.qp-active-sport .qp-sport-symbol--header img {
+  filter:brightness(0) saturate(100%) invert(74%) sepia(99%) saturate(1361%) hue-rotate(359deg) brightness(101%) contrast(103%);
+}
+@media (max-width:767px) {
+  .qp-brand-logo,
+  .qp-standard-brand,
+  .qp-global-header-brand,
+  .qp-clean-home__brand,
+  .qp-sport-picker__header .qp-standard-brand { width:min(235px,74vw); }
+  .qp-brand-logo--compact { width:136px; }
+  .qp-sport-card .qp-sport-symbol--card { width:58px; height:58px; }
+  .qp-sport-card .qp-sport-symbol--card img { width:55px; height:55px; }
+}
+@media (max-height:680px) and (max-width:767px) {
+  .qp-brand-logo,
+  .qp-standard-brand,
+  .qp-sport-picker__header .qp-standard-brand { width:min(205px,68vw); }
+  .qp-sport-card .qp-sport-symbol--card { width:50px; height:50px; }
+  .qp-sport-card .qp-sport-symbol--card img { width:47px; height:47px; }
 }

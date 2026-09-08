@@ -218,7 +218,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
   const copyAccessCredentials = async () => {
     if (!accessCredentials) return;
-    const message = `QuadraPlay\nAcesse: https://quadraplay.centercalculos.com.br\n\nAcesso: ${accessCredentials.email}\nSenha provisória: ${accessCredentials.password}\n\nNo primeiro acesso, crie sua senha pessoal.`;
+    const message = `RacharHoje\nAcesse: https://quadraplay.centercalculos.com.br\n\nAcesso: ${accessCredentials.email}\nSenha provisória: ${accessCredentials.password}\n\nNo primeiro acesso, crie sua senha pessoal.`;
     let copied = false;
     try {
       if (navigator.clipboard && window.isSecureContext) {
@@ -378,7 +378,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     const printWindow = window.open('', '_blank', 'width=760,height=900');
     if (!printWindow) return;
     const cards = dailyMatches.map((match) => `<article><strong>${match.startTime} às ${match.endTime} — ${match.courtName}</strong><p>${match.player1Name} × ${match.player2Name}</p><small>${isTennis ? `Classe ${match.tennisClass} — ` : ''}${matchStatusLabel(match.status)}</small></article>`).join('');
-    printWindow.document.write(`<html><head><title>Jogos do dia</title><style>body{font-family:Arial;padding:32px;color:#101b3d}h1{margin-bottom:4px}header{border-bottom:3px solid #6d4aff;padding-bottom:16px;margin-bottom:20px}article{border:2px solid #d9deea;border-radius:14px;padding:16px;margin:12px 0}p{font-weight:700}small{color:#59627a}</style></head><body><header><h1>QuadraPlay — Jogos do dia</h1><div>${new Date(`${reportDate}T12:00:00`).toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}</div></header>${cards || '<p>Nenhum jogo agendado.</p>'}<strong>Total: ${dailyMatches.length} jogo${dailyMatches.length === 1 ? '' : 's'}</strong><script>window.onload=()=>window.print()<\/script></body></html>`);
+    printWindow.document.write(`<html><head><title>Jogos do dia</title><style>body{font-family:Arial;padding:32px;color:#101b3d}h1{margin-bottom:4px}header{border-bottom:3px solid #f5b400;padding-bottom:16px;margin-bottom:20px}article{border:2px solid #d9deea;border-radius:14px;padding:16px;margin:12px 0}p{font-weight:700}small{color:#59627a}</style></head><body><header><h1>RacharHoje — Jogos do dia</h1><div>${new Date(`${reportDate}T12:00:00`).toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })}</div></header>${cards || '<p>Nenhum jogo agendado.</p>'}<strong>Total: ${dailyMatches.length} jogo${dailyMatches.length === 1 ? '' : 's'}</strong><script>window.onload=()=>window.print()<\/script></body></html>`);
     printWindow.document.close();
   };
 
@@ -842,7 +842,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
             <p className="text-xs text-slate-500 mb-4">
               {editingPlayer
                 ? isTennis ? 'Atualize os dados e a classe do jogador no grupo.' : 'Atualize os dados do participante.'
-                : 'Informe os dados. O QuadraPlay criará e aprovará a conta sem enviar e-mail.'}
+                : 'Informe os dados. O RacharHoje criará e aprovará a conta sem enviar e-mail.'}
             </p>
 
             {playerError && (

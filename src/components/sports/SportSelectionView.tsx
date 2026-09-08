@@ -20,9 +20,6 @@ export const SportSelectionView: React.FC<SportSelectionViewProps> = ({ userName
         <h1>Escolha seu <em>esporte</em></h1>
         <small>Você poderá trocar de modalidade quando quiser.</small>
       </header>
-      <div className="qp-sport-picker__hero">
-        <img src="./quadraplay-athlete-hero-v69.png" alt="Atleta usando o QuadraPlay+ para agendar um horário" />
-      </div>
       <div className="qp-sport-picker__grid">
         {SPORTS.map((sport) => (
           <button key={sport.id} type="button" onClick={() => onSelect(sport.id)} className="qp-sport-card" style={{ '--sport-color': sport.color } as React.CSSProperties}>

@@ -23,7 +23,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
   };
 
   return (
-    <header className="sticky top-0 z-40 shrink-0 px-4 pt-4 pb-3 bg-[#f8f9ff]/95 backdrop-blur-xl">
+    <header className="qp-global-header sticky top-0 z-40 shrink-0 px-4 pt-4 pb-3 backdrop-blur-xl">
       <div className="grid grid-cols-[48px_1fr_48px] items-center gap-3">
         <button
           type="button"
@@ -49,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
             { tab: 'games' as const, label: 'Jogos agendados', icon: ListChecks },
             { tab: 'profile' as const, label: 'Perfil', icon: User },
           ].map(({ tab, label, icon: Icon }) => (
-            <button key={tab} type="button" onClick={() => navigate(tab)} className={`w-full flex items-center gap-3 rounded-[17px] px-3 py-3 text-left text-sm font-black ${activeTab === tab ? 'bg-violet-100 text-violet-700' : 'text-slate-700 hover:bg-slate-50'}`}>
+            <button key={tab} type="button" onClick={() => navigate(tab)} className={`qp-menu-item w-full flex items-center gap-3 rounded-[17px] px-3 py-3 text-left text-sm font-black ${activeTab === tab ? 'is-active' : ''}`}>
               <Icon className="w-5 h-5" /> {label}
             </button>
           ))}

@@ -14,9 +14,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onChangeTab }) 
       type="button"
       onClick={() => onChangeTab(tab)}
       aria-label={`Abrir ${label}`}
-      className={`qp-bottom-nav__button flex flex-col items-center justify-center min-w-[72px] h-[62px] rounded-2xl transition-all ${activeTab === tab ? 'text-[#6855df]' : 'text-[#a7abba]'}`}
+      className={`qp-bottom-nav__button flex flex-col items-center justify-center min-w-[72px] h-[62px] rounded-2xl transition-all ${activeTab === tab ? 'is-active text-[#f5ad00]' : 'text-[#7f8992]'}`}
     >
-      <span className={`grid place-items-center w-9 h-9 rounded-full ${activeTab === tab ? 'bg-[#eeeaff]' : ''}`}>{icon}</span>
+      <span className="grid place-items-center w-9 h-9 rounded-full">{icon}</span>
       <span className="max-w-[76px] text-center text-[9px] sm:text-[10px] font-bold leading-tight mt-0.5">{label}</span>
     </button>
   );

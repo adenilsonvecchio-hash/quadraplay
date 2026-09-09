@@ -2,6 +2,20 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## RacharHoje — versão 90: estatísticas dos últimos 20 jogos
+
+- O Perfil mostra vitórias, derrotas e percentual de aproveitamento.
+- Separa resultados jogados, W.O. e desistências.
+- Considera somente resultados confirmados pelos dois jogadores.
+- Jogos não concluídos não alteram o percentual de aproveitamento.
+
+## RacharHoje — versão 89: resultado em Meus Jogos
+
+- Depois do horário, a partida passa para **Histórico**.
+- O jogador pode informar o resultado diretamente em **Meus Jogos**.
+- O histórico mostra o placar por sets ou a ocorrência registrada.
+- O adversário pode confirmar ou contestar nessa mesma tela.
+
 ## RacharHoje — versão 88: resultados dos jogos
 
 - Em **Jogos agendados**, os participantes podem informar o placar depois do fim do horário.

@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { CalendarDays, CheckCircle2, Clock3, MapPin, Plus, XCircle } from 'lucide-react';
+import { AlertCircle, CalendarDays, CheckCircle2, Clock3, MapPin, Plus, Trophy, XCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { Match } from '../../types';
+import { Match, MatchOutcome, MatchScoreSet } from '../../types';
 import { storageService } from '../../services/storageService';
 import { supabaseAgendaService } from '../../services/supabaseAgendaService';
 import { formatFriendlyDate, getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
 import { ConfirmModal } from '../common/ConfirmModal';
 import { getActiveSportId } from '../../data/sports';
+import { MatchResultModal } from './MatchResultModal';
 
 interface MyMatchesViewProps { onStartBooking: () => void; }
 type SubTab = 'upcoming' | 'past' | 'cancelled';
@@ -26,6 +27,7 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState<Match | null>(null);
+  const [resultMatch, setResultMatch] = useState<Match | null>(null);
 
   const loadMatches = useCallback(async () => {
     if (!currentUser) return;
@@ -66,7 +68,7 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
     const result: Record<SubTab, Match[]> = { upcoming: [], past: [], cancelled: [] };
     matches.forEach((match) => {
       if (match.status === 'cancelled') result.cancelled.push(match);
-      else if (match.status === 'completed' || match.date < today || isSlotInPast(match.date, match.startTime)) result.past.push(match);
+      else if (match.status === 'completed' || match.date < today || isSlotInPast(match.date, match.endTime)) result.past.push(match);
       else result.upcoming.push(match);
     });
     result.upcoming.sort((a, b) => `${a.date} ${a.startTime}`.localeCompare(`${b.date} ${b.startTime}`));
@@ -108,6 +110,49 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
     } finally { setBusyId(null); }
   };
 
+  const saveResult = async (outcome: MatchOutcome, score: MatchScoreSet[]) => {
+    if (!resultMatch) return;
+    setBusyId(resultMatch.id); setError('');
+    try {
+      if (usingSupabase) await supabaseAgendaService.submitMatchResult(resultMatch.id, currentUser.id, outcome, score);
+      else {
+        const result = storageService.submitMatchResult(resultMatch.id, currentUser.id, outcome, score);
+        if (!result.success) throw new Error(result.error);
+      }
+      setResultMatch(null);
+      await loadMatches();
+    } catch { setError('Não foi possível registrar o resultado.'); }
+    finally { setBusyId(null); }
+  };
+
+  const reviewResult = async (match: Match, confirm: boolean) => {
+    setBusyId(match.id); setError('');
+    try {
+      if (usingSupabase) await supabaseAgendaService.reviewMatchResult(match.id, currentUser.id, confirm);
+      else {
+        const result = storageService.reviewMatchResult(match.id, currentUser.id, confirm);
+        if (!result.success) throw new Error(result.error);
+      }
+      await loadMatches();
+    } catch { setError('Não foi possível analisar o resultado.'); }
+    finally { setBusyId(null); }
+  };
+
+  const outcomeLabel = (match: Match) => {
+    const labels: Partial<Record<MatchOutcome, string>> = {
+      not_played: 'Jogo não aconteceu',
+      walkover_player1: `W.O. — vitória de ${match.player1Name}`,
+      walkover_player2: `W.O. — vitória de ${match.player2Name}`,
+      double_walkover: 'W.O. duplo',
+      retirement_player1: `Desistência — vitória de ${match.player1Name}`,
+      retirement_player2: `Desistência — vitória de ${match.player2Name}`,
+      interrupted: 'Jogo interrompido',
+      reschedule: 'Partida será remarcada',
+    };
+    if (match.resultOutcome === 'played') return (match.resultScore || []).map((set) => `${set.player1}×${set.player2}`).join(' | ');
+    return match.resultOutcome ? labels[match.resultOutcome] : '';
+  };
+
   return (
     <div className="space-y-4 pb-8">
       <div className="flex items-end justify-between gap-3 pt-1">
@@ -131,6 +176,8 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
           const incoming = match.status === 'pending' && match.player2Id === currentUser.id;
           const outgoing = match.status === 'pending' && match.player1Id === currentUser.id;
           const statusLabel = incoming ? 'Convite recebido' : outgoing ? 'Aguardando adversário' : match.status === 'cancelled' ? (match.cancelReason === 'Convite recusado pelo adversário' ? 'Convite recusado' : 'Cancelado') : activeTab === 'past' ? 'Realizado' : 'Confirmado';
+          const canSubmitResult = activeTab === 'past' && match.status === 'scheduled' && (!match.resultStatus || match.resultStatus === 'disputed');
+          const canReviewResult = activeTab === 'past' && match.resultStatus === 'pending_confirmation' && match.resultSubmittedBy !== currentUser.id;
           return (
             <article key={safeText(match.id, `${match.date}-${match.startTime}`)} className="qp-card rounded-[26px] p-4">
               <div className="flex items-center justify-between gap-3">
@@ -143,6 +190,15 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
               </div>
               {outgoing && <div className="mt-3 rounded-[15px] bg-orange-50 px-3 py-2 text-[11px] font-bold text-orange-700">O horário está reservado provisoriamente. A partida será confirmada quando o adversário aceitar.</div>}
               {incoming && <div className="mt-3 rounded-[15px] bg-amber-50 px-3 py-2 text-[11px] font-bold text-amber-700">Você recebeu este convite. Aceite para confirmar a partida ou recuse para liberar o horário.</div>}
+              {activeTab === 'past' && match.resultStatus && <div className={`mt-3 rounded-[16px] p-3 ${match.resultStatus === 'disputed' ? 'bg-rose-50 text-rose-700' : match.resultStatus === 'confirmed' ? 'bg-emerald-50 text-emerald-800' : 'bg-blue-50 text-blue-800'}`}>
+                <div className="flex items-center gap-2 text-sm font-black"><Trophy className="w-4 h-4" />Resultado: {outcomeLabel(match)}</div>
+                <p className="mt-1 text-[10px] font-black uppercase tracking-wide">{match.resultStatus === 'confirmed' ? 'Confirmado pelos jogadores' : match.resultStatus === 'disputed' ? 'Resultado contestado' : 'Aguardando confirmação do adversário'}</p>
+              </div>}
+              {canSubmitResult && <button type="button" disabled={busyId === match.id} onClick={() => setResultMatch(match)} className="mt-3 w-full rounded-[15px] py-2.5 text-xs font-black bg-[#101b3d] text-white flex items-center justify-center gap-2 disabled:opacity-50"><Trophy className="w-4 h-4" />{match.resultStatus === 'disputed' ? 'Corrigir resultado' : 'Informar resultado'}</button>}
+              {canReviewResult && <div className="mt-3 grid grid-cols-2 gap-2">
+                <button type="button" disabled={busyId === match.id} onClick={() => void reviewResult(match, false)} className="rounded-[15px] py-2.5 text-xs font-black bg-rose-50 text-rose-700 flex items-center justify-center gap-1"><AlertCircle className="w-4 h-4" />Contestar</button>
+                <button type="button" disabled={busyId === match.id} onClick={() => void reviewResult(match, true)} className="rounded-[15px] py-2.5 text-xs font-black bg-emerald-500 text-white flex items-center justify-center gap-1"><CheckCircle2 className="w-4 h-4" />Confirmar</button>
+              </div>}
               {activeTab === 'upcoming' && <div className="mt-4 pt-3 border-t border-slate-100 flex gap-2">
                 {incoming ? <><button type="button" disabled={busyId === match.id} onClick={() => void respond(match, false)} className="flex-1 qp-soft rounded-[15px] py-2.5 text-xs font-black text-rose-600 disabled:opacity-50">Recusar</button><button type="button" disabled={busyId === match.id} onClick={() => void respond(match, true)} className="flex-1 rounded-[15px] py-2.5 text-xs font-black bg-emerald-500 text-white flex items-center justify-center gap-1 disabled:opacity-50"><CheckCircle2 className="w-4 h-4"/>{busyId === match.id ? 'Salvando...' : 'Aceitar'}</button></> : <button type="button" disabled={busyId === match.id} onClick={() => setCancelling(match)} className="w-full qp-soft rounded-[15px] py-2.5 text-xs font-black text-rose-600 flex items-center justify-center gap-1 disabled:opacity-50"><XCircle className="w-4 h-4"/>Cancelar partida</button>}
               </div>}
@@ -152,6 +208,7 @@ export const MyMatchesView: React.FC<MyMatchesViewProps> = ({ onStartBooking }) 
       </div>
 
       <ConfirmModal isOpen={!!cancelling} title="Cancelar agendamento?" description={cancelling ? `Cancelar o jogo com ${safeText(cancelling.player1Id === currentUser.id ? cancelling.player2Name : cancelling.player1Name, 'Adversário')} em ${safeDate(cancelling.date)}?` : ''} confirmLabel="Cancelar jogo" cancelLabel="Manter jogo" isDestructive showReasonInput onConfirm={(reason) => void confirmCancellation(reason)} onClose={() => setCancelling(null)} />
+      {resultMatch && <MatchResultModal match={resultMatch} isTennis={isTennis} busy={busyId === resultMatch.id} onClose={() => setResultMatch(null)} onSubmit={(outcome, score) => void saveResult(outcome, score)} />}
     </div>
   );
 };

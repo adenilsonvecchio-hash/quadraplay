@@ -133,7 +133,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onOpenAdmin }) => {
   const displayEmail = typeof currentUser.email === 'string' ? currentUser.email : '';
 
   return <div className="space-y-4 pb-8">
-    <section className="pt-1"><h2 className="text-2xl font-black tracking-tight">Perfil Esportivo</h2><p className="text-xs text-slate-500 mt-1">Seus dados e atividade no JogarHoje.</p></section>
+    <section className="pt-1"><h2 className="text-2xl font-black tracking-tight">Perfil Esportivo</h2><p className="text-xs text-slate-500 mt-1">Seus dados e atividade no SAQUE ON.</p></section>
 
     <section className="qp-card rounded-[28px] p-4">
       <div className="flex items-center gap-3">

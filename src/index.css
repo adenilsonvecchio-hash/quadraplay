@@ -1330,3 +1330,16 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   .qp-brand-logo__jogar-wordmark strong { font-size:clamp(23px,9.5vw,39px); letter-spacing:-1.5px; }
   .qp-brand-logo__jogar-wordmark small { margin-top:4px; font-size:7px; letter-spacing:1.4px; }
 }
+
+/* v101 — identidade oficial SAQUE ON. */
+.qp-brand-logo:not(.qp-brand-logo--sport) .qp-brand-logo__lockup {
+  display:block;
+  width:100%;
+}
+.qp-brand-logo__saque-on {
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 5px 7px rgba(3,38,77,.12));
+}

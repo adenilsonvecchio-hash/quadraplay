@@ -28,7 +28,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
   ] as const;
 
   return (
-    <section className="qp-clean-home" aria-label="Início do JogarHoje">
+    <section className="qp-clean-home" aria-label="Início do SAQUE ON">
       <header className="qp-clean-home__header">
         <div className="qp-clean-home__topline">
 <div className="qp-header-brands" aria-hidden="true" />

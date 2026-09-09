@@ -2,6 +2,15 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## SAQUE ON — versão 101: nova identidade oficial
+
+- A marca passa a se chamar SAQUE ON.
+- Novo logo esportivo moderno, com SAQUE em azul-marinho e ON em amarelo.
+- O símbolo combina uma bola em movimento com o botão de ligar.
+- O logo tem fundo transparente e foi otimizado para leitura no celular.
+- Os textos do aplicativo, login, perfil, convites e relatórios foram atualizados.
+- Dentro de cada modalidade, o cabeçalho continua mostrando o esporte selecionado.
+
 ## JogarHoje — versão 100: nova marca e visual mais limpo
 
 - A marca RacharHoje passa a se chamar JogarHoje.

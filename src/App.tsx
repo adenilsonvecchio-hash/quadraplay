@@ -49,7 +49,7 @@ function MainApp() {
     return () => window.removeEventListener('quadraplay:navigate-profile', openProfile);
   }, []);
 
-  if (authLoading) return <div className="min-h-screen grid place-items-center bg-[#eef1f8] text-[#f5b400] font-black">Carregando JogarHoje...</div>;
+  if (authLoading) return <div className="min-h-screen grid place-items-center bg-[#eef1f8] text-[#f5b400] font-black">Carregando SAQUE ON...</div>;
   if (passwordSetupMode) return <PasswordResetView mode={passwordSetupMode} />;
   if (!currentUser) return <LoginView onSuccess={() => setActiveTab('home')} />;
   if (currentUser.mustChangePassword) return <FirstAccessPasswordView />;

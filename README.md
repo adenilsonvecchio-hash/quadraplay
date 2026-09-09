@@ -2,6 +2,13 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## RacharHoje — versão 96: símbolo no lugar do mascote
+
+- O mascote multiesportes aparece antes da seleção da modalidade.
+- Dentro do aplicativo, o mascote desaparece da logo.
+- O símbolo do esporte escolhido ocupa o lugar do mascote ao lado de RacharHoje.
+- A troca de modalidade atualiza o símbolo automaticamente.
+
 ## RacharHoje — versão 95: contorno azul e mascote por esporte
 
 - Símbolos amarelos receberam contorno azul-marinho, reduzindo o excesso de amarelo.

@@ -2,6 +2,13 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## RacharHoje — versão 91: elementos maiores na seleção de esporte
+
+- Mascote ampliado no conjunto da marca.
+- Símbolos das modalidades maiores e mais visíveis.
+- Nomes dos esportes com fonte maior.
+- Ajuste responsivo para preservar o enquadramento em celulares menores.
+
 ## RacharHoje — versão 90: estatísticas dos últimos 20 jogos
 
 - O Perfil mostra vitórias, derrotas e percentual de aproveitamento.

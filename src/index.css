@@ -962,3 +962,36 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   }
   .qp-sport-card { background:rgba(247,249,252,.88); }
 }
+
+/* v91 — mascote, símbolos e nomes maiores na escolha da modalidade. */
+.qp-sport-picker__header .qp-standard-brand { width:min(390px,100%); }
+.qp-sport-picker__header .qp-brand-logo__mascot {
+  flex-basis:31%;
+  width:31%;
+  max-height:104px;
+}
+.qp-sport-picker .qp-sport-card .qp-sport-symbol--card { width:88px; height:88px; }
+.qp-sport-picker .qp-sport-card .qp-sport-symbol--card img { width:84px; height:84px; }
+.qp-sport-picker .qp-sport-card strong { font-size:15px; line-height:1.15; }
+@media (max-width:767px) {
+  .qp-sport-picker__header .qp-standard-brand { width:min(310px,96vw); }
+  .qp-sport-picker__header .qp-brand-logo__mascot {
+    flex-basis:30%;
+    width:30%;
+    max-height:82px;
+  }
+  .qp-sport-picker .qp-sport-card .qp-sport-symbol--card { width:70px; height:70px; }
+  .qp-sport-picker .qp-sport-card .qp-sport-symbol--card img { width:67px; height:67px; }
+  .qp-sport-picker .qp-sport-card strong {
+    width:calc(100% - 14px);
+    font-size:12.5px;
+    line-height:1.12;
+  }
+}
+@media (max-width:359px), (max-height:680px) and (max-width:767px) {
+  .qp-sport-picker__header .qp-standard-brand { width:min(278px,91vw); }
+  .qp-sport-picker__header .qp-brand-logo__mascot { max-height:72px; }
+  .qp-sport-picker .qp-sport-card .qp-sport-symbol--card { width:58px; height:58px; }
+  .qp-sport-picker .qp-sport-card .qp-sport-symbol--card img { width:55px; height:55px; }
+  .qp-sport-picker .qp-sport-card strong { font-size:10.5px; }
+}

@@ -33,7 +33,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
         <div className="qp-clean-home__topline">
 <div className="qp-header-brands" aria-hidden="true" />
           <div className="qp-clean-home__title">
-            <BrandLogo className="qp-standard-brand" />
+            <BrandLogo className="qp-standard-brand" sport={activeSport} />
             <span className="qp-multisports-label">AGENDAMENTO DE HORÁRIOS</span>
           </div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />

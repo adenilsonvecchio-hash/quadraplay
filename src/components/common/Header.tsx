@@ -36,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
         </button>
 
         <div className="justify-self-center qp-global-brand-stack">
-          <BrandLogo className="qp-standard-brand" />
+          <BrandLogo className="qp-standard-brand" sport={activeSport} />
           <span className="qp-multisports-label">AGENDAMENTO DE HORÁRIOS</span>
         </div>
 

@@ -1051,3 +1051,50 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   .qp-sport-picker__header .qp-standard-brand { width:min(300px,94vw); }
   .qp-global-brand-stack .qp-brand-logo { width:min(230px,calc(100vw - 118px)); }
 }
+
+/* v95 — contorno azul e mascote identificado pela modalidade ativa. */
+.qp-sport-picker .qp-sport-card .qp-sport-symbol--card img {
+  filter:saturate(1.12) contrast(1.08)
+    drop-shadow(1.5px 0 0 #063b74)
+    drop-shadow(-1.5px 0 0 #063b74)
+    drop-shadow(0 1.5px 0 #063b74)
+    drop-shadow(0 -1.5px 0 #063b74)
+    drop-shadow(0 3px 0 #d99400)
+    drop-shadow(0 7px 7px rgba(38,73,119,.25));
+}
+.qp-sport-picker .qp-sport-card:hover .qp-sport-symbol--card img,
+.qp-sport-picker .qp-sport-card:focus-visible .qp-sport-symbol--card img {
+  filter:saturate(1.18) brightness(1.04) contrast(1.1)
+    drop-shadow(1.5px 0 0 #063b74)
+    drop-shadow(-1.5px 0 0 #063b74)
+    drop-shadow(0 1.5px 0 #063b74)
+    drop-shadow(0 -1.5px 0 #063b74)
+    drop-shadow(0 4px 0 #d58f00)
+    drop-shadow(0 9px 9px rgba(38,73,119,.3));
+}
+.qp-brand-logo__lockup { position:relative; }
+.qp-brand-logo__sport-badge {
+  position:absolute;
+  z-index:3;
+  left:24%;
+  bottom:5%;
+  width:17%;
+  aspect-ratio:1;
+  display:grid;
+  place-items:center;
+  border:2px solid #063b74;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 25%,#fff7cf 0%,#ffc928 48%,#e39c00 100%);
+  box-shadow:0 3px 0 #042b57,0 7px 11px rgba(3,38,77,.28),inset 0 2px 2px rgba(255,255,255,.85);
+  transform:rotate(-7deg);
+  overflow:hidden;
+}
+.qp-brand-logo__sport-badge img {
+  width:78%;
+  height:78%;
+  object-fit:contain;
+  filter:drop-shadow(1px 0 0 #063b74) drop-shadow(-1px 0 0 #063b74) drop-shadow(0 2px 2px rgba(3,38,77,.32));
+}
+@media (max-width:767px) {
+  .qp-brand-logo__sport-badge { border-width:1.5px; box-shadow:0 2px 0 #042b57,0 5px 8px rgba(3,38,77,.25),inset 0 1px 2px rgba(255,255,255,.85); }
+}

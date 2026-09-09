@@ -2,6 +2,12 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## RacharHoje — versão 95: contorno azul e mascote por esporte
+
+- Símbolos amarelos receberam contorno azul-marinho, reduzindo o excesso de amarelo.
+- Após a escolha, o mascote recebe um selo 3D com a modalidade ativa.
+- O selo muda automaticamente ao trocar de esporte.
+
 ## RacharHoje — versão 94: modalidades nas cores do logo
 
 - Nomes das modalidades no azul-marinho oficial da marca.

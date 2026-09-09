@@ -1,4 +1,4 @@
-import { BlockedSlot, Court, CourtConfig, CourtSlot, Match, Player, TennisClass } from '../types';
+import { BlockedSlot, Court, CourtConfig, CourtSlot, Match, MatchOutcome, MatchScoreSet, Player, TennisClass } from '../types';
 import { supabase } from '../lib/supabase';
 import { generateDaySlots, isSlotInPast } from '../utils/dateUtils';
 import { getActiveSportId } from '../data/sports';
@@ -43,6 +43,14 @@ const mapMatch = (
   cancelledAt: row.cancelado_em || undefined,
   cancelledBy: playerNames.get(row.cancelado_por) || undefined,
   cancelReason: row.motivo_cancelamento || undefined,
+  resultOutcome: row.resultado_tipo || undefined,
+  resultScore: Array.isArray(row.resultado_placar) ? row.resultado_placar : undefined,
+  resultStatus: row.resultado_status || undefined,
+  resultSubmittedBy: safeString(row?.resultado_enviado_por) || undefined,
+  resultSubmittedAt: row.resultado_enviado_em || undefined,
+  resultConfirmedBy: safeString(row?.resultado_confirmado_por) || undefined,
+  resultConfirmedAt: row.resultado_confirmado_em || undefined,
+  resultDisputeReason: row.resultado_contestacao || undefined,
 });
 
 // Consulta apenas as colunas da partida. Os nomes de jogadores e quadras são
@@ -50,7 +58,9 @@ const mapMatch = (
 // que o PostgREST gera para cada banco Supabase.
 const matchSelect = `
   id, grupo_id, modalidade, quadra_id, jogador_1_id, jogador_2_id, classe, data,
-  hora_inicio, hora_fim, status, criado_em, cancelado_por, cancelado_em, motivo_cancelamento
+  hora_inicio, hora_fim, status, criado_em, cancelado_por, cancelado_em, motivo_cancelamento,
+  resultado_tipo, resultado_placar, resultado_status, resultado_enviado_por,
+  resultado_enviado_em, resultado_confirmado_por, resultado_confirmado_em, resultado_contestacao
 `;
 
 const hydrateMatches = async (rows: any[] | null | undefined): Promise<Match[]> => {
@@ -398,6 +408,52 @@ export const supabaseAgendaService = {
       .maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Esta partida já foi alterada.');
+  },
+
+  async submitMatchResult(matchId: string, playerId: string, outcome: MatchOutcome, score: MatchScoreSet[]): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { data, error } = await supabase
+      .from('partidas')
+      .update({
+        resultado_tipo: outcome,
+        resultado_placar: score,
+        resultado_status: 'pending_confirmation',
+        resultado_enviado_por: playerId,
+        resultado_enviado_em: new Date().toISOString(),
+        resultado_confirmado_por: null,
+        resultado_confirmado_em: null,
+        resultado_contestacao: null,
+      })
+      .eq('id', matchId)
+      .eq('status', 'ACEITA')
+      .or(`jogador_1_id.eq.${playerId},jogador_2_id.eq.${playerId}`)
+      .select('id')
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('O resultado não pôde ser registrado.');
+  },
+
+  async reviewMatchResult(matchId: string, playerId: string, confirm: boolean, disputeReason?: string): Promise<void> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { data, error } = await supabase
+      .from('partidas')
+      .update(confirm ? {
+        resultado_status: 'confirmed',
+        resultado_confirmado_por: playerId,
+        resultado_confirmado_em: new Date().toISOString(),
+        status: 'CONCLUIDA',
+      } : {
+        resultado_status: 'disputed',
+        resultado_contestacao: disputeReason?.trim() || 'Resultado contestado pelo adversário',
+      })
+      .eq('id', matchId)
+      .eq('resultado_status', 'pending_confirmation')
+      .neq('resultado_enviado_por', playerId)
+      .or(`jogador_1_id.eq.${playerId},jogador_2_id.eq.${playerId}`)
+      .select('id')
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) throw new Error('Este resultado já foi analisado ou não pertence ao adversário.');
   },
 
   async getSchedule(groupId: string, date: string, courtId: string): Promise<CourtSlot[]> {

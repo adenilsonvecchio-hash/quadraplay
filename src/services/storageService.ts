@@ -1,4 +1,4 @@
-import { Player, Match, BlockedSlot, CourtConfig, TennisClass, CourtSlot, Court } from '../types';
+import { Player, Match, MatchOutcome, MatchScoreSet, BlockedSlot, CourtConfig, TennisClass, CourtSlot, Court } from '../types';
 import { INITIAL_PLAYERS, generateInitialMatches, generateInitialBlockedSlots, DEFAULT_COURT_CONFIG, COURTS } from '../data/initialData';
 import { getBrasiliaToday, isSlotInPast, generateDaySlots, isBeforeDate } from '../utils/dateUtils';
 
@@ -423,6 +423,48 @@ class StorageService {
     if (match.status !== 'pending') return { success: false, error: 'Este convite já foi respondido.' };
     if (match.player2Id !== playerId) return { success: false, error: 'Somente o jogador convidado pode responder.' };
     this.matches[index] = { ...match, status: accept ? 'scheduled' : 'cancelled', ...(accept ? {} : { cancelledAt: new Date().toISOString(), cancelledBy: playerId, cancelReason: 'Convite recusado' }) };
+    this.saveMatches();
+    return { success: true };
+  }
+
+  public submitMatchResult(matchId: string, playerId: string, outcome: MatchOutcome, score: MatchScoreSet[]): { success: boolean; error?: string } {
+    const index = this.matches.findIndex((match) => match.id === matchId);
+    if (index === -1) return { success: false, error: 'Jogo não encontrado.' };
+    const match = this.matches[index];
+    if (match.status !== 'scheduled') return { success: false, error: 'Somente jogos confirmados aceitam resultado.' };
+    if (match.player1Id !== playerId && match.player2Id !== playerId) return { success: false, error: 'Você não participa deste jogo.' };
+    this.matches[index] = {
+      ...match,
+      resultOutcome: outcome,
+      resultScore: score,
+      resultStatus: 'pending_confirmation',
+      resultSubmittedBy: playerId,
+      resultSubmittedAt: new Date().toISOString(),
+      resultConfirmedBy: undefined,
+      resultConfirmedAt: undefined,
+      resultDisputeReason: undefined,
+    };
+    this.saveMatches();
+    return { success: true };
+  }
+
+  public reviewMatchResult(matchId: string, playerId: string, confirm: boolean, disputeReason?: string): { success: boolean; error?: string } {
+    const index = this.matches.findIndex((match) => match.id === matchId);
+    if (index === -1) return { success: false, error: 'Jogo não encontrado.' };
+    const match = this.matches[index];
+    if (match.resultStatus !== 'pending_confirmation' || match.resultSubmittedBy === playerId) return { success: false, error: 'Este resultado não está disponível para sua confirmação.' };
+    if (match.player1Id !== playerId && match.player2Id !== playerId) return { success: false, error: 'Você não participa deste jogo.' };
+    this.matches[index] = confirm ? {
+      ...match,
+      status: 'completed',
+      resultStatus: 'confirmed',
+      resultConfirmedBy: playerId,
+      resultConfirmedAt: new Date().toISOString(),
+    } : {
+      ...match,
+      resultStatus: 'disputed',
+      resultDisputeReason: disputeReason?.trim() || 'Resultado contestado pelo adversário',
+    };
     this.saveMatches();
     return { success: true };
   }

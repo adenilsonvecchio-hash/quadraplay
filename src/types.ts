@@ -13,6 +13,22 @@ export interface Player {
 }
 
 export type MatchStatus = 'pending' | 'scheduled' | 'completed' | 'cancelled';
+export type MatchResultStatus = 'pending_confirmation' | 'confirmed' | 'disputed';
+export type MatchOutcome =
+  | 'played'
+  | 'not_played'
+  | 'walkover_player1'
+  | 'walkover_player2'
+  | 'double_walkover'
+  | 'retirement_player1'
+  | 'retirement_player2'
+  | 'interrupted'
+  | 'reschedule';
+
+export interface MatchScoreSet {
+  player1: number;
+  player2: number;
+}
 
 export interface Court {
   id: string;
@@ -38,6 +54,14 @@ export interface Match {
   cancelledAt?: string;
   cancelledBy?: string;
   cancelReason?: string;
+  resultOutcome?: MatchOutcome;
+  resultScore?: MatchScoreSet[];
+  resultStatus?: MatchResultStatus;
+  resultSubmittedBy?: string;
+  resultSubmittedAt?: string;
+  resultConfirmedBy?: string;
+  resultConfirmedAt?: string;
+  resultDisputeReason?: string;
 }
 
 export interface CourtSlot {

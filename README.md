@@ -2,6 +2,14 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## RacharHoje — versão 88: resultados dos jogos
+
+- Em **Jogos agendados**, os participantes podem informar o placar depois do fim do horário.
+- Tênis registra até três sets; as outras modalidades registram o placar final.
+- Há opções para jogo não realizado, W.O., W.O. duplo, desistência, interrupção e remarcação.
+- O adversário deve confirmar o registro; em caso de discordância, pode contestá-lo.
+- Antes de publicar, execute `supabase/migrations/010_resultados_partidas.sql` no Supabase.
+
 # QuadraPlay+ — versão 66 Agenda Semanal
 
 Esta versão cria uma nova visualização semanal da Agenda, com dias em colunas, horários em linhas, navegação entre semanas e cores para horários disponíveis, reservados, aguardando confirmação e bloqueados. As funções e telas da versão 65 foram preservadas.

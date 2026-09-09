@@ -1213,3 +1213,45 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
     text-shadow:0 1px 0 #d99100,0 3px 0 #063b74,0 5px 7px rgba(3,38,77,.28);
   }
 }
+
+/* v99 — saudação mais humana com raquete de tênis animada. */
+.qp-friendly-greeting {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.qp-clean-home__intro .qp-friendly-greeting h1 {
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:0 .25em;
+}
+.qp-friendly-greeting h1 span {
+  color:#063b74;
+  font-size:inherit;
+  font-weight:950;
+  letter-spacing:inherit;
+}
+.qp-friendly-greeting__racket {
+  width:clamp(52px,6vw,82px);
+  height:clamp(52px,6vw,82px);
+  object-fit:contain;
+  transform-origin:25% 82%;
+  filter:drop-shadow(0 7px 7px rgba(3,38,77,.24));
+  animation:qp-racket-wave 2.15s ease-in-out infinite;
+  will-change:transform;
+}
+@keyframes qp-racket-wave {
+  0%,100% { transform:rotate(-7deg) translateY(1px); }
+  25% { transform:rotate(8deg) translateY(-3px); }
+  48% { transform:rotate(-3deg) translateY(0); }
+  68% { transform:rotate(6deg) translateY(-2px); }
+}
+@media (max-width:767px) {
+  .qp-friendly-greeting { gap:5px; }
+  .qp-clean-home__intro .qp-friendly-greeting h1 { max-width:225px; font-size:19px; line-height:1.08; }
+  .qp-friendly-greeting__racket { width:49px; height:49px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .qp-friendly-greeting__racket { animation:none; }
+}

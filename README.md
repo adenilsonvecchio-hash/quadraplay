@@ -2,6 +2,13 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## RacharHoje — versão 99: saudação humanizada
+
+- A abertura agora diz “Olá, [nome], bora pro play?”.
+- No tênis, uma raquete realista azul e amarela aparece ao final da frase.
+- A raquete faz um movimento suave de convite e respeita a preferência de movimento reduzido do aparelho.
+- O apoio foi atualizado para “Seu próximo jogo começa aqui.”.
+
 ## RacharHoje — versão 98: interrogação grande no logo
 
 - A marca principal passa a ser apresentada como RacharHoje?.

@@ -43,8 +43,13 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
       <div className="qp-clean-home__panel">
         <div className="qp-clean-home__intro">
           <div>
-            <h1>Olá, {firstName}</h1>
-            <p>Organize seu próximo horário</p>
+            <div className="qp-friendly-greeting">
+              <h1>Olá, {firstName}, <span>bora pro play?</span></h1>
+              {activeSport.id === 'tenis' && (
+                <img className="qp-friendly-greeting__racket" src="./raquete-tenis-realista-v99.png" alt="" aria-hidden="true" />
+              )}
+            </div>
+            <p>Seu próximo jogo começa aqui.</p>
           </div>
           <button type="button" className="qp-active-sport" onClick={onChangeSport} aria-label={`Trocar modalidade. Atual: ${activeSport.name}`}>
             <SportSymbol sport={activeSport} size="header" />

@@ -509,6 +509,37 @@ button.qp-slot:active { transform:scale(.97); }
   .qp-sport-card strong { font-size:9px; }
 }
 
+/* v94 — cores oficiais e acabamento 3D nas modalidades. */
+.qp-sport-picker .qp-sport-card strong {
+  color:#063b74;
+  font-weight:950;
+  letter-spacing:-.15px;
+  text-shadow:0 1px 0 rgba(255,255,255,.95);
+}
+.qp-sport-picker .qp-sport-card .qp-sport-symbol--card {
+  background:radial-gradient(circle at 38% 28%,#fff9df 0%,#fff3b8 36%,rgba(255,190,0,.12) 70%,transparent 72%);
+  border:0;
+  box-shadow:none;
+  overflow:visible;
+}
+.qp-sport-picker .qp-sport-card .qp-sport-symbol--card img {
+  filter:saturate(1.3) contrast(1.06)
+    drop-shadow(0 1px 0 #ffe06a)
+    drop-shadow(0 3px 0 #d99400)
+    drop-shadow(0 7px 7px rgba(191,129,0,.28));
+  transform:translateY(-2px);
+  transition:transform .18s ease,filter .18s ease;
+}
+.qp-sport-picker .qp-sport-card:hover .qp-sport-symbol--card img,
+.qp-sport-picker .qp-sport-card:focus-visible .qp-sport-symbol--card img {
+  filter:saturate(1.38) brightness(1.05) contrast(1.08)
+    drop-shadow(0 1px 0 #ffe784)
+    drop-shadow(0 4px 0 #d58f00)
+    drop-shadow(0 9px 9px rgba(177,116,0,.34));
+  transform:translateY(-4px) scale(1.05);
+}
+.qp-sport-picker .qp-sport-card > svg { color:#063b74; }
+
 /* v70 — interface neumórfica clara, sem banner fotográfico. */
 .qp-sport-picker {
   background:linear-gradient(145deg,#edf1f3 0%,#e4e9ec 52%,#f2f5f6 100%);
@@ -994,4 +1025,29 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   .qp-sport-picker .qp-sport-card .qp-sport-symbol--card { width:58px; height:58px; }
   .qp-sport-picker .qp-sport-card .qp-sport-symbol--card img { width:55px; height:55px; }
   .qp-sport-picker .qp-sport-card strong { font-size:10.5px; }
+}
+
+/* v92 — logo oficial multiesportes integrado. */
+.qp-brand-logo__complete {
+  display:block;
+  width:100%;
+  height:auto;
+  object-fit:contain;
+  mix-blend-mode:multiply;
+}
+.qp-brand-logo__lockup { gap:0; }
+.qp-sport-picker__header .qp-standard-brand { width:min(430px,100%); }
+.qp-global-brand-stack .qp-brand-logo { width:min(360px,calc(100vw - 142px)); }
+.qp-clean-home__title .qp-brand-logo { width:min(370px,calc(100vw - 96px)); }
+@media (max-width:767px) {
+  .qp-brand-logo,
+  .qp-standard-brand,
+  .qp-sport-picker__header .qp-standard-brand { width:min(330px,96vw); }
+  .qp-global-brand-stack .qp-brand-logo { width:min(260px,calc(100vw - 130px)); }
+  .qp-clean-home__title .qp-brand-logo { width:min(290px,calc(100vw - 72px)); }
+  .qp-brand-logo--compact { width:205px; }
+}
+@media (max-width:359px) {
+  .qp-sport-picker__header .qp-standard-brand { width:min(300px,94vw); }
+  .qp-global-brand-stack .qp-brand-logo { width:min(230px,calc(100vw - 118px)); }
 }

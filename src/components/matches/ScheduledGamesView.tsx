@@ -20,9 +20,17 @@ export const ScheduledGamesView: React.FC = () => {
   const [resultMatch, setResultMatch] = useState<Match | null>(null);
 
   const load = async () => {
+    if (!currentUser) {
+      setMatches([]);
+      setLoading(false);
+      return;
+    }
     try {
       setLoadError('');
-      setMatches(usingSupabase && groupId ? await supabaseAgendaService.getMatches(groupId) : storageService.getMatches());
+      const playerMatches = usingSupabase && groupId
+        ? await supabaseAgendaService.getMatchesForUser(groupId, currentUser.id)
+        : storageService.getMatches().filter((match) => match.player1Id === currentUser.id || match.player2Id === currentUser.id);
+      setMatches(playerMatches);
     } catch {
       setLoadError('Não foi possível carregar os jogos do banco.');
     } finally {
@@ -33,7 +41,7 @@ export const ScheduledGamesView: React.FC = () => {
     void load();
     if (usingSupabase && groupId) return supabaseAgendaService.subscribeToMatches(groupId, () => void load());
     return storageService.subscribe(() => void load());
-  }, [usingSupabase, groupId]);
+  }, [usingSupabase, groupId, currentUser?.id]);
 
   const visibleMatches = useMemo(() => {
     const today = getBrasiliaToday();

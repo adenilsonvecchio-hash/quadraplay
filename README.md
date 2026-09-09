@@ -2,6 +2,25 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## RacharHoje — versão 94: modalidades nas cores do logo
+
+- Nomes das modalidades no azul-marinho oficial da marca.
+- Símbolos no amarelo dourado do logo.
+- Acabamento 3D com brilho, profundidade e sombra.
+- Efeito de destaque ao passar o mouse ou selecionar pelo teclado.
+
+## RacharHoje — versão 93: jogos filtrados pelo usuário
+
+- **Jogos agendados** mostra somente as partidas do jogador conectado.
+- Geraldo vê apenas jogos em que Geraldo participa; Adenilson vê apenas os dele.
+- A consulta geral de partidas continua disponível somente na área administrativa.
+
+## RacharHoje — versão 92: novo logo multiesportes
+
+- Novo logo oficial com mascote e elementos de várias modalidades.
+- Marca aplicada de forma centralizada em todas as páginas.
+- Conjunto único melhora alinhamento e consistência visual no celular e computador.
+
 ## RacharHoje — versão 91: elementos maiores na seleção de esporte
 
 - Mascote ampliado no conjunto da marca.

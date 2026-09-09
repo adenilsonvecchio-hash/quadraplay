@@ -48,7 +48,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
           </div>
           <button type="button" className="qp-active-sport" onClick={onChangeSport} aria-label={`Trocar modalidade. Atual: ${activeSport.name}`}>
             <SportSymbol sport={activeSport} size="header" />
-            <span><small>Modalidade</small><strong>{activeSport.name}</strong></span>
+            <span><small>Trocar modalidade</small><strong>{activeSport.name}</strong></span>
             <ChevronDown className="qp-active-sport__chevron" size={16} aria-hidden="true" />
           </button>
         </div>

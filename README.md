@@ -2,6 +2,19 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## RacharHoje — versão 98: interrogação grande no logo
+
+- A marca principal passa a ser apresentada como RacharHoje?.
+- A interrogação ganhou acabamento amarelo 3D, contorno azul e maior destaque.
+- Nas páginas internas, o nome da modalidade continua substituindo RacharHoje.
+- O fundo da escolha de esporte agora usa curvas, luzes e elementos esportivos abstratos; as silhuetas humanas foram removidas.
+
+## RacharHoje — versão 97: logo com o nome da modalidade
+
+- Dentro do aplicativo, o nome RacharHoje é substituído pela modalidade ativa.
+- Exemplo: símbolo + **Futebol de Campo** + “Agende seu horário”.
+- O seletor da página inicial agora exibe **TROCAR MODALIDADE**.
+
 ## RacharHoje — versão 96: símbolo no lugar do mascote
 
 - O mascote multiesportes aparece antes da seleção da modalidade.

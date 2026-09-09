@@ -13,7 +13,7 @@ export const SportSelectionView: React.FC<SportSelectionViewProps> = ({ userName
   const firstName = userName?.trim().split(/\s+/)[0] || 'Jogador';
   return (
     <section className="qp-sport-picker" aria-label="Escolha sua modalidade">
-      <img className="qp-sport-picker__athletes" src="./sports-background-v87.svg" alt="" aria-hidden="true" />
+      <img className="qp-sport-picker__athletes" src="./sports-background-v98.svg" alt="" aria-hidden="true" />
       <header className="qp-sport-picker__header">
         <BrandLogo className="qp-standard-brand" />
         <span className="qp-multisports-label qp-multisports-label--picker">AGENDAMENTO DE HORÁRIOS</span>

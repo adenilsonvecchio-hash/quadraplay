@@ -2,6 +2,15 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## JogarHoje — versão 100: nova marca e visual mais limpo
+
+- A marca RacharHoje passa a se chamar JogarHoje.
+- A interrogação foi retirada para reduzir a poluição visual.
+- O mascote multiesportivo foi preservado ao lado do novo nome.
+- “Jogar” aparece em azul e “Hoje” em amarelo.
+- As linhas decorativas do fundo foram removidas; restaram apenas luzes suaves nas cores da marca.
+- A saudação e a raquete animada da versão 99 foram mantidas.
+
 ## RacharHoje — versão 99: saudação humanizada
 
 - A abertura agora diz “Olá, [nome], bora pro play?”.

@@ -1255,3 +1255,78 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
 @media (prefers-reduced-motion:reduce) {
   .qp-friendly-greeting__racket { animation:none; }
 }
+
+/* v100 — nova marca JogarHoje, mais limpa e sem interrogação. */
+.qp-brand-logo:not(.qp-brand-logo--sport) .qp-brand-logo__lockup {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+}
+.qp-brand-logo__mascot-crop {
+  position:relative;
+  flex:0 0 32%;
+  width:32%;
+  aspect-ratio:1/.92;
+  overflow:hidden;
+}
+.qp-brand-logo__mascot-crop img {
+  position:absolute;
+  left:0;
+  top:50%;
+  width:333%;
+  max-width:none;
+  height:auto;
+  transform:translateY(-50%);
+}
+.qp-brand-logo__jogar-wordmark {
+  flex:1 1 auto;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+}
+.qp-brand-logo__jogar-wordmark strong {
+  display:flex;
+  align-items:baseline;
+  color:#063b74;
+  font-family:inherit;
+  font-size:clamp(25px,4vw,55px);
+  font-weight:950;
+  line-height:.92;
+  letter-spacing:-2.2px;
+  white-space:nowrap;
+  text-shadow:0 1px 0 #fff;
+}
+.qp-brand-logo__jogar-wordmark strong em {
+  color:#f5b400;
+  font-style:normal;
+}
+.qp-brand-logo__jogar-wordmark small {
+  margin-top:6px;
+  padding-left:2px;
+  color:#063b74;
+  font-size:clamp(7px,.8vw,11px);
+  font-weight:850;
+  letter-spacing:2.5px;
+  white-space:nowrap;
+}
+.qp-brand-logo__question { display:none; }
+
+/* Fundo mais limpo: apenas luzes suaves nas cores da marca. */
+.qp-sport-picker__athletes { display:none; }
+.qp-sport-picker {
+  background:
+    radial-gradient(circle at 7% 16%,rgba(124,202,248,.16),transparent 22%),
+    radial-gradient(circle at 94% 18%,rgba(255,197,25,.13),transparent 22%),
+    radial-gradient(circle at 12% 88%,rgba(255,197,25,.08),transparent 19%),
+    radial-gradient(circle at 88% 86%,rgba(124,202,248,.11),transparent 21%),
+    #fff;
+}
+@media (max-width:767px) {
+  .qp-brand-logo:not(.qp-brand-logo--sport) .qp-brand-logo__lockup { gap:6px; }
+  .qp-brand-logo__mascot-crop { flex-basis:31%; width:31%; }
+  .qp-brand-logo__jogar-wordmark strong { font-size:clamp(23px,9.5vw,39px); letter-spacing:-1.5px; }
+  .qp-brand-logo__jogar-wordmark small { margin-top:4px; font-size:7px; letter-spacing:1.4px; }
+}

@@ -1,5 +1,5 @@
 {
-  "name": "RacharHoje",
+  "name": "JogarHoje",
   "description": "Agende seu horário esportivo com praticidade.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

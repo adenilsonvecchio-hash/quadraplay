@@ -2,6 +2,13 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## SAQUE ON — versão 102: botão de envio do placar sempre visível
+
+- O botão “Enviar para confirmação” agora fica fixo no rodapé do modal.
+- O conteúdo do placar rola separadamente, sem esconder a ação principal.
+- O modal aparece acima do menu inferior em celulares.
+- Foi adicionada proteção para a área segura inferior de aparelhos móveis.
+
 ## SAQUE ON — versão 101: nova identidade oficial
 
 - A marca passa a se chamar SAQUE ON.

@@ -451,3 +451,11 @@ npx supabase functions deploy admin-invite-player --project-ref vewnjcjkowpiyebz
 O Supabase fornece automaticamente `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` à função. O endereço padrão dos convites é `https://quadraplay.centercalculos.com.br`. Opcionalmente, ele pode ser substituído por um secret chamado `QUADRAPLAY_SITE_URL`.
 
 Depois da publicação, abra **Supabase → Edge Functions** e confirme que `admin-invite-player` aparece como ativa. Em seguida, publique normalmente a versão 42 na Vercel. Sem esta função, o botão **Convidar e salvar** exibirá uma orientação de configuração e não criará contas incompletas.
+
+
+## Versão 110 — Checagem completa em duas etapas por QR Code
+
+A checagem da partida agora segue o fluxo completo em duas direções: jogador A mostra seu QR, jogador B escaneia; jogador B mostra seu QR, jogador A escaneia; somente após as duas confirmações a partida fica validada. O QR agora identifica a partida e o jogador que o apresenta, e o jogador adversário confirma a leitura através da função `public.checar_partida_qr`.
+
+### Supabase
+Execute a migration `supabase/migrations/011_checar_partida_qr.sql` no SQL Editor do projeto Supabase antes de testar a checagem. Ela cria os campos de presença e a RPC que valida: autenticação, participação dos dois jogadores na partida, adversário diferente do próprio usuário, partida aceita e validade de 5 segundos usando o relógio do servidor.

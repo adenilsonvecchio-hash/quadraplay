@@ -51,6 +51,8 @@ const mapMatch = (
   resultConfirmedBy: safeString(row?.resultado_confirmado_por) || undefined,
   resultConfirmedAt: row.resultado_confirmado_em || undefined,
   resultDisputeReason: row.resultado_contestacao || undefined,
+  checkedPlayer1At: row.checagem_jogador_1_em || undefined,
+  checkedPlayer2At: row.checagem_jogador_2_em || undefined,
 });
 
 // Consulta apenas as colunas da partida. Os nomes de jogadores e quadras são
@@ -60,7 +62,8 @@ const matchSelect = `
   id, grupo_id, modalidade, quadra_id, jogador_1_id, jogador_2_id, classe, data,
   hora_inicio, hora_fim, status, criado_em, cancelado_por, cancelado_em, motivo_cancelamento,
   resultado_tipo, resultado_placar, resultado_status, resultado_enviado_por,
-  resultado_enviado_em, resultado_confirmado_por, resultado_confirmado_em, resultado_contestacao
+  resultado_enviado_em, resultado_confirmado_por, resultado_confirmado_em, resultado_contestacao,
+  checagem_jogador_1_em, checagem_jogador_2_em
 `;
 
 const hydrateMatches = async (rows: any[] | null | undefined): Promise<Match[]> => {
@@ -408,6 +411,22 @@ export const supabaseAgendaService = {
       .maybeSingle();
     if (error) throw error;
     if (!data) throw new Error('Esta partida já foi alterada.');
+  },
+
+  async checkMatchByQr(matchId: string, qrPlayerId: string, issuedAtMs: number): Promise<{ adversaryName: string; adversaryValidated: boolean; bothValidated: boolean }> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { data, error } = await supabase.rpc('checar_partida_qr', {
+      p_match_id: matchId,
+      p_qr_player_id: qrPlayerId,
+      p_issued_at_ms: issuedAtMs,
+    });
+    if (error) throw new Error(error.message || 'Não foi possível validar a partida.');
+    if (!data?.ok) throw new Error('QR Code não pôde validar esta partida.');
+    return {
+      adversaryName: data.adversario_nome || 'Adversário',
+      adversaryValidated: Boolean(data.adversario_validou),
+      bothValidated: Boolean(data.partida_validada_por_ambos),
+    };
   },
 
   async submitMatchResult(matchId: string, playerId: string, outcome: MatchOutcome, score: MatchScoreSet[]): Promise<void> {

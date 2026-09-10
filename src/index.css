@@ -1542,3 +1542,12 @@ body {
   .qp-clean-home__intro .qp-check-match-button--home { min-width:132px; min-height:52px; padding:8px 10px; }
   .qp-check-match-button__copy strong { font-size:10px; }
 }
+
+/* v110 — fluxo completo de dupla checagem por QR */
+.qp-check-steps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:10px 0 4px}
+.qp-check-steps span{font-size:9px;font-weight:900;color:#9aa2b4;background:#f3f5f9;border:1px solid #e6e9f0;border-radius:999px;padding:5px 8px}
+.qp-check-steps span.is-done{color:#176b47;background:#e9f8ef;border-color:#c9ead8}
+.qp-check-success{display:flex;align-items:center;gap:10px;margin:10px 0;padding:12px 14px;border-radius:18px;background:#eaf8ef;border:1px solid #c9ead8;color:#176b47}
+.qp-check-success div{display:flex;flex-direction:column;gap:2px}
+.qp-check-success strong{font-size:12px;font-weight:950}
+.qp-check-success span{font-size:10px;font-weight:700;color:#4d7b62}

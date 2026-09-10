@@ -62,6 +62,8 @@ export interface Match {
   resultConfirmedBy?: string;
   resultConfirmedAt?: string;
   resultDisputeReason?: string;
+  checkedPlayer1At?: string;
+  checkedPlayer2At?: string;
 }
 
 export interface CourtSlot {

@@ -7,7 +7,6 @@ import { Match } from '../../types';
 import { getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
 
 type Props = { onClose: () => void };
-
 const TOKEN_TTL_MS = 5000;
 
 const encodePayload = (payload: object) => {
@@ -32,7 +31,11 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
   const [issuedAt, setIssuedAt] = useState(() => Date.now());
   const [mode, setMode] = useState<'show' | 'scan'>('show');
   const [scanMessage, setScanMessage] = useState('');
+  const [scanSuccess, setScanSuccess] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [adversaryValidated, setAdversaryValidated] = useState(false);
+  const [bothValidated, setBothValidated] = useState(false);
+  const [checking, setChecking] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -44,7 +47,7 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
   }, [matches]);
 
   const token = useMemo(() => currentMatch && currentUser ? encodePayload({
-    v: 1,
+    v: 2,
     matchId: currentMatch.id,
     playerId: currentUser.id,
     issuedAt,
@@ -53,6 +56,14 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
   const qrUrl = token
     ? `https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=12&data=${encodeURIComponent(token)}`
     : '';
+
+  const refreshMatches = async () => {
+    if (!currentUser) return;
+    const data = usingSupabase && groupId
+      ? await supabaseAgendaService.getMatchesForUser(groupId, currentUser.id)
+      : storageService.getMatches().filter((m) => m.player1Id === currentUser.id || m.player2Id === currentUser.id);
+    setMatches(data);
+  };
 
   useEffect(() => {
     let active = true;
@@ -70,6 +81,12 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
     void load();
     return () => { active = false; };
   }, [currentUser?.id, usingSupabase, groupId]);
+
+  useEffect(() => {
+    if (!currentMatch) return;
+    setAdversaryValidated(Boolean(currentUser?.id === currentMatch.player1Id ? currentMatch.checkedPlayer2At : currentMatch.checkedPlayer1At));
+    setBothValidated(Boolean(currentMatch.checkedPlayer1At && currentMatch.checkedPlayer2At));
+  }, [currentMatch, currentUser?.id]);
 
   useEffect(() => {
     if (mode !== 'show' || !currentMatch) return;
@@ -98,38 +115,52 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
       try {
         const Detector = (window as any).BarcodeDetector;
         if (!Detector) {
-          setScanMessage('Seu navegador não oferece leitura de QR pela câmera. Use o celular com Chrome/Android atualizado ou peça para o outro jogador apresentar o QR.');
+          setScanMessage('Seu navegador não oferece leitura de QR pela câmera. Use um celular com Chrome/Android atualizado.');
           return;
         }
         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
-        if (cancelled) {
-          stream.getTracks().forEach((track) => track.stop());
-          return;
-        }
+        if (cancelled) { stream.getTracks().forEach((track) => track.stop()); return; }
         streamRef.current = stream;
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-        }
+        if (videoRef.current) { videoRef.current.srcObject = stream; await videoRef.current.play(); }
         const detector = new Detector({ formats: ['qr_code'] });
         const scan = async () => {
-          if (cancelled || !videoRef.current) return;
+          if (cancelled || !videoRef.current || checking || scanSuccess) return;
           try {
             const codes = await detector.detect(videoRef.current);
             const raw = codes?.[0]?.rawValue || '';
             if (raw) {
               const payload = decodePayload(raw);
-              if (payload?.issuedAt && Date.now() - Number(payload.issuedAt) <= TOKEN_TTL_MS && payload.matchId) {
-                setScanMessage('QR válido por 5 segundos. A partida foi identificada; prossiga para a confirmação no cartão de jogos.');
-                stream.getTracks().forEach((track) => track.stop());
-                streamRef.current = null;
+              if (!payload?.issuedAt || !payload.matchId || !payload.playerId) {
+                setScanMessage('QR Code inválido.');
+              } else if (Date.now() - Number(payload.issuedAt) > TOKEN_TTL_MS) {
+                setScanMessage('QR expirado. Peça ao jogador para gerar um novo código.');
+              } else if (String(payload.matchId) !== String(currentMatch?.id)) {
+                setScanMessage('Este QR pertence a outra partida.');
+              } else if (String(payload.playerId) === String(currentUser?.id)) {
+                setScanMessage('Você não pode validar seu próprio QR. Escaneie o QR do adversário.');
+              } else {
+                setChecking(true);
+                try {
+                  const result = usingSupabase
+                    ? await supabaseAgendaService.checkMatchByQr(String(payload.matchId), String(payload.playerId), Number(payload.issuedAt))
+                    : { adversaryName: 'Adversário', adversaryValidated: false, bothValidated: false };
+                  setAdversaryValidated(result.adversaryValidated);
+                  setBothValidated(result.bothValidated);
+                  setScanSuccess(true);
+                  setScanMessage(result.bothValidated
+                    ? 'As duas checagens foram concluídas. A partida está validada.'
+                    : `Você confirmou a presença de ${result.adversaryName}. Agora é a vez dele confirmar a sua.`);
+                  stream.getTracks().forEach((track) => track.stop());
+                  streamRef.current = null;
+                } catch (error) {
+                  setScanMessage(error instanceof Error ? error.message : 'Não foi possível validar esta partida.');
+                } finally {
+                  setChecking(false);
+                }
                 return;
               }
-              setScanMessage('QR expirado. Peça ao jogador para gerar um novo código.');
             }
-          } catch {
-            // A câmera continua tentando sem interromper a tela.
-          }
+          } catch { /* continua tentando */ }
           window.setTimeout(scan, 250);
         };
         void scan();
@@ -143,12 +174,25 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
       streamRef.current?.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     };
-  }, [mode]);
+  }, [mode, currentMatch?.id, currentUser?.id, usingSupabase, checking, scanSuccess]);
 
   const regenerate = () => {
     setIssuedAt(Date.now());
     setSeconds(5);
     setScanMessage('');
+    setScanSuccess(false);
+  };
+
+  const startScan = () => {
+    setScanMessage('Aponte a câmera para o QR que o adversário está mostrando.');
+    setScanSuccess(false);
+    setMode('scan');
+  };
+
+  const returnToMyQr = () => {
+    setScanMessage('Agora mostre o seu QR para o adversário escanear.');
+    setScanSuccess(false);
+    setMode('show');
   };
 
   const copyToken = async () => {
@@ -168,27 +212,38 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
       <div className="qp-check-modal__body">
         {loading ? <div className="qp-check-empty">Carregando seu próximo jogo...</div> : !currentMatch ? (
           <div className="qp-check-empty"><QrCode className="w-10 h-10 mx-auto text-slate-300" /><strong>Nenhuma partida disponível</strong><p>Agende um jogo para gerar o código de validação.</p></div>
-        ) : mode === 'show' ? (
+        ) : (
           <>
             <div className="qp-check-match-card"><strong>{currentMatch.player1Name} × {currentMatch.player2Name}</strong><span><Clock3 className="w-3.5 h-3.5" /> {currentMatch.date} · {currentMatch.startTime}</span></div>
-            <div className={`qp-qr-box ${seconds === 0 ? 'is-expired' : ''}`}>
-              {seconds > 0 ? <img src={qrUrl} alt="QR Code temporário para validação da partida" /> : <div className="qp-qr-expired"><QrCode className="w-10 h-10" /><strong>QR expirado</strong><span>Gere um novo código.</span></div>}
+            <div className="qp-check-steps">
+              <span className="is-done">1. A mostra</span><span className="is-done">2. B escaneia</span><span className={bothValidated ? 'is-done' : ''}>3. B mostra</span><span className={bothValidated ? 'is-done' : ''}>4. A escaneia</span>
             </div>
-            <div className="qp-qr-countdown"><span>Código válido por</span><strong>{seconds}s</strong></div>
-            <p className="qp-check-hint">Mostre este QR ao outro jogador para ele escanear. O código muda e expira em 5 segundos.</p>
-            <div className="qp-check-actions">
-              <button type="button" onClick={regenerate} className="qp-check-primary"><QrCode className="w-4 h-4" /> Gerar novo QR</button>
-              <button type="button" onClick={() => setMode('scan')} className="qp-check-secondary"><ScanLine className="w-4 h-4" /> Escanear adversário</button>
-            </div>
-            <button type="button" onClick={() => void copyToken()} className="qp-check-copy">{copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}{copied ? 'Código copiado' : 'Copiar código de validação'}</button>
+
+            {bothValidated && <div className="qp-check-success"><CheckCircle2 className="w-6 h-6" /><div><strong>PARTIDA VALIDADA</strong><span>Os dois jogadores confirmaram a presença.</span></div></div>}
+
+            {mode === 'show' ? (
+              <>
+                <div className={`qp-qr-box ${seconds === 0 ? 'is-expired' : ''}`}>
+                  {seconds > 0 ? <img src={qrUrl} alt="QR Code temporário para validação da partida" /> : <div className="qp-qr-expired"><QrCode className="w-10 h-10" /><strong>QR expirado</strong><span>Gere um novo código.</span></div>}
+                </div>
+                <div className="qp-qr-countdown"><span>Seu QR é válido por</span><strong>{seconds}s</strong></div>
+                <p className="qp-check-hint">Mostre este QR ao adversário. Ele deve escanear o seu código. Depois, o adversário mostra o QR dele e você escaneia.</p>
+                <div className="qp-check-actions">
+                  <button type="button" onClick={regenerate} className="qp-check-primary"><QrCode className="w-4 h-4" /> Gerar novo QR</button>
+                  {!bothValidated && <button type="button" onClick={startScan} className="qp-check-secondary"><ScanLine className="w-4 h-4" /> Escanear QR do adversário</button>}
+                </div>
+                {scanMessage && <p className="qp-scanner__message">{scanMessage}</p>}
+                <button type="button" onClick={() => void copyToken()} className="qp-check-copy">{copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}{copied ? 'Código copiado' : 'Copiar código de validação'}</button>
+              </>
+            ) : (
+              <div className="qp-scanner">
+                {!scanSuccess && <div className="qp-scanner__frame"><video ref={videoRef} playsInline muted /></div>}
+                <div className="qp-scanner__title">{scanSuccess ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <Camera className="w-5 h-5" />}<strong>{scanSuccess ? 'QR do adversário confirmado' : 'Aponte para o QR do adversário'}</strong></div>
+                {scanMessage && <p className="qp-scanner__message">{scanMessage}</p>}
+                <button type="button" onClick={returnToMyQr} className="qp-check-primary w-full">{bothValidated ? 'Fechar validação' : 'Agora mostrar meu QR'}</button>
+              </div>
+            )}
           </>
-        ) : (
-          <div className="qp-scanner">
-            <div className="qp-scanner__frame"><video ref={videoRef} playsInline muted /></div>
-            <div className="qp-scanner__title"><Camera className="w-5 h-5" /><strong>Aponte para o QR do adversário</strong></div>
-            {scanMessage && <p className="qp-scanner__message">{scanMessage}</p>}
-            <button type="button" onClick={() => { setMode('show'); setScanMessage(''); }} className="qp-check-secondary w-full">Voltar para meu QR</button>
-          </div>
         )}
       </div>
     </div>

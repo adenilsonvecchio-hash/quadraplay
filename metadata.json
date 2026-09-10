@@ -1,6 +1,6 @@
 {
   "name": "SAQUE ON",
-  "description": "Agende seu horário esportivo com praticidade.",
+  "description": "Agende seus jogos e horários de tênis com praticidade.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

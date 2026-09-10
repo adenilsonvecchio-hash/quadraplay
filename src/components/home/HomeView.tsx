@@ -1,21 +1,17 @@
 import React from 'react';
-import { CalendarDays, CalendarPlus, ChevronDown, ChevronRight, ListChecks, Users } from 'lucide-react';
+import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
-import { Sport } from '../../data/sports';
 import { BrandLogo } from '../common/BrandLogo';
-import { SportSymbol } from '../common/SportSymbol';
 
 interface HomeViewProps {
   onStartBooking: () => void;
   onViewAllMatches: () => void;
   onViewSchedule: () => void;
   onViewPlayers: () => void;
-  activeSport: Sport;
-  onChangeSport: () => void;
 }
 
-export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers, activeSport, onChangeSport }) => {
+export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers }) => {
   const { currentUser } = useAuth();
   const firstName = typeof currentUser?.name === 'string' && currentUser.name.trim()
     ? currentUser.name.trim().split(/\s+/)[0]
@@ -24,7 +20,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
     { label: 'Agendar', helper: 'Escolha a quadra e o horário', icon: CalendarPlus, image: undefined, onClick: onStartBooking, tone: 'featured' },
     { label: 'Horários livres', helper: 'Veja a grade disponível', icon: CalendarDays, image: undefined, onClick: onViewSchedule, tone: 'blue' },
     { label: 'Meus jogos', helper: 'Convites e reservas', icon: ListChecks, image: undefined, onClick: onViewAllMatches, tone: 'amber' },
-    { label: 'Participantes', helper: activeSport.id === 'tenis' ? 'Sua classe' : 'Pessoas disponíveis', icon: Users, image: undefined, onClick: onViewPlayers, tone: 'green' },
+    { label: 'Jogadores', helper: 'Encontre por nome ou classe', icon: Users, image: undefined, onClick: onViewPlayers, tone: 'green' },
   ] as const;
 
   return (
@@ -33,8 +29,8 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
         <div className="qp-clean-home__topline">
 <div className="qp-header-brands" aria-hidden="true" />
           <div className="qp-clean-home__title">
-            <BrandLogo className="qp-standard-brand" sport={activeSport} />
-            <span className="qp-multisports-label">AGENDAMENTO DE HORÁRIOS</span>
+            <BrandLogo className="qp-standard-brand" />
+            <span className="qp-tennis-label">TÊNIS · AGENDAMENTO DE HORÁRIOS</span>
           </div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
@@ -45,17 +41,11 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
           <div>
             <div className="qp-friendly-greeting">
               <h1>Olá, {firstName}, <span>bora pro play?</span></h1>
-              {activeSport.id === 'tenis' && (
-                <img className="qp-friendly-greeting__racket" src="./raquete-tenis-realista-v99.png" alt="" aria-hidden="true" />
-              )}
+              <img className="qp-friendly-greeting__racket" src="./raquete-tenis-realista-v99.png" alt="" aria-hidden="true" />
             </div>
             <p>Seu próximo jogo começa aqui.</p>
           </div>
-          <button type="button" className="qp-active-sport" onClick={onChangeSport} aria-label={`Trocar modalidade. Atual: ${activeSport.name}`}>
-            <SportSymbol sport={activeSport} size="header" />
-            <span><small>Trocar modalidade</small><strong>{activeSport.name}</strong></span>
-            <ChevronDown className="qp-active-sport__chevron" size={16} aria-hidden="true" />
-          </button>
+          <div className="qp-tennis-badge" aria-label="Aplicativo exclusivo para tênis"><span aria-hidden="true">🎾</span><strong>Tênis</strong></div>
         </div>
         <div className="qp-action-grid">
           {actions.map(({ label, helper, icon: Icon, image, onClick, tone }) => (

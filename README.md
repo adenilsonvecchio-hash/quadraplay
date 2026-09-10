@@ -2,6 +2,16 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## SAQUE ON — versão 103: exclusiva para tênis
+
+- Removida a seleção de modalidades da entrada do aplicativo.
+- O usuário entra diretamente no ambiente de tênis após o login.
+- Futsal, Futebol de Campo, Beach Tennis, Handebol, Vôlei, Basquete e Peteca foram retirados da interface.
+- Removidos os comandos “Trocar modalidade” e “Trocar esporte”.
+- Agenda, quadras, classes, jogadores, partidas e placar continuam filtrados pela modalidade `tenis` no Supabase.
+- O logo SAQUE ON foi padronizado na tela inicial e nas páginas internas.
+- A confirmação de placar implementada na versão 102 foi preservada.
+
 ## SAQUE ON — versão 102: botão de envio do placar sempre visível
 
 - O botão “Enviar para confirmação” agora fica fixo no rodapé do modal.

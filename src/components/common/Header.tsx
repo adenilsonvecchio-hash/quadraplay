@@ -4,18 +4,14 @@ import { useAuth } from '../../context/AuthContext';
 import { BrandLogo } from './BrandLogo';
 import { NotificationsBell } from './NotificationsBell';
 import { TabType } from './BottomNav';
-import { Sport } from '../../data/sports';
-import { SportSymbol } from './SportSymbol';
 
 interface HeaderProps {
   onOpenAdmin?: () => void;
   activeTab: string;
   onNavigate?: (tab: TabType) => void;
-  activeSport: Sport;
-  onChangeSport: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNavigate, activeSport, onChangeSport }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNavigate }) => {
   const { isAdmin } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = (tab: TabType) => {
@@ -36,8 +32,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
         </button>
 
         <div className="justify-self-center qp-global-brand-stack">
-          <BrandLogo className="qp-standard-brand" sport={activeSport} />
-          <span className="qp-multisports-label">AGENDAMENTO DE HORÁRIOS</span>
+          <BrandLogo className="qp-standard-brand" />
+          <span className="qp-tennis-label">TÊNIS · AGENDAMENTO DE HORÁRIOS</span>
         </div>
 
         <div className="relative"><NotificationsBell onOpenMatches={() => navigate('matches')} /></div>
@@ -59,9 +55,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin, activeTab, onNaviga
               <ShieldCheck className="w-5 h-5" /> Painel administrativo
             </button>
           )}
-          <button type="button" onClick={() => { setMenuOpen(false); onChangeSport(); }} className="w-full flex items-center gap-3 rounded-[17px] px-3 py-3 text-left text-sm font-black text-slate-700 hover:bg-slate-50">
-            <SportSymbol sport={activeSport} size="header" /> Trocar esporte
-          </button>
         </nav>
       )}
     </header>

@@ -427,6 +427,10 @@ button.qp-slot:active { transform:scale(.97); }
 .qp-multisports-label { display:block; margin-top:7px; color:#7a8195; font-size:8px; line-height:1; font-weight:900; letter-spacing:2.5px; text-transform:uppercase; }
 .qp-multisports-label--picker { margin-top:8px; font-size:9px; letter-spacing:2.8px; }
 .qp-multisports-label--login { margin-top:10px; font-size:9px; letter-spacing:2.8px; }
+.qp-tennis-label { display:block; margin-top:7px; color:#7a8195; font-size:8px; line-height:1; font-weight:900; letter-spacing:2px; text-transform:uppercase; }
+.qp-tennis-label--login { margin-top:10px; font-size:9px; letter-spacing:2.2px; }
+.qp-tennis-badge { margin-left:auto; display:flex; align-items:center; gap:8px; padding:9px 14px; border:1px solid rgba(255,255,255,.95); border-radius:16px; background:rgba(255,255,255,.94); box-shadow:0 9px 24px rgba(52,59,95,.1); color:#0b3f78; font-size:12px; font-weight:900; }
+.qp-tennis-badge > span { font-size:24px; line-height:1; }
 @media (max-width: 380px) {
   .qp-standard-brand .qp-brand-logo__quadra { font-size:23px; }
   .qp-standard-brand .qp-brand-logo__play { font-size:37px; }

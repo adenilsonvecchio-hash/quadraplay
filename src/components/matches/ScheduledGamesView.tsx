@@ -125,7 +125,7 @@ export const ScheduledGamesView: React.FC = () => {
           <CalendarDays className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-xs font-bold text-slate-400">{activeSportName} · Multiesportes</p>
+          <p className="text-xs font-bold text-slate-400">{activeSportName} · SAQUE ON</p>
           <h2 className="text-xl font-black text-[#101b3d]">Jogos agendados</h2>
           <p className="text-xs text-slate-500">Próximos jogos e registro de resultados</p>
         </div>

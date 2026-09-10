@@ -1,8 +1,9 @@
 import React from 'react';
-import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'lucide-react';
+import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, QrCode, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
 import { BrandLogo } from '../common/BrandLogo';
+import { MatchCheckModal } from '../matches/MatchCheckModal';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -12,6 +13,7 @@ interface HomeViewProps {
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers }) => {
+  const [checkOpen, setCheckOpen] = React.useState(false);
   const { currentUser } = useAuth();
   const firstName = typeof currentUser?.name === 'string' && currentUser.name.trim()
     ? currentUser.name.trim().split(/\s+/)[0]
@@ -30,7 +32,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
 <div className="qp-header-brands" aria-hidden="true" />
           <div className="qp-clean-home__title">
             <BrandLogo className="qp-standard-brand" />
-            <span className="qp-tennis-label">TÊNIS · AGENDAMENTO DE HORÁRIOS</span>
+            <span className="qp-tennis-label">AGENDAMENTO DE HORÁRIO</span>
           </div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>
@@ -45,7 +47,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
             </div>
             <p>Seu próximo jogo começa aqui.</p>
           </div>
-          <div className="qp-tennis-badge" aria-label="Aplicativo exclusivo para tênis"><span aria-hidden="true">🎾</span><strong>Tênis</strong></div>
+          <button type="button" className="qp-check-match-button qp-check-match-button--home" onClick={() => setCheckOpen(true)} aria-label="Checar partida">
+            <QrCode className="w-8 h-8" strokeWidth={1.8} />
+            <span className="qp-check-match-button__copy"><strong>Checar partida</strong><small>Validar jogo</small></span>
+          </button>
         </div>
         <div className="qp-action-grid">
           {actions.map(({ label, helper, icon: Icon, image, onClick, tone }) => (
@@ -58,6 +63,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
           ))}
         </div>
       </div>
+      {checkOpen && <MatchCheckModal onClose={() => setCheckOpen(false)} />}
     </section>
   );
 };

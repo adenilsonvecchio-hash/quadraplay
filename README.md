@@ -468,6 +468,12 @@ Execute a migration `supabase/migrations/011_checar_partida_qr.sql` no SQL Edito
 - O QR continua com validade de 5 segundos.
 
 
-## v112 — Correção do leitor QR no iPhone
+## v113 — Correção do leitor QR no iPhone
 
 Corrige a inicialização do polyfill no Safari/iPhone quando o navegador expõe BarcodeDetector de forma parcial. O polyfill agora é ativado antes do app sempre que o detector nativo não oferece getSupportedFormats().
+
+
+## v113 — iPhone/WhatsApp
+- Solicitação da câmera ocorre diretamente no toque do botão.
+- Fallback por foto do QR com `capture="environment"`, útil no navegador interno do WhatsApp.
+- Mantida a validação real pelo Supabase e QR com validade de 5 segundos.

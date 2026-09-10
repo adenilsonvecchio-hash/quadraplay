@@ -37,6 +37,7 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
   const [bothValidated, setBothValidated] = useState(false);
   const [checking, setChecking] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   const currentMatch = useMemo(() => {
@@ -104,6 +105,75 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
     return () => window.clearInterval(timer);
   }, [mode, token, issuedAt]);
 
+  const getDetector = () => {
+    const native = (window as any).BarcodeDetector;
+    if (native && typeof native.getSupportedFormats === 'function') return native;
+    return (window as any).barcodeDetectorPolyfill?.BarcodeDetectorPolyfill || native || null;
+  };
+
+  const validateDecoded = async (raw: string) => {
+    const payload = decodePayload(raw);
+    if (!payload?.issuedAt || !payload.matchId || !payload.playerId) {
+      setScanMessage('QR Code inválido.');
+      return false;
+    }
+    if (Date.now() - Number(payload.issuedAt) > TOKEN_TTL_MS) {
+      setScanMessage('QR expirado. Peça ao jogador para gerar um novo código.');
+      return false;
+    }
+    if (String(payload.matchId) !== String(currentMatch?.id)) {
+      setScanMessage('Este QR pertence a outra partida.');
+      return false;
+    }
+    if (String(payload.playerId) === String(currentUser?.id)) {
+      setScanMessage('Você não pode validar seu próprio QR. Escaneie o QR do adversário.');
+      return false;
+    }
+
+    setChecking(true);
+    try {
+      const result = usingSupabase
+        ? await supabaseAgendaService.checkMatchByQr(String(payload.matchId), String(payload.playerId), Number(payload.issuedAt))
+        : { adversaryName: 'Adversário', adversaryValidated: false, bothValidated: false };
+      setAdversaryValidated(result.adversaryValidated);
+      setBothValidated(result.bothValidated);
+      setScanSuccess(true);
+      setScanMessage(result.bothValidated
+        ? 'As duas checagens foram concluídas. A partida está validada.'
+        : `Você confirmou a presença de ${result.adversaryName}. Agora é a vez dele confirmar a sua.`);
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      return true;
+    } catch (error) {
+      setScanMessage(error instanceof Error ? error.message : 'Não foi possível validar esta partida.');
+      return false;
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const scanImageFile = async (file: File) => {
+    try {
+      const Detector = getDetector();
+      if (!Detector) {
+        setScanMessage('Leitor QR não carregado. Recarregue a página e tente novamente.');
+        return;
+      }
+      setScanMessage('Lendo o QR da foto...');
+      const detector = new Detector({ formats: ['qr_code'] });
+      const codes = await detector.detect(file);
+      const raw = codes?.[0]?.rawValue || '';
+      if (!raw) setScanMessage('Não encontrei o QR. Tire outra foto mais próxima e com boa luz.');
+      else await validateDecoded(raw);
+    } catch (error) {
+      setScanMessage(error instanceof Error ? error.message : 'Não foi possível ler a foto do QR.');
+    }
+  };
+
+  const openCameraFallback = () => {
+    fileInputRef.current?.click();
+  };
+
   useEffect(() => {
     if (mode !== 'scan') {
       streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -111,82 +181,35 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
       return;
     }
     let cancelled = false;
-    const start = async () => {
+    const attachAndScan = async () => {
       try {
-        if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
-          setScanMessage('A câmera precisa ser usada em uma conexão segura (HTTPS). Abra o Saque ON pelo endereço oficial.');
+        if (!streamRef.current || !videoRef.current) return;
+        videoRef.current.srcObject = streamRef.current;
+        await videoRef.current.play().catch(() => undefined);
+        const Detector = getDetector();
+        if (!Detector) {
+          setScanMessage('Leitor QR não carregado. Use “Tirar foto do QR”.');
           return;
         }
-
-        // O BarcodeDetector nativo funciona bem em muitos Androids, mas o Safari/iPhone
-        // ainda pode não expor essa API. A v111 usa o polyfill WASM como fallback.
-        let Detector = (window as any).BarcodeDetector;
-        if (!Detector) {
-          Detector = (window as any).barcodeDetectorPolyfill?.BarcodeDetectorPolyfill;
-        }
-        if (!Detector) {
-          setScanMessage('Leitor QR não carregado. Recarregue a página e tente novamente.');
-          return;
-        }
-
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: 'environment' },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-          audio: false,
-        });
-        if (cancelled) { stream.getTracks().forEach((track) => track.stop()); return; }
-        streamRef.current = stream;
-        if (videoRef.current) { videoRef.current.srcObject = stream; await videoRef.current.play(); }
         const detector = new Detector({ formats: ['qr_code'] });
         const scan = async () => {
-          if (cancelled || !videoRef.current || checking || scanSuccess) return;
+          if (cancelled || !videoRef.current || checking || scanSuccess || !streamRef.current) return;
           try {
             const codes = await detector.detect(videoRef.current);
             const raw = codes?.[0]?.rawValue || '';
             if (raw) {
-              const payload = decodePayload(raw);
-              if (!payload?.issuedAt || !payload.matchId || !payload.playerId) {
-                setScanMessage('QR Code inválido.');
-              } else if (Date.now() - Number(payload.issuedAt) > TOKEN_TTL_MS) {
-                setScanMessage('QR expirado. Peça ao jogador para gerar um novo código.');
-              } else if (String(payload.matchId) !== String(currentMatch?.id)) {
-                setScanMessage('Este QR pertence a outra partida.');
-              } else if (String(payload.playerId) === String(currentUser?.id)) {
-                setScanMessage('Você não pode validar seu próprio QR. Escaneie o QR do adversário.');
-              } else {
-                setChecking(true);
-                try {
-                  const result = usingSupabase
-                    ? await supabaseAgendaService.checkMatchByQr(String(payload.matchId), String(payload.playerId), Number(payload.issuedAt))
-                    : { adversaryName: 'Adversário', adversaryValidated: false, bothValidated: false };
-                  setAdversaryValidated(result.adversaryValidated);
-                  setBothValidated(result.bothValidated);
-                  setScanSuccess(true);
-                  setScanMessage(result.bothValidated
-                    ? 'As duas checagens foram concluídas. A partida está validada.'
-                    : `Você confirmou a presença de ${result.adversaryName}. Agora é a vez dele confirmar a sua.`);
-                  stream.getTracks().forEach((track) => track.stop());
-                  streamRef.current = null;
-                } catch (error) {
-                  setScanMessage(error instanceof Error ? error.message : 'Não foi possível validar esta partida.');
-                } finally {
-                  setChecking(false);
-                }
-                return;
-              }
+              const ok = await validateDecoded(raw);
+              if (ok) return;
             }
           } catch { /* continua tentando */ }
           window.setTimeout(scan, 250);
         };
         void scan();
       } catch {
-        setScanMessage('Não foi possível acessar a câmera. Verifique a permissão do navegador.');
+        setScanMessage('Não foi possível iniciar a câmera. Use “Tirar foto do QR”.');
       }
     };
-    void start();
+    void attachAndScan();
     return () => {
       cancelled = true;
       streamRef.current?.getTracks().forEach((track) => track.stop());
@@ -201,10 +224,32 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
     setScanSuccess(false);
   };
 
-  const startScan = () => {
-    setScanMessage('Aponte a câmera para o QR que o adversário está mostrando.');
+  const startScan = async () => {
+    setScanMessage('Abrindo a câmera...');
     setScanSuccess(false);
     setMode('scan');
+
+    // Importante no iPhone: pedir acesso diretamente no toque do botão
+    // aumenta a compatibilidade com Safari e navegadores internos de apps.
+    try {
+      if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+        setScanMessage('A câmera ao vivo não está disponível aqui. Use “Tirar foto do QR”.');
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      setScanMessage('Aponte a câmera para o QR do adversário.');
+    } catch (error) {
+      const name = error instanceof DOMException ? error.name : '';
+      if (name === 'NotAllowedError' || name === 'SecurityError') {
+        setScanMessage('O iPhone bloqueou a câmera neste navegador. Use “Tirar foto do QR” ou abra o Saque ON no Safari.');
+      } else {
+        setScanMessage('Não foi possível abrir a câmera. Use “Tirar foto do QR”.');
+      }
+    }
   };
 
   const returnToMyQr = () => {
@@ -258,6 +303,10 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
                 {!scanSuccess && <div className="qp-scanner__frame"><video ref={videoRef} autoPlay playsInline muted /></div>}
                 <div className="qp-scanner__title">{scanSuccess ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <Camera className="w-5 h-5" />}<strong>{scanSuccess ? 'QR do adversário confirmado' : 'Aponte para o QR do adversário'}</strong></div>
                 {scanMessage && <p className="qp-scanner__message">{scanMessage}</p>}
+                {!scanSuccess && <>
+                  <input ref={fileInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) void scanImageFile(file); e.currentTarget.value = ''; }} />
+                  <button type="button" onClick={openCameraFallback} className="qp-check-secondary w-full"><Camera className="w-4 h-4" /> Tirar foto do QR</button>
+                </>}
                 <button type="button" onClick={returnToMyQr} className="qp-check-primary w-full">{bothValidated ? 'Fechar validação' : 'Agora mostrar meu QR'}</button>
               </div>
             )}

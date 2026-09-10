@@ -502,6 +502,23 @@ button.qp-slot:active { transform:scale(.97); }
   .qp-sport-card svg { grid-column:3; align-self:center; width:14px; height:14px; }
 }
 
+/* v105 — barra inferior centralizada dentro do aplicativo no computador. */
+@media (min-width:1024px) {
+  .qp-bottom-nav {
+    left:50%;
+    right:auto;
+    width:100%;
+    max-width:72rem;
+    transform:translateX(-50%);
+  }
+  .qp-bottom-nav__inner {
+    width:auto;
+    max-width:none;
+    margin-left:12px;
+    margin-right:12px;
+  }
+}
+
 @media (max-width:359px) {
   .qp-sport-picker { padding-inline:9px; gap:6px; }
   .qp-sport-picker__header small { display:none; }

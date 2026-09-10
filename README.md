@@ -2,6 +2,12 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## SAQUE ON — versão 105: barra inferior centralizada no computador
+
+- A navegação inferior agora usa a mesma largura máxima e o mesmo centro do aplicativo no desktop.
+- A barra não fica mais presa à lateral esquerda da janela.
+- O posicionamento aprovado no celular foi preservado sem alterações.
+
 ## SAQUE ON — versão 104: logo ajustado no celular
 
 - O logo SAQUE ON ganhou mais distância da barra superior do aparelho.

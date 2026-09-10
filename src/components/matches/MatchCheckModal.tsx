@@ -125,7 +125,7 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
           Detector = (window as any).barcodeDetectorPolyfill?.BarcodeDetectorPolyfill;
         }
         if (!Detector) {
-          setScanMessage('Ativando o leitor compatível com iPhone… tente novamente em alguns segundos.');
+          setScanMessage('Leitor QR não carregado. Recarregue a página e tente novamente.');
           return;
         }
 

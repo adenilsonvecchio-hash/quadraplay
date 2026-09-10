@@ -16,11 +16,23 @@
     <script src="https://cdn.jsdelivr.net/npm/@undecaf/zbar-wasm@0.9.15/dist/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@undecaf/barcode-detector-polyfill@0.9.23/dist/index.js"></script>
     <script>
+      // v112: Safari/iPhone pode expor BarcodeDetector de forma parcial.
+      // Só usamos o nativo quando ele realmente oferece getSupportedFormats();
+      // caso contrário, ativamos o polyfill WASM antes do app iniciar.
       try {
-        if (!window.BarcodeDetector && window.barcodeDetectorPolyfill?.BarcodeDetectorPolyfill) {
-          window.BarcodeDetector = window.barcodeDetectorPolyfill.BarcodeDetectorPolyfill;
+        const nativeDetector = window.BarcodeDetector;
+        const nativeSupported = nativeDetector && typeof nativeDetector.getSupportedFormats === 'function';
+        const polyfillDetector = window.barcodeDetectorPolyfill?.BarcodeDetectorPolyfill;
+        if (!nativeSupported && polyfillDetector) {
+          window.BarcodeDetector = polyfillDetector;
         }
-      } catch (_) {}
+      } catch (_) {
+        try {
+          if (window.barcodeDetectorPolyfill?.BarcodeDetectorPolyfill) {
+            window.BarcodeDetector = window.barcodeDetectorPolyfill.BarcodeDetectorPolyfill;
+          }
+        } catch (_) {}
+      }
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

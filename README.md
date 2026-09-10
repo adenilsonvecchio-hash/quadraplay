@@ -466,3 +466,8 @@ Execute a migration `supabase/migrations/011_checar_partida_qr.sql` no SQL Edito
 - A câmera usa `autoplay`, `playsInline` e câmera traseira preferencial.
 - A validação continua sendo feita pelo RPC `checar_partida_qr` no Supabase.
 - O QR continua com validade de 5 segundos.
+
+
+## v112 — Correção do leitor QR no iPhone
+
+Corrige a inicialização do polyfill no Safari/iPhone quando o navegador expõe BarcodeDetector de forma parcial. O polyfill agora é ativado antes do app sempre que o detector nativo não oferece getSupportedFormats().

@@ -7,7 +7,7 @@ import { Match } from '../../types';
 import { getBrasiliaToday, isSlotInPast } from '../../utils/dateUtils';
 
 type Props = { onClose: () => void };
-const TOKEN_TTL_MS = 5000;
+const TOKEN_TTL_MS = 60000;
 
 const encodePayload = (payload: object) => {
   const text = JSON.stringify(payload);
@@ -30,7 +30,7 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
   const { currentUser, usingSupabase, groupId } = useAuth();
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [seconds, setSeconds] = useState(5);
+  const [seconds, setSeconds] = useState(60);
   const [issuedAt, setIssuedAt] = useState(() => Date.now());
   const [mode, setMode] = useState<'show' | 'scan'>('show');
   const [scanMessage, setScanMessage] = useState('');
@@ -92,7 +92,7 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
   useEffect(() => {
     if (mode !== 'show' || !currentMatch) return;
     setIssuedAt(Date.now());
-    setSeconds(5);
+    setSeconds(60);
   }, [mode, currentMatch?.id]);
 
   useEffect(() => {
@@ -164,7 +164,7 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
 
   const regenerate = () => {
     setIssuedAt(Date.now());
-    setSeconds(5);
+    setSeconds(60);
     setScanMessage('');
     setScanSuccess(false);
   };

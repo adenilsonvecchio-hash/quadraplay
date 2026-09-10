@@ -1347,3 +1347,17 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   object-fit:contain;
   filter:drop-shadow(0 5px 7px rgba(3,38,77,.12));
 }
+
+/* v104 — respiro superior do logo em celulares e navegadores internos. */
+@media (max-width:767px) {
+  .qp-clean-home__header {
+    height:142px;
+    padding-top:max(24px,env(safe-area-inset-top));
+  }
+  .qp-clean-home__title {
+    top:calc(50% + 9px);
+  }
+  .qp-clean-home__panel {
+    height:calc(100% - 142px);
+  }
+}

@@ -2,6 +2,14 @@
 <img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
 </div>
 
+## SAQUE ON — versão 104: logo ajustado no celular
+
+- O logo SAQUE ON ganhou mais distância da barra superior do aparelho.
+- O cabeçalho agora respeita a área segura de iPhones e navegadores internos, como o WhatsApp.
+- A faixa “Tênis · Agendamento de horários” acompanha o novo alinhamento.
+- A saudação foi simplificada para “Olá, [nome]! Vamos jogar?”.
+- O restante da tela inicial e todas as funcionalidades da versão 103 foram preservados.
+
 ## SAQUE ON — versão 103: exclusiva para tênis
 
 - Removida a seleção de modalidades da entrada do aplicativo.

@@ -40,7 +40,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
         <div className="qp-clean-home__intro">
           <div>
             <div className="qp-friendly-greeting">
-              <h1>Olá, {firstName}, <span>bora pro play?</span></h1>
+              <h1>Olá, {firstName}! <span>Vamos jogar?</span></h1>
               <img className="qp-friendly-greeting__racket" src="./raquete-tenis-realista-v99.png" alt="" aria-hidden="true" />
             </div>
             <p>Seu próximo jogo começa aqui.</p>

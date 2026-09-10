@@ -459,3 +459,10 @@ A checagem da partida agora segue o fluxo completo em duas direções: jogador A
 
 ### Supabase
 Execute a migration `supabase/migrations/011_checar_partida_qr.sql` no SQL Editor do projeto Supabase antes de testar a checagem. Ela cria os campos de presença e a RPC que valida: autenticação, participação dos dois jogadores na partida, adversário diferente do próprio usuário, partida aceita e validade de 5 segundos usando o relógio do servidor.
+
+## v111 — Leitor QR compatível com iPhone
+- Mantém o BarcodeDetector nativo quando disponível.
+- Adiciona fallback WASM `@undecaf/barcode-detector-polyfill` para Safari/iPhone.
+- A câmera usa `autoplay`, `playsInline` e câmera traseira preferencial.
+- A validação continua sendo feita pelo RPC `checar_partida_qr` no Supabase.
+- O QR continua com validade de 5 segundos.

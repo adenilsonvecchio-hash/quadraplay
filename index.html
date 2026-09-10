@@ -12,6 +12,16 @@
   </head>
   <body class="bg-slate-100 font-['Plus_Jakarta_Sans',sans-serif] antialiased">
     <div id="root"></div>
+    <!-- v111: leitor QR compatível com Safari/iPhone via polyfill WASM. O leitor nativo é usado quando disponível. -->
+    <script src="https://cdn.jsdelivr.net/npm/@undecaf/zbar-wasm@0.9.15/dist/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@undecaf/barcode-detector-polyfill@0.9.23/dist/index.js"></script>
+    <script>
+      try {
+        if (!window.BarcodeDetector && window.barcodeDetectorPolyfill?.BarcodeDetectorPolyfill) {
+          window.BarcodeDetector = window.barcodeDetectorPolyfill.BarcodeDetectorPolyfill;
+        }
+      } catch (_) {}
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

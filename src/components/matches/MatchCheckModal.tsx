@@ -113,12 +113,30 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
     let cancelled = false;
     const start = async () => {
       try {
-        const Detector = (window as any).BarcodeDetector;
-        if (!Detector) {
-          setScanMessage('Seu navegador não oferece leitura de QR pela câmera. Use um celular com Chrome/Android atualizado.');
+        if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+          setScanMessage('A câmera precisa ser usada em uma conexão segura (HTTPS). Abra o Saque ON pelo endereço oficial.');
           return;
         }
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+
+        // O BarcodeDetector nativo funciona bem em muitos Androids, mas o Safari/iPhone
+        // ainda pode não expor essa API. A v111 usa o polyfill WASM como fallback.
+        let Detector = (window as any).BarcodeDetector;
+        if (!Detector) {
+          Detector = (window as any).barcodeDetectorPolyfill?.BarcodeDetectorPolyfill;
+        }
+        if (!Detector) {
+          setScanMessage('Ativando o leitor compatível com iPhone… tente novamente em alguns segundos.');
+          return;
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        });
         if (cancelled) { stream.getTracks().forEach((track) => track.stop()); return; }
         streamRef.current = stream;
         if (videoRef.current) { videoRef.current.srcObject = stream; await videoRef.current.play(); }
@@ -237,7 +255,7 @@ export const MatchCheckModal: React.FC<Props> = ({ onClose }) => {
               </>
             ) : (
               <div className="qp-scanner">
-                {!scanSuccess && <div className="qp-scanner__frame"><video ref={videoRef} playsInline muted /></div>}
+                {!scanSuccess && <div className="qp-scanner__frame"><video ref={videoRef} autoPlay playsInline muted /></div>}
                 <div className="qp-scanner__title">{scanSuccess ? <CheckCircle2 className="w-5 h-5 text-emerald-600" /> : <Camera className="w-5 h-5" />}<strong>{scanSuccess ? 'QR do adversário confirmado' : 'Aponte para o QR do adversário'}</strong></div>
                 {scanMessage && <p className="qp-scanner__message">{scanMessage}</p>}
                 <button type="button" onClick={returnToMyQr} className="qp-check-primary w-full">{bothValidated ? 'Fechar validação' : 'Agora mostrar meu QR'}</button>

@@ -477,3 +477,8 @@ Corrige a inicialização do polyfill no Safari/iPhone quando o navegador expõe
 - Solicitação da câmera ocorre diretamente no toque do botão.
 - Fallback por foto do QR com `capture="environment"`, útil no navegador interno do WhatsApp.
 - Mantida a validação real pelo Supabase e QR com validade de 5 segundos.
+
+
+## v114 — Validação por câmera nativa
+
+A validação QR não usa mais a câmera dentro do navegador. O QR agora contém uma URL HTTPS do próprio SAQUE ON, permitindo que a câmera nativa do iPhone/Android reconheça o código e abra o aplicativo. Ao abrir o link com a sessão do jogador ativa, a checagem é enviada automaticamente ao Supabase. A validade do token continua em 5 segundos.

@@ -15,6 +15,9 @@ interface HomeViewProps {
 export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers }) => {
   const [checkOpen, setCheckOpen] = React.useState(false);
   const { currentUser } = useAuth();
+  React.useEffect(() => {
+    if (new URLSearchParams(window.location.search).has('check')) setCheckOpen(true);
+  }, []);
   const firstName = typeof currentUser?.name === 'string' && currentUser.name.trim()
     ? currentUser.name.trim().split(/\s+/)[0]
     : 'Jogador';

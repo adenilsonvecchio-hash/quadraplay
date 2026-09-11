@@ -1235,53 +1235,7 @@ body { background:linear-gradient(145deg,#edf1f3,#e3e9ec); color:var(--qp-navy);
   }
 }
 
-/* v99 — saudação mais humana com raquete de tênis animada. */
-.qp-friendly-greeting {
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.qp-clean-home__intro .qp-friendly-greeting h1 {
-  display:flex;
-  align-items:baseline;
-  flex-wrap:wrap;
-  gap:0 .25em;
-}
-.qp-friendly-greeting h1 span {
-  color:#063b74;
-  font-size:inherit;
-  font-weight:950;
-  letter-spacing:inherit;
-}
-/* v116 — carrossel de fotos reais de quadra no lugar da raquete: imagens
-   embaralhadas trocando sozinhas, sem moldura — as bordas se dissolvem em
-   transparência (máscara radial) para fundir com o fundo da tela. */
-.qp-court-carousel {
-  position:relative;
-  width:120px;
-  height:80px;
-  flex:0 0 auto;
-}
-.qp-court-slide {
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:0;
-  transition:opacity 1.15s ease;
-  -webkit-mask-image:radial-gradient(ellipse 72% 72% at 50% 50%, #000 40%, transparent 96%);
-  mask-image:radial-gradient(ellipse 72% 72% at 50% 50%, #000 40%, transparent 96%);
-  pointer-events:none;
-}
-.qp-court-slide.is-active { opacity:1; }
-@media (max-width:767px) {
-  .qp-friendly-greeting { gap:5px; }
-  .qp-clean-home__intro .qp-friendly-greeting h1 { max-width:180px; font-size:19px; line-height:1.08; }
-}
-@media (prefers-reduced-motion:reduce) {
-  .qp-court-slide { transition:none; }
-}
+
 
 /* v100 — nova marca JogarHoje, mais limpa e sem interrogação. */
 .qp-brand-logo:not(.qp-brand-logo--sport) .qp-brand-logo__lockup {

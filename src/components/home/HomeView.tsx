@@ -1,9 +1,7 @@
 import React from 'react';
 import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
 import { BrandLogo } from '../common/BrandLogo';
-import { CourtCarousel } from '../common/CourtCarousel';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -13,10 +11,6 @@ interface HomeViewProps {
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers }) => {
-  const { currentUser } = useAuth();
-  const firstName = typeof currentUser?.name === 'string' && currentUser.name.trim()
-    ? currentUser.name.trim().split(/\s+/)[0]
-    : 'Jogador';
   const actions = [
     { label: 'Agendar', helper: 'Escolha a quadra e o horário', icon: CalendarPlus, image: undefined, onClick: onStartBooking, tone: 'featured' },
     { label: 'Horários livres', helper: 'Veja a grade disponível', icon: CalendarDays, image: undefined, onClick: onViewSchedule, tone: 'blue' },
@@ -38,15 +32,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
       </header>
 
       <div className="qp-clean-home__panel">
-        <div className="qp-clean-home__intro">
-          <div>
-            <div className="qp-friendly-greeting">
-              <h1>Olá, {firstName}! <span>Vamos jogar?</span></h1>
-              <CourtCarousel />
-            </div>
-            <p>Seu próximo jogo começa aqui.</p>
-          </div>
-        </div>
         <div className="qp-action-grid">
           {actions.map(({ label, helper, icon: Icon, image, onClick, tone }) => (
             <button type="button" key={label} onClick={onClick} className={`qp-action-card qp-action-card--${tone}`}>

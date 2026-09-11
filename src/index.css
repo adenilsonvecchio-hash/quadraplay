@@ -1507,9 +1507,15 @@ body {
 .qp-jogamos-picker__item strong { font-size:11px; font-weight:900; color:#17213f; }
 .qp-jogamos-picker__item small { font-size:9px; font-weight:800; color:#8b94a8; }
 @media (max-width:767px) {
-  .qp-jogamos-button { min-width:132px; min-height:52px; padding:8px 10px; }
-  .qp-jogamos-button__copy strong { font-size:10px; }
-  .qp-jogamos-picker { width:max(210px,100%); }
+  /* Em telas estreitas o card de presença não cabe ao lado da saudação
+     (fica espremido e quebra feio). Empilha abaixo, ocupando a largura
+     inteira, como um cartão próprio. */
+  .qp-clean-home__intro { flex-wrap:wrap; row-gap:12px; }
+  .qp-jogamos-wrap { margin-left:0; width:100%; flex:1 1 100%; }
+  .qp-jogamos-button { width:100%; min-width:0; min-height:52px; padding:10px 14px; justify-content:flex-start; }
+  .qp-jogamos-button__copy strong { font-size:12px; }
+  .qp-jogamos-button__copy small { font-size:10px; }
+  .qp-jogamos-picker { left:0; right:0; width:100%; }
 }
 
 /* v110 — fluxo completo de dupla checagem por QR */

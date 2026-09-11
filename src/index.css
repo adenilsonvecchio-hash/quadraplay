@@ -1435,6 +1435,28 @@ body {
 /* v107 — subtítulo do SAQUE ON */
 .qp-tennis-label { display:block; margin-top:4px; color:#7f899d; font-size:9px; font-weight:900; letter-spacing:2px; text-align:center; text-transform:uppercase; }
 
+/* v117 — "Agendamento de horário" em destaque na Home, como um selo do
+   propósito principal do app. Ícone + texto maiores, com leve contraste de
+   fundo pra não passar batido. */
+.qp-tennis-label--home {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:9px;
+  padding:6px 14px;
+  border-radius:999px;
+  background:rgba(11,63,120,.08);
+  border:1px solid rgba(11,63,120,.14);
+  color:#0b3f78;
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:1.4px;
+}
+.qp-tennis-label--home svg { color:#f0aa00; flex-shrink:0; }
+@media (min-width:768px) {
+  .qp-tennis-label--home { font-size:13px; padding:7px 16px; letter-spacing:1.8px; }
+}
+
 /* v110 — fluxo completo de dupla checagem por QR */
 .qp-check-steps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:10px 0 4px}
 .qp-check-steps span{font-size:9px;font-weight:900;color:#9aa2b4;background:#f3f5f9;border:1px solid #e6e9f0;border-radius:999px;padding:5px 8px}

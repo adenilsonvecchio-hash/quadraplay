@@ -1,5 +1,5 @@
 import React from 'react';
-import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'lucide-react';
+import { CalendarCheck, CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'lucide-react';
 import { NotificationsBell } from '../common/NotificationsBell';
 import { BrandLogo } from '../common/BrandLogo';
 
@@ -25,7 +25,10 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
 <div className="qp-header-brands" aria-hidden="true" />
           <div className="qp-clean-home__title">
             <BrandLogo className="qp-standard-brand" />
-            <span className="qp-tennis-label">AGENDAMENTO DE HORÁRIO</span>
+            <span className="qp-tennis-label qp-tennis-label--home">
+              <CalendarCheck size={13} strokeWidth={2.6} aria-hidden="true" />
+              Agendamento de horário
+            </span>
           </div>
           <NotificationsBell variant="dark" onOpenMatches={onViewAllMatches} />
         </div>

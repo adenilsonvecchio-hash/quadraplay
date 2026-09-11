@@ -1475,49 +1475,6 @@ body {
 /* v107 — subtítulo do SAQUE ON */
 .qp-tennis-label { display:block; margin-top:4px; color:#7f899d; font-size:9px; font-weight:900; letter-spacing:2px; text-align:center; text-transform:uppercase; }
 
-/* v114 — botão único de check-in de presença (JOGAMOS) */
-.qp-jogamos-wrap { position:relative; margin-left:auto; flex:0 0 auto; }
-.qp-jogamos-button {
-  margin-left:0; min-width:166px; min-height:62px; padding:9px 13px; flex:0 0 auto; width:100%;
-  display:flex; align-items:center; justify-content:center; gap:9px;
-  border:1px solid rgba(255,255,255,.98); border-radius:18px;
-  background:rgba(255,255,255,.94); color:#0b3f78;
-  box-shadow:0 10px 26px rgba(52,59,95,.11), inset 0 1px 0 rgba(255,255,255,.9);
-  font-size:12px; font-weight:900; transition:transform .15s ease, box-shadow .15s ease;
-}
-.qp-jogamos-button:active { transform:scale(.97); box-shadow:0 6px 16px rgba(52,59,95,.09); }
-.qp-jogamos-button:disabled { opacity:.8; }
-.qp-jogamos-button svg { color:#f0aa00; flex-shrink:0; }
-.qp-jogamos-button--done { background:#e9f9f0; border-color:#bdeccf; color:#0f5132; }
-.qp-jogamos-button--done svg { color:#22c55e; }
-.qp-jogamos-button--error { background:#fdecec; border-color:#f6c6c6; color:#8a1f1f; }
-.qp-jogamos-button__copy { display:flex; flex-direction:column; align-items:flex-start; line-height:1.15; text-align:left; }
-.qp-jogamos-button__copy small { margin-top:4px; font-size:9px; font-weight:800; color:#8b94a8; }
-.qp-jogamos-picker {
-  position:absolute; top:calc(100% + 8px); right:0; z-index:40; width:max(240px,100%);
-  display:flex; flex-direction:column; gap:4px; padding:6px;
-  border:1px solid #eef0f5; border-radius:16px; background:#fff;
-  box-shadow:0 16px 36px rgba(25,36,76,.18);
-}
-.qp-jogamos-picker__item {
-  display:flex; flex-direction:column; align-items:flex-start; gap:2px;
-  padding:8px 10px; border-radius:12px; text-align:left; background:transparent;
-}
-.qp-jogamos-picker__item:hover, .qp-jogamos-picker__item:active { background:#f6f8fb; }
-.qp-jogamos-picker__item strong { font-size:11px; font-weight:900; color:#17213f; }
-.qp-jogamos-picker__item small { font-size:9px; font-weight:800; color:#8b94a8; }
-@media (max-width:767px) {
-  /* Em telas estreitas o card de presença não cabe ao lado da saudação
-     (fica espremido e quebra feio). Empilha abaixo, ocupando a largura
-     inteira, como um cartão próprio. */
-  .qp-clean-home__intro { flex-wrap:wrap; row-gap:12px; }
-  .qp-jogamos-wrap { margin-left:0; width:100%; flex:1 1 100%; }
-  .qp-jogamos-button { width:100%; min-width:0; min-height:52px; padding:10px 14px; justify-content:flex-start; }
-  .qp-jogamos-button__copy strong { font-size:12px; }
-  .qp-jogamos-button__copy small { font-size:10px; }
-  .qp-jogamos-picker { left:0; right:0; width:100%; }
-}
-
 /* v110 — fluxo completo de dupla checagem por QR */
 .qp-check-steps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin:10px 0 4px}
 .qp-check-steps span{font-size:9px;font-weight:900;color:#9aa2b4;background:#f3f5f9;border:1px solid #e6e9f0;border-radius:999px;padding:5px 8px}

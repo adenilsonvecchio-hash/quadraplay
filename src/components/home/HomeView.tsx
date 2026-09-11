@@ -3,7 +3,6 @@ import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'luc
 import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
 import { BrandLogo } from '../common/BrandLogo';
-import { JogamosButton } from '../matches/JogamosButton';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -46,7 +45,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
             </div>
             <p>Seu próximo jogo começa aqui.</p>
           </div>
-          <JogamosButton />
         </div>
         <div className="qp-action-grid">
           {actions.map(({ label, helper, icon: Icon, image, onClick, tone }) => (

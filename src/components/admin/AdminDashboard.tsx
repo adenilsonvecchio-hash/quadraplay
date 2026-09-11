@@ -21,6 +21,8 @@ import {
   X,
   Copy,
   Printer,
+  MapPin,
+  ExternalLink,
 } from 'lucide-react';
 import { ConfirmModal } from '../common/ConfirmModal';
 import { getActiveSportId, getSport } from '../../data/sports';
@@ -84,6 +86,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
   // Cancellation Modal
   const [cancellingMatch, setCancellingMatch] = useState<Match | null>(null);
+  const [locationMatch, setLocationMatch] = useState<Match | null>(null);
+  const [locationData, setLocationData] = useState<{
+    player1: { at?: string; lat?: number; lng?: number };
+    player2: { at?: string; lat?: number; lng?: number };
+    distanceMeters?: number;
+  } | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationError, setLocationError] = useState('');
+
+  const LOCATION_MATCH_RADIUS_M = 150;
+
+  const handleViewLocation = async (match: Match) => {
+    setLocationMatch(match);
+    setLocationData(null);
+    setLocationError('');
+    if (!usingSupabase) {
+      setLocationError('A localização só fica disponível quando o app está conectado ao Supabase.');
+      return;
+    }
+    setLocationLoading(true);
+    try {
+      const data = await supabaseAgendaService.obterLocalizacaoPartida(match.id);
+      setLocationData(data);
+    } catch (error) {
+      setLocationError(error instanceof Error ? error.message : 'Não foi possível carregar a localização.');
+    } finally {
+      setLocationLoading(false);
+    }
+  };
 
   // Deletion Modal
   const [deletingPlayer, setDeletingPlayer] = useState<Player | null>(null);
@@ -349,6 +380,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
     if (matchClassFilter === 'ALL') return true;
     return m.tennisClass === matchClassFilter;
   });
+  const matchesWithCheckIn = (Array.isArray(matches) ? matches : [])
+    .filter((m) => m.checkedPlayer1At || m.checkedPlayer2At)
+    .sort((a, b) => `${b.date} ${b.startTime}`.localeCompare(`${a.date} ${a.startTime}`));
   const dailyMatches = (Array.isArray(matches) ? matches : [])
     .filter((match) => match.date === reportDate)
     .sort((a, b) => a.startTime.localeCompare(b.startTime));
@@ -614,16 +648,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                       </span>
                     </div>
 
-                    {m.status === 'scheduled' && (
-                      <button
-                        id={`btn-admin-cancel-match-${m.id}`}
-                        onClick={() => setCancellingMatch(m)}
-                        className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 hover:bg-rose-50 px-2 py-1 rounded-lg"
-                      >
-                        <XCircle className="w-3.5 h-3.5" />
-                        <span>Cancelar</span>
-                      </button>
-                    )}
+                    <div className="flex items-center gap-1">
+                      {(m.checkedPlayer1At || m.checkedPlayer2At) && (
+                        <button
+                          id={`btn-admin-view-location-${m.id}`}
+                          onClick={() => void handleViewLocation(m)}
+                          className="text-xs font-bold text-slate-600 hover:text-[#0b1742] flex items-center gap-1 hover:bg-slate-100 px-2 py-1 rounded-lg"
+                          title="Ver localização registrada no check-in"
+                        >
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span>Localização</span>
+                        </button>
+                      )}
+                      {m.status === 'scheduled' && (
+                        <button
+                          id={`btn-admin-cancel-match-${m.id}`}
+                          onClick={() => setCancellingMatch(m)}
+                          className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 hover:bg-rose-50 px-2 py-1 rounded-lg"
+                        >
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>Cancelar</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between text-xs">
@@ -635,6 +682,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
                       <p className="text-slate-500 mt-0.5">
                         {formatFriendlyDate(m.date)} • {m.startTime} às {m.endTime}
                       </p>
+                      {(m.checkedPlayer1At || m.checkedPlayer2At) && (
+                        <p className="mt-1 text-[10px] font-bold text-slate-500 flex items-center gap-2">
+                          <span className={m.checkedPlayer1At ? 'text-emerald-600' : 'text-slate-300'}>● {m.player1Name}{m.checkedPlayer1At ? ' presente' : ''}</span>
+                          <span className={m.checkedPlayer2At ? 'text-emerald-600' : 'text-slate-300'}>● {m.player2Name}{m.checkedPlayer2At ? ' presente' : ''}</span>
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -710,7 +763,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
 
       {/* TAB 4: CONFIGURAÇÕES DA QUADRA */}
       {activeTab === 'config' && (
-        <form onSubmit={handleSaveConfig} className="bg-white p-5 rounded-3xl border border-slate-200 space-y-4 shadow-sm">
+        <div className="space-y-3">
+          <section className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+            <div>
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">Verificação de presença</h3>
+              <p className="text-[11px] font-semibold text-slate-500 mt-1">Em caso de dúvida sobre um jogo, veja aqui a localização registrada no check-in de cada jogador. Visível somente para administradores.</p>
+            </div>
+            {matchesWithCheckIn.length === 0 ? (
+              <p className="text-xs font-bold text-slate-400 text-center py-4">Nenhum jogo com check-in registrado ainda.</p>
+            ) : (
+              <div className="space-y-2 max-h-72 overflow-auto pr-1">
+                {matchesWithCheckIn.map((m) => (
+                  <div key={`loc-${m.id}`} className="flex items-center justify-between gap-2 rounded-2xl border border-slate-200 p-3">
+                    <div className="min-w-0">
+                      <p className="text-xs font-black text-slate-900 truncate">{m.player1Name} × {m.player2Name}</p>
+                      <p className="text-[10px] font-bold text-slate-400 mt-0.5">{formatFriendlyDate(m.date)} • {m.startTime}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => void handleViewLocation(m)}
+                      className="shrink-0 text-xs font-black text-[#0b3f78] flex items-center gap-1 hover:bg-slate-100 px-2.5 py-1.5 rounded-xl border border-slate-200"
+                    >
+                      <MapPin className="w-3.5 h-3.5" />
+                      <span>Ver localização</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <form onSubmit={handleSaveConfig} className="bg-white p-5 rounded-3xl border border-slate-200 space-y-4 shadow-sm">
           <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">
             Horários & Regras da Quadra
           </h3>
@@ -823,6 +906,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           </button>
           {configSaved && <p className="text-center text-xs font-black text-emerald-700">Configurações salvas com sucesso.</p>}
         </form>
+        </div>
       )}
 
       {/* PLAYER MODAL (Create/Edit) */}
@@ -1100,6 +1184,75 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onBack }) => {
           setDeleteError(null);
         }}
       />
+
+      {/* MATCH LOCATION PANEL — somente admin, sob demanda */}
+      {locationMatch && (
+        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-[#091634]/30 backdrop-blur-sm" onClick={() => setLocationMatch(null)}>
+          <div className="w-full max-w-sm rounded-3xl bg-white shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-wider text-amber-600">Localização da partida</p>
+                <h3 className="mt-0.5 text-base font-black text-slate-900">{locationMatch.player1Name} × {locationMatch.player2Name}</h3>
+              </div>
+              <button type="button" onClick={() => setLocationMatch(null)} className="w-9 h-9 grid place-items-center rounded-xl bg-slate-100 text-slate-500"><X className="w-4 h-4" /></button>
+            </div>
+
+            <div className="p-5 space-y-3">
+              {locationLoading && <p className="text-xs font-bold text-slate-500 text-center py-6">Carregando localização registrada...</p>}
+              {!locationLoading && locationError && <p className="text-xs font-bold text-rose-600 text-center py-6">{locationError}</p>}
+
+              {!locationLoading && !locationError && locationData && (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { name: locationMatch.player1Name, info: locationData.player1 },
+                      { name: locationMatch.player2Name, info: locationData.player2 },
+                    ].map(({ name, info }) => (
+                      <div key={name} className="rounded-2xl border border-slate-200 p-3">
+                        <p className="text-xs font-black text-slate-900 truncate">{name}</p>
+                        {info.lat != null && info.lng != null ? (
+                          <>
+                            <p className="mt-1 text-[10px] font-bold text-emerald-600">📍 Local registrado</p>
+                            {info.at && <p className="text-[9px] font-bold text-slate-400 mt-0.5">{new Date(info.at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>}
+                            <a
+                              href={`https://www.google.com/maps/search/?api=1&query=${info.lat},${info.lng}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="mt-2 inline-flex items-center gap-1 text-[9px] font-black text-[#0b3f78] hover:underline"
+                            >
+                              Ver no mapa <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </>
+                        ) : (
+                          <p className="mt-1 text-[10px] font-bold text-slate-400">Sem localização (permissão negada ou ainda não confirmou)</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {typeof locationData.distanceMeters === 'number' ? (
+                    locationData.distanceMeters <= LOCATION_MATCH_RADIUS_M ? (
+                      <div className="rounded-2xl bg-emerald-50 border border-emerald-200 px-4 py-3 text-center">
+                        <p className="text-xs font-black text-emerald-700">🟢 Presença compatível</p>
+                        <p className="text-[10px] font-bold text-emerald-600 mt-0.5">Jogadores a cerca de {Math.round(locationData.distanceMeters)} m um do outro</p>
+                      </div>
+                    ) : (
+                      <div className="rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3 text-center">
+                        <p className="text-xs font-black text-amber-700">🟡 Localizações distantes</p>
+                        <p className="text-[10px] font-bold text-amber-600 mt-0.5">Cerca de {Math.round(locationData.distanceMeters)} m de diferença — vale checar com os jogadores. GPS pode variar em áreas cobertas.</p>
+                      </div>
+                    )
+                  ) : (
+                    <div className="rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-center">
+                      <p className="text-[10px] font-bold text-slate-500">Ainda não é possível comparar: falta a localização de um dos jogadores.</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

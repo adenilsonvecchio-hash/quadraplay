@@ -1472,75 +1472,29 @@ body {
   }
 }
 
-/* v107 — validação rápida da partida e subtítulo do SAQUE ON */
+/* v107 — subtítulo do SAQUE ON */
 .qp-tennis-label { display:block; margin-top:4px; color:#7f899d; font-size:9px; font-weight:900; letter-spacing:2px; text-align:center; text-transform:uppercase; }
-.qp-check-match-button {
-  margin-left:auto; min-width:154px; min-height:58px; padding:9px 13px;
+
+/* v114 — botão único de check-in de presença (JOGAMOS) */
+.qp-jogamos-button {
+  margin-left:auto; min-width:166px; min-height:62px; padding:9px 13px; flex:0 0 auto;
   display:flex; align-items:center; justify-content:center; gap:9px;
   border:1px solid rgba(255,255,255,.98); border-radius:18px;
   background:rgba(255,255,255,.94); color:#0b3f78;
   box-shadow:0 10px 26px rgba(52,59,95,.11), inset 0 1px 0 rgba(255,255,255,.9);
-  font-size:11px; font-weight:900; transition:transform .15s ease, box-shadow .15s ease;
+  font-size:12px; font-weight:900; transition:transform .15s ease, box-shadow .15s ease;
 }
-.qp-check-match-button svg { color:#f0aa00; }
-.qp-check-match-button:active { transform:scale(.97); box-shadow:0 6px 16px rgba(52,59,95,.09); }
-
-.qp-check-modal-layer { position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center; padding:18px; background:rgba(9,22,52,.30); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px); }
-.qp-check-modal { width:min(430px,100%); max-height:min(720px,calc(100dvh - 36px)); overflow:hidden; border:1px solid rgba(255,255,255,.95); border-radius:30px; background:#fff; box-shadow:0 28px 80px rgba(25,36,76,.25); }
-.qp-check-modal__header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 19px 14px; border-bottom:1px solid #eef0f5; }
-.qp-check-modal__header span { color:#e0a000; font-size:9px; font-weight:900; letter-spacing:1.5px; }
-.qp-check-modal__header h2 { margin:3px 0 0; color:#101b3d; font-size:21px; font-weight:900; }
-.qp-check-modal__header button { width:38px; height:38px; display:grid; place-items:center; border-radius:13px; background:#f4f5f8; color:#4e5871; }
-.qp-check-modal__body { padding:17px; overflow:auto; max-height:calc(100dvh - 120px); }
-.qp-check-match-card { display:flex; flex-direction:column; align-items:center; gap:5px; padding:11px 13px; border-radius:17px; background:#f6f8fb; text-align:center; }
-.qp-check-match-card strong { color:#17213f; font-size:13px; font-weight:900; }
-.qp-check-match-card span { display:flex; align-items:center; gap:4px; color:#7d879b; font-size:10px; font-weight:800; }
-.qp-qr-box { width:286px; height:286px; margin:15px auto 8px; display:grid; place-items:center; border:1px solid #edf0f5; border-radius:25px; background:#fff; box-shadow:0 12px 32px rgba(38,48,84,.08); overflow:hidden; }
-.qp-qr-box img { width:260px; height:260px; display:block; }
-.qp-qr-box.is-expired { background:#f8f9fb; }
-.qp-qr-expired { display:flex; flex-direction:column; align-items:center; gap:5px; color:#8a93a7; text-align:center; }
-.qp-qr-expired strong { color:#59637b; font-size:14px; }
-.qp-qr-expired span { font-size:11px; font-weight:700; }
-.qp-qr-countdown { display:flex; align-items:center; justify-content:center; gap:7px; color:#7b8498; font-size:11px; font-weight:800; }
-.qp-qr-countdown strong { min-width:29px; padding:4px 7px; border-radius:999px; background:#fff3c8; color:#9a6b00; text-align:center; }
-.qp-check-hint { max-width:330px; margin:9px auto 13px; color:#7c8598; text-align:center; font-size:10px; line-height:1.5; font-weight:700; }
-.qp-check-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.qp-check-primary, .qp-check-secondary { min-height:43px; display:flex; align-items:center; justify-content:center; gap:6px; border-radius:14px; font-size:10px; font-weight:900; }
-.qp-check-primary { background:#f5b400; color:#13203d; box-shadow:0 8px 18px rgba(245,180,0,.20); }
-.qp-check-secondary { border:1px solid #e7eaf1; background:#f7f8fb; color:#243150; }
-.qp-check-copy { width:100%; margin-top:9px; min-height:36px; display:flex; align-items:center; justify-content:center; gap:6px; color:#8a93a7; font-size:9px; font-weight:900; }
-.qp-check-empty { min-height:300px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:#8a93a7; text-align:center; }
-.qp-check-empty strong { color:#34405d; font-size:14px; }
-.qp-check-empty p { max-width:250px; font-size:11px; line-height:1.5; font-weight:700; }
-.qp-scanner { display:flex; flex-direction:column; gap:12px; }
-.qp-scanner__frame { position:relative; width:100%; aspect-ratio:1; overflow:hidden; border-radius:24px; background:#101827; }
-.qp-scanner__frame::after { content:''; position:absolute; inset:18%; border:2px solid rgba(245,180,0,.9); border-radius:18px; box-shadow:0 0 0 999px rgba(3,12,28,.20); pointer-events:none; }
-.qp-scanner__frame video { width:100%; height:100%; object-fit:cover; display:block; }
-.qp-scanner__title { display:flex; align-items:center; justify-content:center; gap:7px; color:#182443; font-size:12px; font-weight:900; text-align:center; }
-.qp-scanner__message { padding:10px; border-radius:14px; background:#f4f7fb; color:#59647b; text-align:center; font-size:10px; line-height:1.45; font-weight:800; }
-@media (max-width:520px) {
-  .qp-check-match-button { min-width:130px; }
-}
-@media (max-width:380px) {
-  .qp-check-match-button { min-width:118px; padding-inline:10px; }
-  .qp-check-match-button strong { font-size:10px; }
-  .qp-qr-box { width:250px; height:250px; }
-  .qp-qr-box img { width:228px; height:228px; }
-  .qp-check-actions { grid-template-columns:1fr; }
-}
-
-/* v108 — área direita da Home reservada exclusivamente para checagem da partida. */
-.qp-clean-home__intro .qp-check-match-button--home {
-  min-width:166px;
-  min-height:62px;
-  flex:0 0 auto;
-}
-.qp-check-match-button__copy { display:flex; flex-direction:column; align-items:flex-start; line-height:1.05; }
-.qp-check-match-button__copy strong { font-size:12px; }
-.qp-check-match-button__copy small { margin-top:4px; font-size:9px; font-weight:800; color:#8b94a8; }
+.qp-jogamos-button:active { transform:scale(.97); box-shadow:0 6px 16px rgba(52,59,95,.09); }
+.qp-jogamos-button:disabled { opacity:.8; }
+.qp-jogamos-button svg { color:#f0aa00; flex-shrink:0; }
+.qp-jogamos-button--done { background:#e9f9f0; border-color:#bdeccf; color:#0f5132; }
+.qp-jogamos-button--done svg { color:#22c55e; }
+.qp-jogamos-button--error { background:#fdecec; border-color:#f6c6c6; color:#8a1f1f; }
+.qp-jogamos-button__copy { display:flex; flex-direction:column; align-items:flex-start; line-height:1.15; text-align:left; }
+.qp-jogamos-button__copy small { margin-top:4px; font-size:9px; font-weight:800; color:#8b94a8; }
 @media (max-width:767px) {
-  .qp-clean-home__intro .qp-check-match-button--home { min-width:132px; min-height:52px; padding:8px 10px; }
-  .qp-check-match-button__copy strong { font-size:10px; }
+  .qp-jogamos-button { min-width:132px; min-height:52px; padding:8px 10px; }
+  .qp-jogamos-button__copy strong { font-size:10px; }
 }
 
 /* v110 — fluxo completo de dupla checagem por QR */

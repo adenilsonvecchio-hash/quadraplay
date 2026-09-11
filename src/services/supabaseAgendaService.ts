@@ -429,6 +429,42 @@ export const supabaseAgendaService = {
     };
   },
 
+  // Confirmação de presença com um toque ("JOGAMOS"). A localização é
+  // opcional (se o navegador/jogador negar a permissão, a presença ainda é
+  // registrada) e nunca volta para o cliente — só o status de confirmação.
+  async confirmarPresenca(matchId: string, coords?: { lat: number; lng: number }): Promise<{ jaTinhaConfirmado: boolean; ambosConfirmaram: boolean }> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { data, error } = await supabase.rpc('confirmar_presenca_jogamos', {
+      p_match_id: matchId,
+      p_lat: coords?.lat ?? null,
+      p_lng: coords?.lng ?? null,
+    });
+    if (error) throw new Error(error.message || 'Não foi possível registrar sua presença.');
+    if (!data?.ok) throw new Error('Não foi possível registrar sua presença.');
+    return {
+      jaTinhaConfirmado: Boolean(data.ja_tinha_confirmado),
+      ambosConfirmaram: Boolean(data.ambos_confirmaram),
+    };
+  },
+
+  // Somente para admins: busca a localização registrada de cada jogador no
+  // momento do check-in e a distância entre os dois pontos, calculada no
+  // banco. Usado na tela de relatório, sob demanda.
+  async obterLocalizacaoPartida(matchId: string): Promise<{
+    player1: { at?: string; lat?: number; lng?: number };
+    player2: { at?: string; lat?: number; lng?: number };
+    distanceMeters?: number;
+  }> {
+    if (!supabase) throw new Error('Supabase não configurado.');
+    const { data, error } = await supabase.rpc('obter_localizacao_partida', { p_match_id: matchId });
+    if (error) throw new Error(error.message || 'Não foi possível carregar a localização.');
+    return {
+      player1: { at: data?.jogador_1_em || undefined, lat: data?.jogador_1_lat ?? undefined, lng: data?.jogador_1_lng ?? undefined },
+      player2: { at: data?.jogador_2_em || undefined, lat: data?.jogador_2_lat ?? undefined, lng: data?.jogador_2_lng ?? undefined },
+      distanceMeters: typeof data?.distancia_metros === 'number' ? data.distancia_metros : undefined,
+    };
+  },
+
   async submitMatchResult(matchId: string, playerId: string, outcome: MatchOutcome, score: MatchScoreSet[]): Promise<void> {
     if (!supabase) throw new Error('Supabase não configurado.');
     const { data, error } = await supabase

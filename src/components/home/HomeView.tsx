@@ -1,9 +1,9 @@
 import React from 'react';
-import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, QrCode, Users } from 'lucide-react';
+import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
 import { BrandLogo } from '../common/BrandLogo';
-import { MatchCheckModal } from '../matches/MatchCheckModal';
+import { JogamosButton } from '../matches/JogamosButton';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -13,11 +13,7 @@ interface HomeViewProps {
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMatches, onViewSchedule, onViewPlayers }) => {
-  const [checkOpen, setCheckOpen] = React.useState(false);
   const { currentUser } = useAuth();
-  React.useEffect(() => {
-    if (new URLSearchParams(window.location.search).has('check')) setCheckOpen(true);
-  }, []);
   const firstName = typeof currentUser?.name === 'string' && currentUser.name.trim()
     ? currentUser.name.trim().split(/\s+/)[0]
     : 'Jogador';
@@ -50,10 +46,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
             </div>
             <p>Seu próximo jogo começa aqui.</p>
           </div>
-          <button type="button" className="qp-check-match-button qp-check-match-button--home" onClick={() => setCheckOpen(true)} aria-label="Checar partida">
-            <QrCode className="w-8 h-8" strokeWidth={1.8} />
-            <span className="qp-check-match-button__copy"><strong>Checar partida</strong><small>Validar jogo</small></span>
-          </button>
+          <JogamosButton />
         </div>
         <div className="qp-action-grid">
           {actions.map(({ label, helper, icon: Icon, image, onClick, tone }) => (
@@ -66,7 +59,6 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
           ))}
         </div>
       </div>
-      {checkOpen && <MatchCheckModal onClose={() => setCheckOpen(false)} />}
     </section>
   );
 };

@@ -61,16 +61,16 @@ begin
   if sou_jogador_1 then
     ja_confirmou := partida.checagem_jogador_1_em is not null;
     update public.partidas set
-      checagem_jogador_1_em := coalesce(checagem_jogador_1_em, agora),
-      checagem_jogador_1_lat := coalesce(checagem_jogador_1_lat, p_lat),
-      checagem_jogador_1_lng := coalesce(checagem_jogador_1_lng, p_lng)
+      checagem_jogador_1_em = coalesce(checagem_jogador_1_em, agora),
+      checagem_jogador_1_lat = coalesce(checagem_jogador_1_lat, p_lat),
+      checagem_jogador_1_lng = coalesce(checagem_jogador_1_lng, p_lng)
     where id = partida.id;
   else
     ja_confirmou := partida.checagem_jogador_2_em is not null;
     update public.partidas set
-      checagem_jogador_2_em := coalesce(checagem_jogador_2_em, agora),
-      checagem_jogador_2_lat := coalesce(checagem_jogador_2_lat, p_lat),
-      checagem_jogador_2_lng := coalesce(checagem_jogador_2_lng, p_lng)
+      checagem_jogador_2_em = coalesce(checagem_jogador_2_em, agora),
+      checagem_jogador_2_lat = coalesce(checagem_jogador_2_lat, p_lat),
+      checagem_jogador_2_lng = coalesce(checagem_jogador_2_lng, p_lng)
     where id = partida.id;
   end if;
 

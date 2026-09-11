@@ -3,6 +3,7 @@ import { CalendarDays, CalendarPlus, ChevronRight, ListChecks, Users } from 'luc
 import { useAuth } from '../../context/AuthContext';
 import { NotificationsBell } from '../common/NotificationsBell';
 import { BrandLogo } from '../common/BrandLogo';
+import { CourtCarousel } from '../common/CourtCarousel';
 
 interface HomeViewProps {
   onStartBooking: () => void;
@@ -41,7 +42,7 @@ export const HomeView: React.FC<HomeViewProps> = ({ onStartBooking, onViewAllMat
           <div>
             <div className="qp-friendly-greeting">
               <h1>Olá, {firstName}! <span>Vamos jogar?</span></h1>
-              <img className="qp-friendly-greeting__racket" src="./raquete-tenis-realista-v99.png" alt="" aria-hidden="true" />
+              <CourtCarousel />
             </div>
             <p>Seu próximo jogo começa aqui.</p>
           </div>
